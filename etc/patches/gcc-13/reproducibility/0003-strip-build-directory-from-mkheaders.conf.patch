@@ -1,0 +1,25 @@
+From b3cd904a8b4c35cd399a1c3726547a2edbe575fc Mon Sep 17 00:00:00 2001
+From: Oliver Reiche <oliver.reiche@huawei.com>
+Date: Fri, 8 Sep 2023 16:16:29 +0200
+Subject: [PATCH 3/5] Strip build directory from mkheaders.conf
+
+---
+ gcc/Makefile.in | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/gcc/Makefile.in b/gcc/Makefile.in
+index f07dfe135..56a3f8e59 100644
+--- a/gcc/Makefile.in
++++ b/gcc/Makefile.in
+@@ -4014,6 +4014,8 @@ install-mkheaders: stmp-int-hdrs install-itoolsdirs \
+ 		>> $(DESTDIR)$(itoolsdatadir)/mkheaders.conf
+ 	echo 'STMP_FIXINC="$(STMP_FIXINC)"' \
+ 		>> $(DESTDIR)$(itoolsdatadir)/mkheaders.conf
++	sed -i 's|'$${BUILD_ROOT_DIR:-/nonexistent}'|/build|g' \
++		$(DESTDIR)$(itoolsdatadir)/mkheaders.conf
+ 
+ # Use this target to install the program `collect2' under the name `collect2'.
+ install-collect2: collect2 installdirs
+-- 
+2.30.2
+

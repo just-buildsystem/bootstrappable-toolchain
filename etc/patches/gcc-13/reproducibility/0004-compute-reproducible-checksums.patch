@@ -1,0 +1,75 @@
+From 6ca5ec25d5dc33d3c54072619601e980af976050 Mon Sep 17 00:00:00 2001
+From: Oliver Reiche <oliver.reiche@huawei.com>
+Date: Mon, 21 Aug 2023 18:03:56 +0200
+Subject: [PATCH 4/5] Compute reproducible checksums
+
+... for variable toolchain paths:
+* remove linker path from gcc's checksum-options
+* disable thin archives (for stripping libbackend.a)
+* strip debug info before computing checksums
+For removing the linker path, the user needs to set
+"BUILD_ROOT_DIR" before building.
+---
+ gcc/Makefile.in     | 3 ++-
+ gcc/c/Make-lang.in  | 6 +++++-
+ gcc/cp/Make-lang.in | 6 +++++-
+ 3 files changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/gcc/Makefile.in b/gcc/Makefile.in
+index ad9a5d94c..45ea14ffa 100644
+--- a/gcc/Makefile.in
++++ b/gcc/Makefile.in
+@@ -293,7 +293,7 @@ USE_THIN_ARCHIVES = no
+ ifeq ($(THIN_ARCHIVE_SUPPORT),yes)
+ ifeq ($(AR_FLAGS),rc)
+ ifeq ($(RANLIB_FLAGS),)
+-USE_THIN_ARCHIVES = yes
++#USE_THIN_ARCHIVES = yes
+ endif
+ endif
+ endif
+@@ -2188,6 +2188,7 @@ gcc-cross$(exeext): xgcc$(exeext)
+ 
+ checksum-options:
+ 	echo "$(LINKER) $(ALL_LINKERFLAGS) $(LDFLAGS)" > checksum-options.tmp \
++	&& sed -i 's|'$${BUILD_ROOT_DIR:-/nonexistent}'|/build|g' checksum-options.tmp \
+ 	&& $(srcdir)/../move-if-change checksum-options.tmp checksum-options
+ 
+ #
+diff --git a/gcc/c/Make-lang.in b/gcc/c/Make-lang.in
+index b3b12dcff..1733b40a7 100644
+--- a/gcc/c/Make-lang.in
++++ b/gcc/c/Make-lang.in
+@@ -77,7 +77,11 @@ cc1-checksum.cc : build/genchecksum$(build_exeext) checksum-options \
+ 	   && cmp -s ../stage_current ../stage_final; then \
+ 	  cp ../prev-gcc/cc1-checksum.cc cc1-checksum.cc; \
+ 	else \
+-	  build/genchecksum$(build_exeext) $(C_OBJS) $(BACKEND) $(LIBDEPS) \
++	  rm -rf stripped_c_checksum_inputs; \
++	  mkdir stripped_c_checksum_inputs; \
++	  cp $(C_OBJS) $(BACKEND) $(LIBDEPS) stripped_c_checksum_inputs/; \
++	  strip -g stripped_c_checksum_inputs/*; \
++	  build/genchecksum$(build_exeext) $$(ls stripped_c_checksum_inputs/* | LC_ALL=C sort) \
+                      checksum-options > cc1-checksum.cc.tmp && 		 \
+ 	  $(srcdir)/../move-if-change cc1-checksum.cc.tmp cc1-checksum.cc; \
+ 	fi
+diff --git a/gcc/cp/Make-lang.in b/gcc/cp/Make-lang.in
+index 4ee26fad9..30fe695ec 100644
+--- a/gcc/cp/Make-lang.in
++++ b/gcc/cp/Make-lang.in
+@@ -135,7 +135,11 @@ cc1plus-checksum.cc : build/genchecksum$(build_exeext) checksum-options \
+ 	   && cmp -s ../stage_current ../stage_final; then \
+ 	   cp ../prev-gcc/cc1plus-checksum.cc cc1plus-checksum.cc; \
+ 	else \
+-	  build/genchecksum$(build_exeext) $(CXX_OBJS) $(BACKEND) $(CODYLIB) $(LIBDEPS) \
++	  rm -rf stripped_cp_checksum_inputs; \
++	  mkdir stripped_cp_checksum_inputs; \
++	  cp $(CXX_OBJS) $(BACKEND) $(CODYLIB) $(LIBDEPS) stripped_cp_checksum_inputs; \
++	  strip -g stripped_cp_checksum_inputs/*; \
++	  build/genchecksum$(build_exeext) $$(ls stripped_cp_checksum_inputs/* | LC_ALL=C sort) \
+                      checksum-options > cc1plus-checksum.cc.tmp &&	   \
+ 	  $(srcdir)/../move-if-change cc1plus-checksum.cc.tmp cc1plus-checksum.cc; \
+ 	fi
+-- 
+2.30.2
+

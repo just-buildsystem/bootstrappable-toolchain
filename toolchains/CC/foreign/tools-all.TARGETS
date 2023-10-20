@@ -1,0 +1,10 @@
+{ "defaults":
+  { "type": ["@", "rules", "CC/foreign", "defaults"]
+  , "base":
+    [ ["@", "busybox", "CC/foreign", "defaults"]
+    , ["@", "make", "CC/foreign", "defaults"]
+    , ["@", "cmake", "CC/foreign", "defaults"]
+    , ["@", "python", "CC/foreign", "defaults"]
+    ]
+  }
+}

@@ -1,0 +1,5 @@
+{ "defaults":
+  { "type": ["@", "rules", "patch", "defaults"]
+  , "base": [["@", "busybox", "patch", "defaults"]]
+  }
+}

@@ -1,0 +1,9 @@
+{ "defaults":
+  { "type": ["@", "rules", "patch", "defaults"]
+  , "PATCH": ["busybox/usr/bin/patch"]
+  , "toolchain": ["staged-busybox"]
+  , "PATH": ["/bin"]
+  }
+, "staged-busybox":
+  {"type": "install", "dirs": [[["", "toolchain"], "busybox"]]}
+}

@@ -1,0 +1,70 @@
+From 32088af3619e49aecec44260d594fdcf590bfe00 Mon Sep 17 00:00:00 2001
+From: Oliver Reiche <oliver.reiche@huawei.com>
+Date: Wed, 19 Jul 2023 11:55:37 +0200
+Subject: [PATCH] config.guess: Detect glibc via __GLIBC__
+
+Backport from GCC 11.1.0
+  Git commit: 53a90650663e59948f86505660604b5769cf808c and
+              74af13c174714dd3b9f1ded4b39955f003c16361
+
+Co-authored-by: Iain Sandoe <iain@sandoe.co.uk>
+Co-authored-by: Kito Cheng <kito.cheng@sifive.com>
+---
+ config.guess | 30 ++++++++++++++++++++----------
+ 1 file changed, 20 insertions(+), 10 deletions(-)
+
+diff --git a/config.guess b/config.guess
+index 081f4c8b7..3d378a144 100755
+--- a/config.guess
++++ b/config.guess
+@@ -144,9 +144,7 @@ UNAME_VERSION=`(uname -v) 2>/dev/null` || UNAME_VERSION=unknown
+ 
+ case "$UNAME_SYSTEM" in
+ Linux|GNU|GNU/*)
+-	# If the system lacks a compiler, then just pick glibc.
+-	# We could probably try harder.
+-	LIBC=gnu
++	LIBC=unknown
+ 
+ 	eval $set_cc_for_build
+ 	cat <<-EOF > "$dummy.c"
+@@ -155,17 +153,29 @@ Linux|GNU|GNU/*)
+ 	LIBC=uclibc
+ 	#elif defined(__dietlibc__)
+ 	LIBC=dietlibc
+-	#else
++	#elif defined(__GLIBC__)
+ 	LIBC=gnu
++	#else
++	#include <stdarg.h>
++ 	/* First heuristic to detect musl libc.  */
++	#ifdef __DEFINED_va_list
++	LIBC=musl
++	#endif
+ 	#endif
+ 	EOF
+-	eval "`$CC_FOR_BUILD -E "$dummy.c" 2>/dev/null | grep '^LIBC' | sed 's, ,,g'`"
++	eval "`$CC_FOR_BUILD -E "$dummy.c" 2>/dev/null | grep '^LIBC' | sed 's, ,,g'`"
+ 
+-	# If ldd exists, use it to detect musl libc.
+-	if command -v ldd >/dev/null && \
+-		ldd --version 2>&1 | grep -q ^musl
+-	then
+-	    LIBC=musl
++	# Second heuristic to detect musl libc.
++	if [ "$LIBC" = unknown ] &&
++	   command -v ldd >/dev/null &&
++	   ldd --version 2>&1 | grep -q ^musl; then
++		LIBC=musl
++	fi
++
++	# If the system lacks a compiler, then just pick glibc.
++	# We could probably try harder.
++	if [ "$LIBC" = unknown ]; then
++		LIBC=gnu
+ 	fi
+ 	;;
+ esac
+-- 
+2.30.2
+

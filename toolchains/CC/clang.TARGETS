@@ -1,0 +1,89 @@
+{ "defaults":
+  { "type": ["@", "rules", "CC", "defaults"]
+  , "arguments_config": ["TOOLCHAIN_CONFIG"]
+  , "CC": ["clang/bin/clang"]
+  , "CXX": ["clang/bin/clang++"]
+  , "AR": ["clang/bin/ar"]
+  , "CXXFLAGS":
+    { "type": "if"
+    , "cond":
+      { "type": "lookup"
+      , "key": "USE_LIBCXX"
+      , "map":
+        { "type": "var"
+        , "name": "TOOLCHAIN_CONFIG"
+        , "default": {"type": "empty_map"}
+        }
+      }
+    , "then": ["-nostdlib++", "-stdlib=libc++"]
+    }
+  , "LDFLAGS":
+    { "type": "if"
+    , "cond":
+      { "type": "lookup"
+      , "key": "STATIC_RUNLIBS"
+      , "map":
+        { "type": "var"
+        , "name": "TOOLCHAIN_CONFIG"
+        , "default": {"type": "empty_map"}
+        }
+      }
+    , "then":
+      { "type": "++"
+      , "$1":
+        [ ["-static-libgcc"]
+        , { "type": "if"
+          , "cond":
+            { "type": "lookup"
+            , "key": "USE_LIBCXX"
+            , "map":
+              { "type": "var"
+              , "name": "TOOLCHAIN_CONFIG"
+              , "default": {"type": "empty_map"}
+              }
+            }
+          , "then":
+            [ "-Wl,--push-state"
+            , "-Wl,-Bstatic"
+            , "-lc++"
+            , "-lc++abi"
+            , "-Wl,--pop-state"
+            , "-lpthread"
+            ]
+          , "else": ["-static-libstdc++", "-l:libstdc++.a"]
+          }
+        ]
+      }
+    }
+  , "deps":
+    { "type": "if"
+    , "cond":
+      { "type": "lookup"
+      , "key": "STATIC_RUNLIBS"
+      , "map":
+        { "type": "var"
+        , "name": "TOOLCHAIN_CONFIG"
+        , "default": {"type": "empty_map"}
+        }
+      }
+    , "then": []
+    , "else":
+      { "type": "if"
+      , "cond":
+        { "type": "lookup"
+        , "key": "USE_LIBCXX"
+        , "map":
+          { "type": "var"
+          , "name": "TOOLCHAIN_CONFIG"
+          , "default": {"type": "empty_map"}
+          }
+        }
+      , "then": [["@", "clang", "", "runlibs_libcxx"]]
+      , "else": [["@", "clang", "", "runlibs"]]
+      }
+    }
+  , "toolchain": ["staged-clang"]
+  , "PATH": ["$(TOOLCHAIN)/clang/bin", "/bin"]
+  }
+, "staged-clang": {"type": "install", "dirs": [[["", "toolchain"], "clang"]]}
+}

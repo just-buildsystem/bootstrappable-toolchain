@@ -1,0 +1,10 @@
+{ "toolchain":
+  { "type": "install"
+  , "dirs":
+    [ [["@", "busybox", "", "toolchain"], "busybox"]
+    , [["@", "make", "", "toolchain"], "make"]
+    , [["@", "cmake", "", "toolchain"], "cmake"]
+    , [["@", "python", "", "toolchain"], "python"]
+    ]
+  }
+}

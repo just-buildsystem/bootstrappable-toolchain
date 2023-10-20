@@ -1,0 +1,46 @@
+From 8dfe03984e5c8060b5baabd19478db9f89bc43d0 Mon Sep 17 00:00:00 2001
+From: Oliver Reiche <oliver.reiche@huawei.com>
+Date: Thu, 29 Jun 2023 15:47:17 +0200
+Subject: [PATCH 1/4] Non-behavioral changing fix in gcc/cp/rtti.c
+
+... to fix an infinite loop that occurs in the "cc1plus"
+binary, if it was compiled with TinyCC version 0.9.27. Upon
+closer inspection, the loop was infinitely executing the
+lines 814, 820, and 823 of the following snippet:
+
+---
+812: function(...) {
+813:     while (true) {
+814:         if (...)
+...
+820:         else if (...)
+...
+822:         else
+823:             return ...;
+824: }
+---
+
+Presumably, TinyCC somehow generates instructions that are
+not able to exit the function from the return-statement
+inside the while loop. The solution is a non-behavioral
+changing fix: insert a break-statement in line 823 and
+thereby move the return-statement outside the while loop.
+---
+ gcc/cp/rtti.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/gcc/cp/rtti.c b/gcc/cp/rtti.c
+index 30383ed18..faf639115 100644
+--- a/gcc/cp/rtti.c
++++ b/gcc/cp/rtti.c
+@@ -820,6 +820,7 @@ target_incomplete_p (tree type)
+     else if (TREE_CODE (type) == POINTER_TYPE)
+       type = TREE_TYPE (type);
+     else
++      break;
+       return !COMPLETE_OR_VOID_TYPE_P (type);
+ }
+ 
+-- 
+2.30.2
+

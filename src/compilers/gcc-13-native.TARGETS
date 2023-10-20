@@ -1,0 +1,193 @@
+{ "toolchain":
+  { "type": "configure"
+  , "arguments_config": ["ARCH", "TARGET_ARCH", "BUILD_ARCH"]
+  , "config":
+    { "type": "if"
+    , "cond":
+      { "type": "=="
+      , "$1":
+        { "type": "var"
+        , "name": "TARGET_ARCH"
+        , "default": {"type": "var", "name": "ARCH"}
+        }
+      , "$2":
+        { "type": "var"
+        , "name": "BUILD_ARCH"
+        , "default": {"type": "var", "name": "ARCH"}
+        }
+      }
+    , "then": {"type": "empty_map"}
+    , "else":
+      {"type": "fail", "msg": "gcc-native does not support cross-compilation."}
+    }
+  , "target": "toolchain_native"
+  }
+, "toolchain_native":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "target": "gcc-native"
+  }
+, "runlibs":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "target": "libstdc++"
+  }
+, "original_sources_and_patches":
+  { "type": "install"
+  , "dirs":
+    [[["TREE", null, "."], "src"], [["@", "patches", "", "gcc-13"], "patches"]]
+  }
+, "patched_sources":
+  { "type": ["@", "rules", "CC/foreign/shell", "data"]
+  , "project": ["original_sources_and_patches"]
+  , "cmds":
+    [ "cp -r src/. ${DESTDIR}/."
+    , "cd ${DESTDIR}"
+    , "chmod -R +w *"
+    , "for p in $(cat ${WORKDIR}/patches/gcc-13/reproducibility/series); do"
+    , "  patch -p1 < ${WORKDIR}/patches/gcc-13/reproducibility/$p >/dev/null"
+    , "done"
+    ]
+  , "out_dirs": ["."]
+  }
+, "patched_separate_sources":
+  { "type": "install"
+  , "dirs":
+    [ ["patched_sources", "src"]
+    , [["@", "gmp", "", "files"], "gmp"]
+    , [["@", "mpc", "", "files"], "mpc"]
+    , [["@", "mpfr", "", "files"], "mpfr"]
+    ]
+  }
+, "gcc-native":
+  { "type": ["@", "rules", "CC/foreign/shell", "data"]
+  , "arguments_config": ["TOOLCHAIN_CONFIG"]
+  , "project": ["patched_separate_sources"]
+  , "localbase": [["@", "binutils", "", "binutils"]]
+  , "cmds":
+    [ { "type": "join"
+      , "$1":
+        [ "HOST_SYSTEM_HDR_DIR='"
+        , { "type": "lookup"
+          , "key": "HOST_SYSTEM_HDR_DIR"
+          , "map":
+            { "type": "var"
+            , "name": "TOOLCHAIN_CONFIG"
+            , "default": {"type": "empty_map"}
+            }
+          , "default": ""
+          }
+        , "'"
+        ]
+      }
+    , { "type": "join"
+      , "$1":
+        [ "HOST_SYSTEM_LIB_DIR='"
+        , { "type": "lookup"
+          , "key": "HOST_SYSTEM_LIB_DIR"
+          , "map":
+            { "type": "var"
+            , "name": "TOOLCHAIN_CONFIG"
+            , "default": {"type": "empty_map"}
+            }
+          , "default": ""
+          }
+        , "'"
+        ]
+      }
+    , { "type": "join"
+      , "$1":
+        [ "HOST_DYNAMIC_LINKER='"
+        , { "type": "lookup"
+          , "key": "HOST_DYNAMIC_LINKER"
+          , "map":
+            { "type": "var"
+            , "name": "TOOLCHAIN_CONFIG"
+            , "default": {"type": "empty_map"}
+            }
+          , "default": ""
+          }
+        , "'"
+        ]
+      }
+    , "export NJOBS=$(nproc --all 2>/dev/null || echo 1)"
+    , "export PATH=${LOCALBASE}/bin:$PATH"
+    , "export MAKEINFO=missing"
+    , "export BUILD_ROOT_DIR=${ACTION_DIR}"
+    , "unset CFLAGS CXXFLAGS LDFLAGS"
+    , "CONF_ARGS="
+    , "if [ -n \"$HOST_SYSTEM_HDR_DIR\" ]; then"
+    , "  CONF_ARGS=\"$CONF_ARGS --with-sysroot=/ --with-native-system-header-dir=$HOST_SYSTEM_HDR_DIR\""
+    , "fi"
+    , "LINK_ARGS="
+    , "if [ -n \"$HOST_SYSTEM_LIB_DIR\" ]; then"
+    , "  export LIBRARY_PATH=\"$HOST_SYSTEM_LIB_DIR\""
+    , "  LINK_ARGS=\"$LINK_ARGS -B$HOST_SYSTEM_LIB_DIR -L$HOST_SYSTEM_LIB_DIR\""
+    , "  LINK_ARGS=\"$LINK_ARGS -Xlinker -rpath -Xlinker $HOST_SYSTEM_LIB_DIR\""
+    , "fi"
+    , "if [ -n \"$HOST_DYNAMIC_LINKER\" ]; then"
+    , "  mv src/gcc/config src/gcc/config.orig"
+    , "  cp -r src/gcc/config.orig src/gcc/config"
+    , "  chmod -R +w src/gcc/config"
+    , "  for h in src/gcc/config/*/*.h; do"
+    , "    grep -q _DYNAMIC_LINKER \"$h\" || continue"
+    , "    sed -i 's|\\(^#define [A-Z]*_DYNAMIC_LINKER[A-Z0-9]* *\"\\).*\"|\\1'$HOST_DYNAMIC_LINKER'\"|g' \"$h\""
+    , "  done"
+    , "fi"
+    , "export LDFLAGS_FOR_TARGET=\"${LINK_ARGS}\""
+    , "if [ -f /lib/ld-musl-$(uname -m).so.1 ]; then"
+    , "  ln -s /lib/ld-musl-$(uname -m).so.1 ${TMPDIR}/ldd"
+    , "  export PATH=$PATH:${TMPDIR}"
+    , "fi"
+    , "cp -r ${LOCALBASE}/. ${DESTDIR}/."
+    , "chmod -R +w ${DESTDIR}/*"
+    , "mv gmp mpc mpfr src/."
+    , "cd src"
+    , "export check_msgfmt=no   # do not use system's msgfmt, if available"
+    , "./configure ${CONF_ARGS} --prefix=/ --enable-checking=release --enable-languages=c,c++ --disable-multilib --disable-libsanitizer >configure.log 2>&1 || (cat configure.log && exit 1)"
+    , "${MAKE} -j${NJOBS} >build.log 2>&1 || (cat build.log && exit 1)"
+    , "${MAKE} -j${NJOBS} DESTDIR=${DESTDIR} install-strip >>build.log 2>&1 || (cat build.log && exit 1)"
+    , "cd ${DESTDIR}"
+    , "strip ./bin/*"
+    , "find . -type f -name '*.so*' -exec sh -c \"strip {} 2>/dev/null\" \\;"
+    , "find . -type f -name '*.a' -exec sh -c \"strip -g {}\" \\;"
+    , "find . -type f -name '*.o' -exec sh -c \"strip -g {}\" \\;"
+    , "if [ -n \"${LINK_ARGS}\" ]; then"
+    , "  cd ${DESTDIR}/bin"
+    , "  mv gcc gcc.real"
+    , "  mv g++ g++.real"
+    , "  printf '#!/bin/sh\\nexec $(dirname $0)/gcc.real %s \"$@\"' \"${LINK_ARGS}\" >gcc"
+    , "  printf '#!/bin/sh\\nexec $(dirname $0)/g++.real %s \"$@\"' \"${LINK_ARGS}\" >g++"
+    , "  chmod +x gcc g++"
+    , "fi"
+    ]
+  , "out_dirs": ["."]
+  }
+, "libstdc++":
+  { "type": ["@", "rules", "CC/prebuilt", "library"]
+  , "name": ["libstdc++"]
+  , "lib": ["libstdc++_files"]
+  , "deps": ["libgcc_s"]
+  }
+, "libgcc_s":
+  { "type": ["@", "rules", "CC/prebuilt", "library"]
+  , "name": ["libgcc_s"]
+  , "lib": ["libgcc_s_files"]
+  }
+, "libstdc++_files":
+  { "type": "generic"
+  , "arguments_config": ["ENV"]
+  , "deps": ["toolchain"]
+  , "cmds": [":"]
+  , "outs": ["lib64/libstdc++.so.6"]
+  , "env": {"type": "var", "name": "ENV", "default": {"type": "empty_map"}}
+  }
+, "libgcc_s_files":
+  { "type": "generic"
+  , "arguments_config": ["ENV"]
+  , "deps": ["toolchain"]
+  , "cmds": [":"]
+  , "outs": ["lib64/libgcc_s.so.1"]
+  , "env": {"type": "var", "name": "ENV", "default": {"type": "empty_map"}}
+  }
+}

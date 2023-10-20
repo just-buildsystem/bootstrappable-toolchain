@@ -1,0 +1,234 @@
+From 7a642773c924589eeee2ca1be4615b35c12c6f5e Mon Sep 17 00:00:00 2001
+From: Oliver Reiche <oliver.reiche@huawei.com>
+Date: Tue, 17 Oct 2023 14:59:32 +0200
+Subject: [PATCH 4/4] Fix GMP configure to comply with newer C standards
+
+---
+ configure | 68 +++++++++++++++++++++++--------------------------------
+ 1 file changed, 28 insertions(+), 40 deletions(-)
+
+diff --git a/gmp/configure b/gmp/configure
+index c72990c..c13bea9 100755
+--- a/gmp/configure
++++ b/gmp/configure
+@@ -7752,7 +7752,7 @@ cat >conftest.c <<EOF
+ int
+ main ()
+ {
+-  exit(0);
++  return 0;
+ }
+ EOF
+ gmp_compile="$CC_FOR_BUILD conftest.c"
+@@ -7786,7 +7786,7 @@ cat >conftest.c <<EOF
+ int
+ main ()
+ {
+-  exit(0);
++  return 0;
+ }
+ EOF
+ gmp_compile="$HOST_CC conftest.c"
+@@ -7821,7 +7821,7 @@ cat >conftest.c <<EOF
+ int
+ main ()
+ {
+-  exit(0);
++  return 0;
+ }
+ EOF
+ gmp_compile="$i conftest.c"
+@@ -7904,7 +7904,7 @@ else
+ int
+ main ()
+ {
+-  exit (0);
++  return 0;
+ }
+ EOF
+ for i in .exe ,ff8 ""; do
+@@ -7941,9 +7941,9 @@ if test "${gmp_cv_c_for_build_ansi+set}" = set; then
+ else
+   cat >conftest.c <<EOF
+ int
+-main (int argc, char *argv)
++main (int argc, char **argv)
+ {
+-  exit(0);
++  return 0;
+ }
+ EOF
+ gmp_compile="$CC_FOR_BUILD conftest.c"
+@@ -7978,7 +7978,7 @@ else
+ int
+ main ()
+ {
+-  exit(0);
++  return 0;
+ }
+ double d;
+ double
+@@ -9243,7 +9243,7 @@ main ()
+     if (XOR (islower (i), ISLOWER (i))
+ 	|| toupper (i) != TOUPPER (i))
+       exit(2);
+-  exit (0);
++  return 0;
+ }
+ _ACEOF
+ rm -f conftest$ac_exeext
+@@ -24628,7 +24628,7 @@ main ()
+     if (XOR (islower (i), ISLOWER (i))
+ 	|| toupper (i) != TOUPPER (i))
+       exit(2);
+-  exit (0);
++  return 0;
+ }
+ _ACEOF
+ rm -f conftest$ac_exeext
+@@ -27932,11 +27932,11 @@ check (va_alist)
+   ret = vsnprintf (buf, 4, fmt, ap);
+ 
+   if (strcmp (buf, "hel") != 0)
+-    exit (1);
++    return 1;
+ 
+   /* allowed return values */
+   if (ret != -1 && ret != 3 && ret != 11)
+-    exit (2);
++    return 2;
+ 
+   return 0;
+ }
+@@ -27945,7 +27945,7 @@ int
+ main ()
+ {
+ $i
+-  exit (0);
++  return 0;
+ }
+ 
+ _ACEOF
+@@ -30741,25 +30741,22 @@ main ()
+ 
+   FILE *f = fopen ("conftest.val", "w");
+   if (! f)
+-    exit (1);
++    return 1;
+   if (((long) (sizeof (unsigned short))) < 0)
+     {
+       long i = longval ();
+       if (i != ((long) (sizeof (unsigned short))))
+-	exit (1);
++	return 1;
+       fprintf (f, "%ld\n", i);
+     }
+   else
+     {
+       unsigned long i = ulongval ();
+       if (i != ((long) (sizeof (unsigned short))))
+-	exit (1);
++	return 1;
+       fprintf (f, "%lu\n", i);
+     }
+-  exit (ferror (f) || fclose (f) != 0);
+-
+-  ;
+-  return 0;
++  return (ferror (f) || fclose (f) != 0);
+ }
+ _ACEOF
+ rm -f conftest$ac_exeext
+@@ -31155,25 +31152,22 @@ main ()
+ 
+   FILE *f = fopen ("conftest.val", "w");
+   if (! f)
+-    exit (1);
++    return 1;
+   if (((long) (sizeof (unsigned))) < 0)
+     {
+       long i = longval ();
+       if (i != ((long) (sizeof (unsigned))))
+-	exit (1);
++	return 1;
+       fprintf (f, "%ld\n", i);
+     }
+   else
+     {
+       unsigned long i = ulongval ();
+       if (i != ((long) (sizeof (unsigned))))
+-	exit (1);
++	return 1;
+       fprintf (f, "%lu\n", i);
+     }
+-  exit (ferror (f) || fclose (f) != 0);
+-
+-  ;
+-  return 0;
++  return (ferror (f) || fclose (f) != 0);
+ }
+ _ACEOF
+ rm -f conftest$ac_exeext
+@@ -31569,25 +31563,22 @@ main ()
+ 
+   FILE *f = fopen ("conftest.val", "w");
+   if (! f)
+-    exit (1);
++    return 1;
+   if (((long) (sizeof (unsigned long))) < 0)
+     {
+       long i = longval ();
+       if (i != ((long) (sizeof (unsigned long))))
+-	exit (1);
++	return 1;
+       fprintf (f, "%ld\n", i);
+     }
+   else
+     {
+       unsigned long i = ulongval ();
+       if (i != ((long) (sizeof (unsigned long))))
+-	exit (1);
++	return 1;
+       fprintf (f, "%lu\n", i);
+     }
+-  exit (ferror (f) || fclose (f) != 0);
+-
+-  ;
+-  return 0;
++  return (ferror (f) || fclose (f) != 0);
+ }
+ _ACEOF
+ rm -f conftest$ac_exeext
+@@ -32032,25 +32023,22 @@ main ()
+ 
+   FILE *f = fopen ("conftest.val", "w");
+   if (! f)
+-    exit (1);
++    return 1;
+   if (((long) (sizeof (mp_limb_t))) < 0)
+     {
+       long i = longval ();
+       if (i != ((long) (sizeof (mp_limb_t))))
+-	exit (1);
++	return 1;
+       fprintf (f, "%ld\n", i);
+     }
+   else
+     {
+       unsigned long i = ulongval ();
+       if (i != ((long) (sizeof (mp_limb_t))))
+-	exit (1);
++	return 1;
+       fprintf (f, "%lu\n", i);
+     }
+-  exit (ferror (f) || fclose (f) != 0);
+-
+-  ;
+-  return 0;
++  return (ferror (f) || fclose (f) != 0);
+ }
+ _ACEOF
+ rm -f conftest$ac_exeext
+-- 
+2.30.2
+

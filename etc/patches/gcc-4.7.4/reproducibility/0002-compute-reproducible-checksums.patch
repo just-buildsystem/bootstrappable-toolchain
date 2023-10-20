@@ -1,0 +1,58 @@
+From 617a9fc8ad3711fedea305881286bdc00b80a6e1 Mon Sep 17 00:00:00 2001
+From: Oliver Reiche <oliver.reiche@huawei.com>
+Date: Mon, 21 Aug 2023 18:03:56 +0200
+Subject: [PATCH 2/2] Compute reproducible checksums
+
+... for variable toolchain paths:
+* remove linker path from gcc's checksum-options
+* strip debug info before computing checksums
+For removing the linker path, the user needs to set
+"BUILD_ROOT_DIR" before building.
+---
+ gcc/Makefile.in     | 7 ++++++-
+ gcc/cp/Make-lang.in | 6 +++++-
+ 2 files changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/gcc/Makefile.in b/gcc/Makefile.in
+index f3cc49fdb..7fb30a13f 100644
+--- a/gcc/Makefile.in
++++ b/gcc/Makefile.in
+@@ -1804,12 +1804,17 @@ gcc-cross$(exeext): xgcc$(exeext)
+ 
+ checksum-options:
+ 	echo "$(LINKER) $(ALL_LINKERFLAGS) $(LDFLAGS)" > checksum-options.tmp \
++	&& sed -i 's|'$${BUILD_ROOT_DIR:-/nonexistent}'|/build|g' checksum-options.tmp \
+ 	&& $(srcdir)/../move-if-change checksum-options.tmp checksum-options
+ 
+ # compute checksum over all object files and the options
+ cc1-checksum.c : build/genchecksum$(build_exeext) checksum-options \
+ 	$(C_OBJS) $(BACKEND) $(LIBDEPS) 
+-	build/genchecksum$(build_exeext) $(C_OBJS) $(BACKEND) $(LIBDEPS) \
++	rm -rf stripped_c_checksum_inputs; \
++	mkdir stripped_c_checksum_inputs; \
++	cp $(C_OBJS) $(BACKEND) $(LIBDEPS) stripped_c_checksum_inputs/; \
++	strip -g stripped_c_checksum_inputs/*; \
++	build/genchecksum$(build_exeext) $$(ls stripped_c_checksum_inputs/* | LC_ALL=C sort) \
+                      checksum-options > cc1-checksum.c.tmp && 		 \
+ 	$(srcdir)/../move-if-change cc1-checksum.c.tmp cc1-checksum.c
+ 
+diff --git a/gcc/cp/Make-lang.in b/gcc/cp/Make-lang.in
+index 0ce01ac49..0fc43d305 100644
+--- a/gcc/cp/Make-lang.in
++++ b/gcc/cp/Make-lang.in
+@@ -95,7 +95,11 @@ cp-warn = $(STRICT_WARN)
+ # compute checksum over all object files and the options
+ cc1plus-checksum.c : build/genchecksum$(build_exeext) checksum-options \
+ 	$(CXX_OBJS) $(BACKEND) $(LIBDEPS) 
+-	build/genchecksum$(build_exeext) $(CXX_OBJS) $(BACKEND) $(LIBDEPS) \
++	rm -rf stripped_cp_checksum_inputs; \
++	mkdir stripped_cp_checksum_inputs; \
++	cp $(CXX_OBJS) $(BACKEND) $(CODYLIB) $(LIBDEPS) stripped_cp_checksum_inputs; \
++	strip -g stripped_cp_checksum_inputs/*; \
++	build/genchecksum$(build_exeext) $$(ls stripped_cp_checksum_inputs/* | LC_ALL=C sort) \
+                      checksum-options > cc1plus-checksum.c.tmp &&	   \
+ 	$(srcdir)/../move-if-change cc1plus-checksum.c.tmp cc1plus-checksum.c
+ 
+-- 
+2.30.2
+

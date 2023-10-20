@@ -1,0 +1,651 @@
+{ "main": "gcc-latest-musl+tools"
+, "repositories":
+  { "patches": {"repository": {"type": "file", "path": "etc/patches"}}
+  , "scripts": {"repository": {"type": "file", "path": "etc/scripts"}}
+  , "imports": {"repository": {"type": "file", "path": "etc/imports"}}
+  , "defaults": {"repository": {"type": "file", "path": "etc/defaults"}}
+  , "bootstrap": {"repository": {"type": "file", "path": "src/bootstrap"}}
+  , "compilers": {"repository": {"type": "file", "path": "src/compilers"}}
+  , "tools": {"repository": {"type": "file", "path": "src/tools"}}
+  , "toolchains": {"repository": {"type": "file", "path": "toolchains"}}
+  , "rules":
+    { "repository":
+      { "type": "git"
+      , "branch": "master"
+      , "commit": "90185a3c608f1428b4ce3c32bc2451f31041acc2"
+      , "repository": "https://github.com/just-buildsystem/rules-cc"
+      , "subdir": "rules"
+      }
+    }
+  , "rules/stage-0":
+    { "repository": "rules"
+    , "target_root": "defaults"
+    , "target_file_name": "stage-0.TARGETS"
+    , "rule_root": "rules"
+    }
+  , "rules/stage-1":
+    { "repository": "rules"
+    , "target_root": "defaults"
+    , "target_file_name": "stage-1.TARGETS"
+    , "rule_root": "rules"
+    , "bindings":
+      { "make": "stage-0/make"
+      , "busybox": "stage-0/busybox"
+      , "gcc": "stage-0/gcc"
+      }
+    }
+  , "rules/gcc":
+    { "repository": "rules"
+    , "target_root": "defaults"
+    , "target_file_name": "gcc.TARGETS"
+    , "rule_root": "rules"
+    , "bindings":
+      { "make": "stage-0/make"
+      , "busybox": "stage-0/busybox"
+      , "gcc": "stage-1/gcc"
+      }
+    }
+  , "rules/clang":
+    { "repository": "rules"
+    , "target_root": "defaults"
+    , "target_file_name": "clang.TARGETS"
+    , "rule_root": "rules"
+    , "bindings":
+      { "make": "stage-0/make"
+      , "busybox": "stage-0/busybox"
+      , "gcc": "compilers/gcc-13.2.0-native"
+      , "cmake": "cmake-3.27.1"
+      , "python": "python-3.12.0"
+      }
+    }
+  , "rules/static-build":
+    { "repository": "rules"
+    , "target_root": "defaults"
+    , "target_file_name": "static-build.TARGETS"
+    , "rule_root": "rules"
+    , "bindings":
+      { "make": "stage-0/make"
+      , "busybox": "stage-0/busybox"
+      , "gcc-musl": "compilers/gcc-13.2.0-musl"
+      }
+    }
+  , "imports/stage-0/gmp-4.2.4":
+    { "repository":
+      { "type": "archive"
+      , "content": "c3b7c9fa7ff0f6634dfde7ba8bf4a9afa0b3b509"
+      , "fetch": "https://ftp.gnu.org/gnu/gmp/gmp-4.2.4.tar.gz"
+      , "sha256": "09652b51e348ea459f121c01b4b7189821e06bf457fbd85382aa6f0b741b4e78"
+      , "subdir": "gmp-4.2.4"
+      }
+    , "target_root": "imports"
+    , "target_file_name": "files.TARGETS"
+    }
+  , "imports/stage-0/mpc-0.8.1":
+    { "repository":
+      { "type": "archive"
+      , "content": "4828dd699fe92fc23456a7abe58fae1aa45c9e84"
+      , "fetch": "https://gcc.gnu.org/pub/gcc/infrastructure/mpc-0.8.1.tar.gz"
+      , "sha256": "e664603757251fd8a352848276497a4c79b7f8b21fd8aedd5cc0598a38fee3e4"
+      , "subdir": "mpc-0.8.1"
+      }
+    , "target_root": "imports"
+    , "target_file_name": "files.TARGETS"
+    }
+  , "imports/stage-0/mpfr-2.3.1":
+    { "repository":
+      { "type": "archive"
+      , "content": "34118d1fdb9a271925d769458ededef8c595876f"
+      , "fetch": "https://www.mpfr.org/mpfr-2.3.1/mpfr-2.3.1.tar.gz"
+      , "sha256": "504e34cace2fe0ba2824abb66928b623965d6f5f9bc931316e6785db7ef2e790"
+      , "subdir": "mpfr-2.3.1"
+      }
+    , "target_root": "imports"
+    , "target_file_name": "files.TARGETS"
+    }
+  , "imports/stage-1/gmp-5.1.3":
+    { "repository":
+      { "type": "archive"
+      , "content": "ba6992490775f21d0926ab17b51a7b8b6ed5e586"
+      , "fetch": "https://ftp.gnu.org/gnu/gmp/gmp-5.1.3.tar.gz"
+      , "sha256": "71f37fe18b7eaffd0700c0d3c5062268c3933c7100c29f944b81d2b6e9f78527"
+      , "subdir": "gmp-5.1.3"
+      }
+    , "target_root": "imports"
+    , "target_file_name": "files.TARGETS"
+    }
+  , "imports/binutils-latest":
+    { "repository":
+      { "type": "archive"
+      , "content": "17cfb0cec609e1771ed867b2d005492329759e39"
+      , "fetch": "https://ftp.gnu.org/gnu/binutils/binutils-2.41.tar.xz"
+      , "sha256": "ae9a5789e23459e59606e6714723f2d3ffc31c03174191ef0d015bdf06007450"
+      , "subdir": "binutils-2.41"
+      }
+    , "target_root": "imports"
+    , "target_file_name": "binutils.TARGETS"
+    , "bindings": {"rules": "rules/gcc"}
+    }
+  , "imports/gmp-6.3.0":
+    { "repository":
+      { "type": "archive"
+      , "content": "eed1334cca024677702c3a4de194758cb1b15c36"
+      , "fetch": "https://gmplib.org/download/gmp/gmp-6.3.0.tar.xz"
+      , "sha256": "a3c2b80201b89e68616f4ad30bc66aee4927c3ce50e33929ca819d5c43538898"
+      , "subdir": "gmp-6.3.0"
+      }
+    , "target_root": "imports"
+    , "target_file_name": "files.TARGETS"
+    }
+  , "imports/mpc-1.3.1":
+    { "repository":
+      { "type": "archive"
+      , "content": "afd933ab8b5246004dc0767bcd3d51333d5ca720"
+      , "fetch": "https://ftp.gnu.org/gnu/mpc/mpc-1.3.1.tar.gz"
+      , "sha256": "ab642492f5cf882b74aa0cb730cd410a81edcdbec895183ce930e706c1c759b8"
+      , "subdir": "mpc-1.3.1"
+      }
+    , "target_root": "imports"
+    , "target_file_name": "files.TARGETS"
+    }
+  , "imports/mpfr-4.2.1":
+    { "repository":
+      { "type": "archive"
+      , "content": "62fb991131420c31d94e7e992c9ba798e8de866f"
+      , "fetch": "https://www.mpfr.org/mpfr-current/mpfr-4.2.1.tar.xz"
+      , "sha256": "277807353a6726978996945af13e52829e3abd7a9a5b7fb2793894e18f1fcbb2"
+      , "subdir": "mpfr-4.2.1"
+      }
+    , "target_root": "imports"
+    , "target_file_name": "files.TARGETS"
+    }
+  , "imports/linux-headers-4.19.88-1":
+    { "repository":
+      { "type": "archive"
+      , "content": "d67e9625ed2750a32eadc8abdd4a356f429e1e61"
+      , "fetch": "https://github.com/sabotage-linux/kernel-headers/releases/download/v4.19.88-1/linux-headers-4.19.88-1.tar.xz"
+      , "sha256": "995bc76ccf0c40d752b5ea67c022232a17eef6c9ec80ea74ea742e3c19992813"
+      , "subdir": "linux-headers-4.19.88-1"
+      , "pragma": {"special": "resolve-partially"}
+      }
+    , "target_root": "imports"
+    , "target_file_name": "files.TARGETS"
+    }
+  , "imports/config-3d5db9e":
+    { "repository":
+      { "type": "archive"
+      , "content": "3a01a6bdf61b589ad70e35e1abf15758f6c2aa39"
+      , "fetch": "https://git.savannah.gnu.org/gitweb/?p=config.git;a=snapshot;h=3d5db9ebe8607382d17d60faf8853c944fc5f353;sf=tgz"
+      , "sha256": "b9974284ff6f9e285c8c57f57a9b0726f48576c61edc2e94a71815198fda0827"
+      , "subdir": "config-3d5db9e"
+      }
+    , "target_root": "imports"
+    , "target_file_name": "files.TARGETS"
+    }
+  , "imports/musl-cross-make-fe915821":
+    { "repository":
+      { "type": "archive"
+      , "content": "99cdef1bbcaf683b9801453fc78aa0c59636f9a2"
+      , "fetch": "https://github.com/richfelker/musl-cross-make/archive/fe915821b652a7fa37b34a596f47d8e20bc72338.tar.gz"
+      , "sha256": "c5df9afd5efd41c97fc7f3866664ef0c91af0ff65116e27cd9cba078c7ab33ae"
+      , "subdir": "musl-cross-make-fe915821b652a7fa37b34a596f47d8e20bc72338"
+      }
+    , "target_root": "imports"
+    , "target_file_name": "musl-cross-make-fe915821.TARGETS"
+    , "bindings":
+      { "rules": "rules/gcc"
+      , "linux-headers": "imports/linux-headers-4.19.88-1"
+      , "config": "imports/config-3d5db9e"
+      , "patches": "patches"
+      }
+    }
+  , "imports/musl-1.2.4":
+    { "repository":
+      { "type": "archive"
+      , "content": "3ae819b834bf1ca20cff02cb67b7526372d58bfd"
+      , "fetch": "https://musl.libc.org/releases/musl-1.2.4.tar.gz"
+      , "sha256": "7a35eae33d5372a7c0da1188de798726f68825513b7ae3ebe97aaaa52114f039"
+      , "subdir": "musl-1.2.4"
+      }
+    , "target_root": "imports"
+    , "target_file_name": "files.TARGETS"
+    }
+  , "imports/boringssl":
+    { "repository":
+      { "type": "archive"
+      , "content": "19cdde8ba529848172c09e84e3deb2c92dc670c3"
+      , "fetch": "https://github.com/google/boringssl/archive/6195bf8242156c9a2fa75702eee058f91b86a88b.tar.gz"
+      , "sha256": "ad0b806b6c5cbd6cae121c608945d5fed468748e330632e8d53315089ad52c67"
+      , "subdir": "boringssl-6195bf8242156c9a2fa75702eee058f91b86a88b"
+      }
+    , "target_root": "imports"
+    , "target_file_name": "boringssl.TARGETS"
+    , "bindings": {"rules": "rules/static-build"}
+    }
+  , "imports/zlib":
+    { "repository":
+      { "type": "archive"
+      , "content": "d115fc690fa59d3be51b3442158876536140b6c2"
+      , "fetch": "https://github.com/madler/zlib/releases/download/v1.2.13/zlib-1.2.13.tar.gz"
+      , "sha256": "b3a24de97a8fdbc835b9833169501030b8977031bcb54b3b3ac13740f846ab30"
+      , "subdir": "zlib-1.2.13"
+      }
+    , "target_root": "imports"
+    , "target_file_name": "zlib.TARGETS"
+    , "bindings": {"rules": "rules/static-build"}
+    }
+  , "stage-0/busybox":
+    { "repository":
+      { "type": "archive"
+      , "content": "529defd1de4d1e362458e6561017ae74b2b3f28e"
+      , "fetch": "https://busybox.net/downloads/busybox-1.36.1.tar.bz2"
+      , "sha256": "b8cc24c9574d809e7279c3be349795c5d5ceb6fdf19ca709f80cde50e47de314"
+      , "subdir": "busybox-1.36.1"
+      }
+    , "target_root": "bootstrap"
+    , "target_file_name": "stage-0-busybox.TARGETS"
+    , "bindings":
+      { "rules": "rules/stage-0"
+      , "scripts": "scripts"
+      , "gcc": "stage-0/gcc"
+      , "make": "stage-0/make"
+      }
+    }
+  , "stage-0/make":
+    { "repository":
+      { "type": "archive"
+      , "content": "4adc00a78258ae2eb53d103ef2c1ecf291a86fbf"
+      , "fetch": "https://ftp.gnu.org/gnu/make/make-4.4.1.tar.gz"
+      , "sha256": "dd16fb1d67bfab79a72f5e8390735c49e3e8e70b4945a15ab1f81ddb78658fb3"
+      , "subdir": "make-4.4.1"
+      }
+    , "target_root": "bootstrap"
+    , "target_file_name": "stage-0-make.TARGETS"
+    , "bindings":
+      { "rules": "rules/stage-0"
+      , "busybox": "stage-0/busybox"
+      , "gcc": "stage-0/gcc"
+      }
+    }
+  , "stage-0/binutils":
+    { "repository": "imports/binutils-latest"
+    , "target_root": "bootstrap"
+    , "target_file_name": "stage-0-binutils.TARGETS"
+    , "bindings":
+      { "rules": "rules/stage-0"
+      , "busybox": "stage-0/busybox"
+      , "make": "stage-0/make"
+      , "scripts": "scripts"
+      }
+    }
+  , "stage-0/gcc":
+    { "repository":
+      { "type": "archive"
+      , "content": "4819a9afa95dae6ac8d5abec15049a66e3e725a0"
+      , "fetch": "https://ftp.gnu.org/gnu/gcc/gcc-4.7.4/gcc-4.7.4.tar.gz"
+      , "sha256": "ddbaa583c5d4e4f0928bf15d9f6b6c283349e16eedc47bde71e1b813f6f37819"
+      , "subdir": "gcc-4.7.4"
+      }
+    , "target_root": "bootstrap"
+    , "target_file_name": "stage-0-gcc.TARGETS"
+    , "bindings":
+      { "rules": "rules/stage-0"
+      , "busybox": "stage-0/busybox"
+      , "make": "stage-0/make"
+      , "binutils": "stage-0/binutils"
+      , "gmp": "imports/stage-0/gmp-4.2.4"
+      , "mpc": "imports/stage-0/mpc-0.8.1"
+      , "mpfr": "imports/stage-0/mpfr-2.3.1"
+      , "patches": "patches"
+      }
+    }
+  , "stage-1/gcc":
+    { "repository":
+      { "type": "archive"
+      , "content": "25e1bc0b9c97916a3e6c3f4c100bf170ddf06eaa"
+      , "fetch": "https://ftp.gnu.org/gnu/gcc/gcc-10.2.0/gcc-10.2.0.tar.gz"
+      , "sha256": "27e879dccc639cd7b0cc08ed575c1669492579529b53c9ff27b0b96265fa867d"
+      , "subdir": "gcc-10.2.0"
+      }
+    , "target_root": "bootstrap"
+    , "target_file_name": "stage-1-gcc.TARGETS"
+    , "bindings":
+      { "rules": "rules/stage-1"
+      , "gmp": "imports/stage-1/gmp-5.1.3"
+      , "mpc": "imports/mpc-1.3.1"
+      , "mpfr": "imports/mpfr-4.2.1"
+      , "binutils": "imports/binutils-latest"
+      , "patches": "patches"
+      }
+    }
+  , "compilers/gcc-13.2.0-native":
+    { "repository":
+      { "type": "archive"
+      , "content": "c88c4e3f76d499c613970283fde3c1da3d11e809"
+      , "fetch": "https://ftp.gnu.org/gnu/gcc/gcc-13.2.0/gcc-13.2.0.tar.gz"
+      , "sha256": "8cb4be3796651976f94b9356fa08d833524f62420d6292c5033a9a26af315078"
+      , "subdir": "gcc-13.2.0"
+      }
+    , "target_root": "compilers"
+    , "target_file_name": "gcc-13-native.TARGETS"
+    , "bindings":
+      { "rules": "rules/gcc"
+      , "binutils": "imports/binutils-latest"
+      , "gmp": "imports/gmp-6.3.0"
+      , "mpc": "imports/mpc-1.3.1"
+      , "mpfr": "imports/mpfr-4.2.1"
+      , "patches": "patches"
+      }
+    }
+  , "compilers/gcc-13.2.0-musl":
+    { "repository": "compilers"
+    , "target_file_name": "gcc-13-musl.TARGETS"
+    , "bindings":
+      { "rules": "rules/gcc"
+      , "musl-cross-make": "imports/musl-cross-make-fe915821"
+      , "binutils": "imports/binutils-latest"
+      , "musl": "imports/musl-1.2.4"
+      , "gmp": "imports/gmp-6.3.0"
+      , "mpc": "imports/mpc-1.3.1"
+      , "mpfr": "imports/mpfr-4.2.1"
+      , "gcc": "compilers/gcc-13.2.0-native"
+      }
+    }
+  , "compilers/gcc-13.2.0-musl-static":
+    { "repository": "compilers"
+    , "target_file_name": "gcc-13-musl-static.TARGETS"
+    , "bindings":
+      {"rules": "rules/static-build", "gcc-musl": "compilers/gcc-13.2.0-musl"}
+    }
+  , "compilers/clang-16.0.6-native":
+    { "repository":
+      { "type": "archive"
+      , "content": "e288cee0a32034107fabd6aad63d4b7a045b6b25"
+      , "fetch": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-16.0.6.tar.gz"
+      , "sha256": "56b2f75fdaa95ad5e477a246d3f0d164964ab066b4619a01836ef08e475ec9d5"
+      , "subdir": "llvm-project-llvmorg-16.0.6"
+      , "pragma": {"special": "resolve-partially"}
+      }
+    , "target_root": "compilers"
+    , "target_file_name": "clang-16-native.TARGETS"
+    , "bindings":
+      { "rules": "rules/clang"
+      , "binutils": "imports/binutils-latest"
+      , "patches": "patches"
+      }
+    }
+  , "compilers/clang-17.0.1-native":
+    { "repository":
+      { "type": "archive"
+      , "content": "8ac42d74d5689f28a8eae1f9d46330d196f84c2a"
+      , "fetch": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-17.0.1.tar.gz"
+      , "sha256": "d51b10be66c10a6a81f4c594b554ffbf1063ffbadcb810af37d1f88d6e0b49dd"
+      , "subdir": "llvm-project-llvmorg-17.0.1"
+      , "pragma": {"special": "resolve-partially"}
+      }
+    , "target_root": "compilers"
+    , "target_file_name": "clang-17-native.TARGETS"
+    , "bindings":
+      { "rules": "rules/clang"
+      , "binutils": "imports/binutils-latest"
+      , "patches": "patches"
+      }
+    }
+  , "tools/busybox-1.36.1":
+    { "repository":
+      { "type": "archive"
+      , "content": "529defd1de4d1e362458e6561017ae74b2b3f28e"
+      , "fetch": "https://busybox.net/downloads/busybox-1.36.1.tar.bz2"
+      , "sha256": "b8cc24c9574d809e7279c3be349795c5d5ceb6fdf19ca709f80cde50e47de314"
+      , "subdir": "busybox-1.36.1"
+      }
+    , "target_root": "tools"
+    , "target_file_name": "busybox-1.36.TARGETS"
+    , "bindings": {"rules": "rules/static-build"}
+    }
+  , "tools/make-4.4.1":
+    { "repository":
+      { "type": "archive"
+      , "content": "4adc00a78258ae2eb53d103ef2c1ecf291a86fbf"
+      , "fetch": "https://ftp.gnu.org/gnu/make/make-4.4.1.tar.gz"
+      , "sha256": "dd16fb1d67bfab79a72f5e8390735c49e3e8e70b4945a15ab1f81ddb78658fb3"
+      , "subdir": "make-4.4.1"
+      }
+    , "target_root": "tools"
+    , "target_file_name": "make-4.4.TARGETS"
+    , "bindings": {"rules": "rules/static-build"}
+    }
+  , "tools/cmake-3.27.1":
+    { "repository":
+      { "type": "archive"
+      , "content": "45586697d7bb7d4f3cae4c86bba5bde710a367a9"
+      , "fetch": "https://github.com/Kitware/CMake/releases/download/v3.27.1/cmake-3.27.1.tar.gz"
+      , "sha256": "b1a6b0135fa11b94476e90f5b32c4c8fad480bf91cf22d0ded98ce22c5132004"
+      , "subdir": "cmake-3.27.1"
+      }
+    , "target_root": "tools"
+    , "target_file_name": "cmake-3.27.TARGETS"
+    , "bindings": {"rules": "rules/static-build", "ssl": "imports/boringssl"}
+    }
+  , "tools/python-3.12.0":
+    { "repository":
+      { "type": "archive"
+      , "content": "0b9a01c1b77e8b75a977e7e8e447d6764215eb1b"
+      , "fetch": "https://www.python.org/ftp/python/3.12.0/Python-3.12.0.tar.xz"
+      , "sha256": "795c34f44df45a0e9b9710c8c71c15c671871524cd412ca14def212e8ccb155d"
+      , "subdir": "Python-3.12.0"
+      }
+    , "target_root": "tools"
+    , "target_file_name": "python-3.12.TARGETS"
+    , "bindings": {"rules": "rules/static-build", "zlib": "imports/zlib"}
+    }
+  , "gcc-latest-native":
+    { "repository": "toolchains"
+    , "target_file_name": "gcc.TARGETS"
+    , "bindings": {"rules": "rules", "gcc": "compilers/gcc-13.2.0-native"}
+    }
+  , "gcc-13.2.0-native":
+    { "repository": "toolchains"
+    , "target_file_name": "gcc.TARGETS"
+    , "bindings": {"rules": "rules", "gcc": "compilers/gcc-13.2.0-native"}
+    }
+  , "gcc-latest-musl":
+    { "repository": "toolchains"
+    , "target_file_name": "gcc.TARGETS"
+    , "bindings": {"rules": "rules", "gcc": "compilers/gcc-13.2.0-musl"}
+    }
+  , "gcc-13.2.0-musl":
+    { "repository": "toolchains"
+    , "target_file_name": "gcc.TARGETS"
+    , "bindings": {"rules": "rules", "gcc": "compilers/gcc-13.2.0-musl"}
+    }
+  , "gcc-latest-musl-static":
+    { "repository": "toolchains"
+    , "target_file_name": "gcc.TARGETS"
+    , "bindings": {"rules": "rules", "gcc": "compilers/gcc-13.2.0-musl-static"}
+    }
+  , "gcc-13.2.0-musl-static":
+    { "repository": "toolchains"
+    , "target_file_name": "gcc.TARGETS"
+    , "bindings": {"rules": "rules", "gcc": "compilers/gcc-13.2.0-musl-static"}
+    }
+  , "clang-latest-native":
+    { "repository": "toolchains"
+    , "target_file_name": "clang.TARGETS"
+    , "bindings": {"rules": "rules", "clang": "compilers/clang-17.0.1-native"}
+    }
+  , "clang-17.0.1-native":
+    { "repository": "toolchains"
+    , "target_file_name": "clang.TARGETS"
+    , "bindings": {"rules": "rules", "clang": "compilers/clang-17.0.1-native"}
+    }
+  , "clang-16.0.6-native":
+    { "repository": "toolchains"
+    , "target_file_name": "clang.TARGETS"
+    , "bindings": {"rules": "rules", "clang": "compilers/clang-16.0.6-native"}
+    }
+  , "busybox-latest":
+    { "repository": "toolchains"
+    , "target_file_name": "busybox.TARGETS"
+    , "bindings": {"rules": "rules", "busybox": "tools/busybox-1.36.1"}
+    }
+  , "busybox-1.36.1":
+    { "repository": "toolchains"
+    , "target_file_name": "busybox.TARGETS"
+    , "bindings": {"rules": "rules", "busybox": "tools/busybox-1.36.1"}
+    }
+  , "make-latest":
+    { "repository": "toolchains"
+    , "target_file_name": "make.TARGETS"
+    , "bindings": {"rules": "rules", "make": "tools/make-4.4.1"}
+    }
+  , "make-4.4.1":
+    { "repository": "toolchains"
+    , "target_file_name": "make.TARGETS"
+    , "bindings": {"rules": "rules", "make": "tools/make-4.4.1"}
+    }
+  , "cmake-latest":
+    { "repository": "toolchains"
+    , "target_file_name": "cmake.TARGETS"
+    , "bindings": {"rules": "rules", "cmake": "tools/cmake-3.27.1"}
+    }
+  , "cmake-3.27.1":
+    { "repository": "toolchains"
+    , "target_file_name": "cmake.TARGETS"
+    , "bindings": {"rules": "rules", "cmake": "tools/cmake-3.27.1"}
+    }
+  , "python-latest":
+    { "repository": "toolchains"
+    , "target_file_name": "python.TARGETS"
+    , "bindings": {"rules": "rules", "python": "tools/python-3.12.0"}
+    }
+  , "python-3.12.0":
+    { "repository": "toolchains"
+    , "target_file_name": "python.TARGETS"
+    , "bindings": {"rules": "rules", "python": "tools/python-3.12.0"}
+    }
+  , "tools-all":
+    { "repository": "toolchains"
+    , "target_file_name": "tools-all.TARGETS"
+    , "bindings":
+      { "rules": "rules"
+      , "busybox": "busybox-latest"
+      , "make": "make-latest"
+      , "cmake": "cmake-latest"
+      , "python": "python-latest"
+      }
+    }
+  , "gcc-latest-native+tools":
+    { "repository": "toolchains"
+    , "target_file_name": "compiler+tools.TARGETS"
+    , "bindings":
+      {"rules": "rules", "tools": "tools-all", "compiler": "gcc-latest-native"}
+    }
+  , "gcc-13.2.0-native+tools":
+    { "repository": "toolchains"
+    , "target_file_name": "compiler+tools.TARGETS"
+    , "bindings":
+      {"rules": "rules", "tools": "tools-all", "compiler": "gcc-13.2.0-native"}
+    }
+  , "gcc-latest-musl+tools":
+    { "repository": "toolchains"
+    , "target_file_name": "compiler+tools.TARGETS"
+    , "bindings":
+      {"rules": "rules", "tools": "tools-all", "compiler": "gcc-latest-musl"}
+    }
+  , "gcc-13.2.0-musl+tools":
+    { "repository": "toolchains"
+    , "target_file_name": "compiler+tools.TARGETS"
+    , "bindings":
+      {"rules": "rules", "tools": "tools-all", "compiler": "gcc-13.2.0-musl"}
+    }
+  , "gcc-latest-musl-static+tools":
+    { "repository": "toolchains"
+    , "target_file_name": "compiler+tools.TARGETS"
+    , "bindings":
+      { "rules": "rules"
+      , "tools": "tools-all"
+      , "compiler": "gcc-latest-musl-static"
+      }
+    }
+  , "gcc-13.2.0-musl-static+tools":
+    { "repository": "toolchains"
+    , "target_file_name": "compiler+tools.TARGETS"
+    , "bindings":
+      { "rules": "rules"
+      , "tools": "tools-all"
+      , "compiler": "gcc-13.2.0-musl-static"
+      }
+    }
+  , "clang-latest-native+tools":
+    { "repository": "toolchains"
+    , "target_file_name": "compiler+tools.TARGETS"
+    , "bindings":
+      { "rules": "rules"
+      , "tools": "tools-all"
+      , "compiler": "clang-latest-native"
+      }
+    }
+  , "clang-17.0.1-native+tools":
+    { "repository": "toolchains"
+    , "target_file_name": "compiler+tools.TARGETS"
+    , "bindings":
+      { "rules": "rules"
+      , "tools": "tools-all"
+      , "compiler": "clang-17.0.1-native"
+      }
+    }
+  , "clang-16.0.6-native+tools":
+    { "repository": "toolchains"
+    , "target_file_name": "compiler+tools.TARGETS"
+    , "bindings":
+      { "rules": "rules"
+      , "tools": "tools-all"
+      , "compiler": "clang-16.0.6-native"
+      }
+    }
+  , "test/rules-gcc-native":
+    { "repository": "rules"
+    , "target_root": "defaults"
+    , "target_file_name": "test.TARGETS"
+    , "rule_root": "rules"
+    , "bindings": {"rules": "rules", "toolchain": "gcc-latest-native"}
+    }
+  , "test/rules-gcc-musl":
+    { "repository": "rules"
+    , "target_root": "defaults"
+    , "target_file_name": "test.TARGETS"
+    , "rule_root": "rules"
+    , "bindings": {"rules": "rules", "toolchain": "gcc-latest-musl"}
+    }
+  , "test/rules-gcc-musl-static":
+    { "repository": "rules"
+    , "target_root": "defaults"
+    , "target_file_name": "test.TARGETS"
+    , "rule_root": "rules"
+    , "bindings": {"rules": "rules", "toolchain": "gcc-latest-musl-static"}
+    }
+  , "test/rules-clang-native":
+    { "repository": "rules"
+    , "target_root": "defaults"
+    , "target_file_name": "test.TARGETS"
+    , "rule_root": "rules"
+    , "bindings": {"rules": "rules", "toolchain": "clang-latest-native"}
+    }
+  , "test/gcc-native":
+    { "repository": {"type": "file", "path": "test"}
+    , "bindings": {"rules": "test/rules-gcc-native"}
+    }
+  , "test/gcc-musl":
+    { "repository": {"type": "file", "path": "test"}
+    , "bindings": {"rules": "test/rules-gcc-musl"}
+    }
+  , "test/gcc-musl-static":
+    { "repository": {"type": "file", "path": "test"}
+    , "bindings": {"rules": "test/rules-gcc-musl-static"}
+    }
+  , "test/clang-native":
+    { "repository": {"type": "file", "path": "test"}
+    , "bindings": {"rules": "test/rules-clang-native"}
+    }
+  }
+}

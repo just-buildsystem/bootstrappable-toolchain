@@ -1,0 +1,8 @@
+{ "defaults":
+  { "type": ["@", "rules", "CC/foreign", "defaults"]
+  , "MAKE": ["make/bin/make"]
+  , "PATH": ["$(TOOLCHAIN)/make/bin"]
+  , "toolchain": ["staged-make"]
+  }
+, "staged-make": {"type": "install", "dirs": [[["", "toolchain"], "make"]]}
+}

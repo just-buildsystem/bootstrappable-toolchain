@@ -1,0 +1,26 @@
+{ "defaults":
+  { "type": ["CC", "defaults"]
+  , "arguments_config": ["TOOLCHAIN_CONFIG"]
+  , "CC":
+    [ { "type": "lookup"
+      , "map":
+        { "type": "var"
+        , "name": "TOOLCHAIN_CONFIG"
+        , "default": {"type": "empty_map"}
+        }
+      , "key": "BOOTSTRAP_CC"
+      , "default": "cc"
+      }
+    ]
+  , "PATH":
+    { "type": "lookup"
+    , "map":
+      { "type": "var"
+      , "name": "TOOLCHAIN_CONFIG"
+      , "default": {"type": "empty_map"}
+      }
+    , "key": "BOOTSTRAP_PATH"
+    , "default": ["/bin", "/usr/bin"]
+    }
+  }
+}

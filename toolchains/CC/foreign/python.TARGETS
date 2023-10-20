@@ -1,0 +1,7 @@
+{ "defaults":
+  { "type": ["@", "rules", "CC/foreign", "defaults"]
+  , "toolchain": ["staged-python"]
+  , "PATH": ["$(TOOLCHAIN)/python/usr/bin"]
+  }
+, "staged-python": {"type": "install", "dirs": [[["", "toolchain"], "python"]]}
+}

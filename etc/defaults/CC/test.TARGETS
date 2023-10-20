@@ -1,0 +1,3 @@
+{ "defaults":
+  {"type": ["CC", "defaults"], "base": [["@", "toolchain", "CC", "defaults"]]}
+}

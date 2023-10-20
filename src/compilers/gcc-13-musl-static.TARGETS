@@ -1,0 +1,121 @@
+{ "toolchain":
+  { "type": "configure"
+  , "arguments_config": ["ARCH", "BUILD_ARCH"]
+  , "config":
+    { "type": "singleton_map"
+    , "key": "BUILD_ARCH"
+    , "value":
+      { "type": "var"
+      , "name": "BUILD_ARCH"
+      , "default":
+        { "type": "var"
+        , "name": "ARCH"
+        , "default":
+          {"type": "fail", "msg": "ARCH is required for cross-compiler."}
+        }
+      }
+    }
+  , "target": "toolchain_cross"
+  }
+, "toolchain_cross":
+  { "type": "export"
+  , "flexible_config":
+    ["ARCH", "TARGET_ARCH", "BUILD_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "target": "gcc-musl-static"
+  }
+, "runlibs":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "target": "libgcc_s"
+  }
+, "gcc-musl-static":
+  { "type": ["@", "rules", "CC/foreign/shell", "data"]
+  , "project": [["@", "gcc-musl", "", "combined_patched_sources"]]
+  , "arguments_config": ["BUILD_ARCH"]
+  , "cmds":
+    { "type": "let*"
+    , "bindings":
+      [ [ "TARGET"
+        , { "type": "case"
+          , "expr":
+            { "type": "var"
+            , "name": "BUILD_ARCH"
+            , "default": {"type": "fail", "msg": "BUILD_ARCH is missing."}
+            }
+          , "case":
+            { "x86": "i686"
+            , "x86_64": "x86_64"
+            , "arm": "arm"
+            , "arm64": "aarch64"
+            }
+          , "default":
+            { "type": "fail"
+            , "msg":
+              ["Unsupported BUILD_ARCH", {"type": "var", "name": "BUILD_ARCH"}]
+            }
+          }
+        ]
+      ]
+    , "body":
+      [ { "type": "join"
+        , "$1": ["TARGET=", {"type": "var", "name": "TARGET"}, "-linux-musl"]
+        }
+      , "export NJOBS=$(nproc --all 2>/dev/null || echo 1)"
+      , "export MAKEINFO=missing"
+      , "unset CFLAGS CXXFLAGS LDFLAGS"
+      , "printf '#!/bin/sh\\nexec \"%s\" -static \"$@\"' \"${CC}\" >${TMPDIR}/cc"
+      , "printf '#!/bin/sh\\nexec \"%s\" -static \"$@\"' \"${CXX}\" >${TMPDIR}/c++"
+      , "chmod +x ${TMPDIR}/cc ${TMPDIR}/c++"
+      , "mv musl-latest.orig musl.readonly"
+      , "cp -r musl.readonly musl-latest.orig && chmod -R +w musl-latest.orig"
+      , "export check_msgfmt=no   # do not use system's msgfmt, if available"
+      , "${MAKE} -j${NJOBS} TARGET=${TARGET} CC=${TMPDIR}/cc CXX=${TMPDIR}/c++ LDFLAGS='-static' LDFLAGS_FOR_TARGET='-static' >build.log 2>&1 || (cat build.log && exit 1)"
+      , "${MAKE} -j${NJOBS} TARGET=${TARGET} CC=${TMPDIR}/cc CXX=${TMPDIR}/c++ LDFLAGS='-static' LDFLAGS_FOR_TARGET='-static' OUTPUT= DESTDIR=${DESTDIR} install >>build.log 2>&1 || (cat build.log && exit 1)"
+      , "cd ${DESTDIR}"
+      , "TARGET_STRIP=./bin/${TARGET}-strip"
+      , "find ./bin/ ./${TARGET}/bin/ ./libexec/gcc/ -type f -exec sh -c \"strip {} 2>/dev/null\" \\;"
+      , "find . -type f -name '*.so*' -exec sh -c \"${TARGET_STRIP} {} 2>/dev/null\" \\;"
+      , "find . -type f -name '*.a' -exec sh -c \"${TARGET_STRIP} -g {}\" \\;"
+      , "find . -type f -name '*.o' -exec sh -c \"${TARGET_STRIP} -g {}\" \\;"
+      , "for f in $(ls ./bin/${TARGET}-*); do"
+      , "  cp -l $f $(echo $f | sed 's|/'${TARGET}-'|/|g')"
+      , "done"
+      , "cp -rl ./${TARGET}/lib/. ./lib/."
+      , "find . -type l ! -exec test -e {} \\; -delete"
+      ]
+    }
+  , "out_dirs": ["."]
+  }
+, "toolchain_for_target":
+  { "type": "configure"
+  , "arguments_config": ["ARCH", "TARGET_ARCH"]
+  , "config":
+    { "type": "singleton_map"
+    , "key": "BUILD_ARCH"
+    , "value":
+      { "type": "var"
+      , "name": "TARGET_ARCH"
+      , "default":
+        { "type": "var"
+        , "name": "ARCH"
+        , "default":
+          {"type": "fail", "msg": "ARCH is required for cross-compiler."}
+        }
+      }
+    }
+  , "target": "toolchain_cross"
+  }
+, "libgcc_s":
+  { "type": ["@", "rules", "CC/prebuilt", "library"]
+  , "name": ["libgcc"]
+  , "lib": ["libgcc_s_files"]
+  }
+, "libgcc_s_files":
+  { "type": "generic"
+  , "arguments_config": ["ENV"]
+  , "deps": ["toolchain_for_target"]
+  , "cmds": [":"]
+  , "outs": ["lib/libgcc_s.so.1"]
+  , "env": {"type": "var", "name": "ENV", "default": {"type": "empty_map"}}
+  }
+}

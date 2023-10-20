@@ -1,0 +1,8 @@
+{ "gcc-4.7.4": {"type": "install", "deps": [["TREE", null, "gcc-4.7.4"]]}
+, "gcc-10": {"type": "install", "deps": [["TREE", null, "gcc-10"]]}
+, "gcc-13": {"type": "install", "deps": [["TREE", null, "gcc-13"]]}
+, "musl-cross-make-fe915821":
+  {"type": "install", "deps": [["TREE", null, "musl-cross-make-fe915821"]]}
+, "clang-16": {"type": "install", "deps": [["TREE", null, "clang-16"]]}
+, "clang-17": {"type": "install", "deps": [["TREE", null, "clang-17"]]}
+}

@@ -1,0 +1,161 @@
+{ "toolchain":
+  { "type": "configure"
+  , "arguments_config": ["ARCH", "BUILD_ARCH"]
+  , "config":
+    { "type": "singleton_map"
+    , "key": "BUILD_ARCH"
+    , "value":
+      { "type": "var"
+      , "name": "BUILD_ARCH"
+      , "default":
+        { "type": "var"
+        , "name": "ARCH"
+        , "default":
+          {"type": "fail", "msg": "ARCH is required for cross-compiler."}
+        }
+      }
+    }
+  , "target": "toolchain_cross"
+  }
+, "toolchain_cross":
+  { "type": "export"
+  , "flexible_config":
+    ["ARCH", "TARGET_ARCH", "BUILD_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "target": "gcc-musl"
+  }
+, "runlibs":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "target": "libstdc++"
+  }
+, "separate_patched_sources":
+  { "type": "install"
+  , "dirs":
+    [ [["@", "musl-cross-make", "", "combined_sources_and_patches"], "src"]
+    , [["@", "binutils", "", "files"], "binutils"]
+    , [["@", "musl", "", "files"], "musl"]
+    , [["@", "gmp", "", "files"], "gmp"]
+    , [["@", "mpc", "", "files"], "mpc"]
+    , [["@", "mpfr", "", "files"], "mpfr"]
+    , [["@", "gcc", "", "patched_sources"], "gcc"]
+    ]
+  }
+, "combined_patched_sources":
+  { "type": ["@", "rules", "CC/foreign/shell", "data"]
+  , "project": ["separate_patched_sources"]
+  , "cmds":
+    [ "cp -r src/. ${DESTDIR}"
+    , "mv binutils ${DESTDIR}/binutils-latest.orig"
+    , "mv musl ${DESTDIR}/musl-latest.orig"
+    , "mv gmp ${DESTDIR}/gmp-latest.orig"
+    , "mv mpc ${DESTDIR}/mpc-latest.orig"
+    , "mv mpfr ${DESTDIR}/mpfr-latest.orig"
+    , "mv gcc ${DESTDIR}/gcc-13.orig"
+    , "chmod +w ${DESTDIR}/config.mak"
+    , "printf 'GCC_VER = 13\n' >> ${DESTDIR}/config.mak"
+    ]
+  , "out_dirs": ["."]
+  }
+, "gcc-musl":
+  { "type": ["@", "rules", "CC/foreign/shell", "data"]
+  , "project": ["combined_patched_sources"]
+  , "arguments_config": ["BUILD_ARCH"]
+  , "cmds":
+    { "type": "let*"
+    , "bindings":
+      [ [ "TARGET"
+        , { "type": "case"
+          , "expr":
+            { "type": "var"
+            , "name": "BUILD_ARCH"
+            , "default": {"type": "fail", "msg": "BUILD_ARCH is missing."}
+            }
+          , "case":
+            { "x86": "i686"
+            , "x86_64": "x86_64"
+            , "arm": "arm"
+            , "arm64": "aarch64"
+            }
+          , "default":
+            { "type": "fail"
+            , "msg":
+              ["Unsupported BUILD_ARCH", {"type": "var", "name": "BUILD_ARCH"}]
+            }
+          }
+        ]
+      ]
+    , "body":
+      [ { "type": "join"
+        , "$1": ["TARGET=", {"type": "var", "name": "TARGET"}, "-linux-musl"]
+        }
+      , "export NJOBS=$(nproc --all 2>/dev/null || echo 1)"
+      , "export MAKEINFO=missing"
+      , "export BUILD_ROOT_DIR=${ACTION_DIR}"
+      , "unset CFLAGS CXXFLAGS LDFLAGS"
+      , "mv musl-latest.orig musl.readonly"
+      , "cp -r musl.readonly musl-latest.orig && chmod -R +w musl-latest.orig"
+      , "export check_msgfmt=no   # do not use system's msgfmt, if available"
+      , "${MAKE} -j${NJOBS} TARGET=${TARGET} >build.log 2>&1 || (cat build.log && exit 1)"
+      , "${MAKE} -j${NJOBS} TARGET=${TARGET} OUTPUT= DESTDIR=${DESTDIR} install >>build.log 2>&1 || (cat build.log && exit 1)"
+      , "cd ${DESTDIR}"
+      , "TARGET_STRIP=./bin/${TARGET}-strip"
+      , "find ./bin/ ./${TARGET}/bin/ ./libexec/gcc/ -type f -exec sh -c \"strip {} 2>/dev/null\" \\;"
+      , "find . -type f -name '*.so*' -exec sh -c \"${TARGET_STRIP} {} 2>/dev/null\" \\;"
+      , "find . -type f -name '*.a' -exec sh -c \"${TARGET_STRIP} -g {}\" \\;"
+      , "find . -type f -name '*.o' -exec sh -c \"${TARGET_STRIP} -g {}\" \\;"
+      , "for f in $(ls ./bin/${TARGET}-*); do"
+      , "  cp -l $f $(echo $f | sed 's|/'${TARGET}-'|/|g')"
+      , "done"
+      , "cp -rl ./${TARGET}/lib/. ./lib/."
+      , "find . -type l ! -exec test -e {} \\; -delete"
+      ]
+    }
+  , "out_dirs": ["."]
+  }
+, "toolchain_for_target":
+  { "type": "configure"
+  , "arguments_config": ["ARCH", "TARGET_ARCH"]
+  , "config":
+    { "type": "singleton_map"
+    , "key": "BUILD_ARCH"
+    , "value":
+      { "type": "var"
+      , "name": "TARGET_ARCH"
+      , "default":
+        { "type": "var"
+        , "name": "ARCH"
+        , "default":
+          {"type": "fail", "msg": "ARCH is required for cross-compiler."}
+        }
+      }
+    }
+  , "target": "toolchain_cross"
+  }
+, "libstdc++":
+  { "type": ["@", "rules", "CC/prebuilt", "library"]
+  , "name": ["libstdc++"]
+  , "lib": ["libstdc++_files"]
+  , "deps": ["libgcc_s"]
+  }
+, "libgcc_s":
+  { "type": ["@", "rules", "CC/prebuilt", "library"]
+  , "name": ["libgcc_s"]
+  , "lib": ["libgcc_s_files"]
+  }
+, "libstdc++_files":
+  { "type": "generic"
+  , "arguments_config": ["ENV"]
+  , "deps": ["toolchain_for_target"]
+  , "cmds": [":"]
+  , "outs": ["lib/libstdc++.so.6"]
+  , "env": {"type": "var", "name": "ENV", "default": {"type": "empty_map"}}
+  }
+, "libgcc_s_files":
+  { "type": "generic"
+  , "arguments_config": ["ENV"]
+  , "deps": ["toolchain_for_target"]
+  , "cmds": [":"]
+  , "outs": ["lib/libgcc_s.so.1"]
+  , "env": {"type": "var", "name": "ENV", "default": {"type": "empty_map"}}
+  }
+}

@@ -1,0 +1,4 @@
+0001-non-behavioral-changing-fix-in-gcc-cp-rtti.c.patch
+0002-comment-out-M4-m4-not-needed-in-gmp-configure.patch
+0003-cfns-fix-mismatch-in-gnu_inline-attributes.patch
+0004-fix-gmp-configure-to-comply-with-newer-c-standards.patch

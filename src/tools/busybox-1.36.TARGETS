@@ -1,0 +1,21 @@
+{ "toolchain":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "target": "busybox"
+  }
+, "busybox":
+  { "type": ["@", "rules", "CC/foreign/shell", "data"]
+  , "project": [["TREE", null, "."]]
+  , "cmds":
+    [ "NJOBS=$(nproc --all 2>/dev/null || echo 1)"
+    , "GCC_TOOLCHAIN=$(dirname ${CC})/.."
+    , "unset CFLAGS CXXFLAGS"
+    , "export LDFLAGS=\"-static\""
+    , "export SOURCE_DATE_EPOCH=0"
+    , "${MAKE} HOSTCC=\"${CC} -static\" HOSTCXX=\"${CXX} -static\" defconfig >configure.log 2>&1 || (cat configure.log && exit 1)"
+    , "${MAKE} -j${NJOBS} HOSTCC=\"${CC} -static\" HOSTCXX=\"${CXX} -static\" >build.log 2>&1 || (cat configure.log build.log && exit 1)"
+    , "${MAKE} -j${NJOBS} HOSTCC=\"${CC} -static\" HOSTCXX=\"${CXX} -static\" CONFIG_PREFIX=${DESTDIR} install >>build.log 2>&1 || (cat configure.log build.log && exit 1)"
+    ]
+  , "out_dirs": ["."]
+  }
+}

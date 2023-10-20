@@ -1,0 +1,36 @@
+{ "toolchain":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "target": "python"
+  }
+, "python":
+  { "type": ["@", "rules", "CC/foreign/shell", "data"]
+  , "project": [["TREE", null, "."]]
+  , "localbase": [["@", "zlib", "", "zlib"]]
+  , "cmds":
+    [ "export NJOBS=$(nproc --all 2>/dev/null || echo 1)"
+    , "export CFLAGS=\"-I${LOCALBASE}/include\""
+    , "export LDFLAGS=\"-static -L${LOCALBASE}/lib\""
+    , "export SOURCE_DATE_EPOCH=0"
+    , "./configure --disable-shared --disable-test-modules --prefix=/usr --with-pkg-config=no >configure.log 2>&1 || (cat configure.log && exit 1)"
+    , "rm Modules/Setup.local"
+    , "cp Modules/Setup.stdlib Modules/Setup.local"
+    , "sed -i 's/^\\*shared\\*/\\*static\\*/' Modules/Setup.local"
+    , "sed -i 's/^nis /#nis /' Modules/Setup.local"
+    , "sed -i 's/^_lzma /#_lzma /' Modules/Setup.local"
+    , "sed -i 's/^_uuid /#_uuid /' Modules/Setup.local"
+    , "${MAKE} -j${NJOBS} LINKFORSHARED=' ' >build.log 2>&1 || (cat configure.log build.log && exit 1)"
+    , "${MAKE} -j${NJOBS} LINKFORSHARED=' ' install >>build.log 2>&1 || (cat configure.log build.log && exit 1)"
+    , "cd ${DESTDIR}/usr"
+    , "find ./bin -type f -exec sh -c \"strip {} 2>/dev/null\" \\;"
+    , "find ./lib -type f -name '*.a' -exec strip -g {} \\;"
+    , "find ./lib -type f -name '*.o' -exec strip -g {} \\;"
+    , "find ./lib -depth -type d -name '__pycache__' -exec rm -rf {} \\;"
+    , "find ./bin -type f -name '*-config' -exec sh -c \"sed -i 's|${ACTION_DIR}|/build|g' {}\" \\;"
+    , "find ./lib -type f -name 'Makefile' -exec sh -c \"sed -i 's|${ACTION_DIR}|/build|g' {}\" \\;"
+    , "find ./lib -type f -name '_sysconfigdata_*' -exec sh -c \"sed -i 's|${ACTION_DIR}|/build|g' {}\" \\;"
+    , "cp -l bin/python3 bin/python"
+    ]
+  , "out_dirs": ["."]
+  }
+}

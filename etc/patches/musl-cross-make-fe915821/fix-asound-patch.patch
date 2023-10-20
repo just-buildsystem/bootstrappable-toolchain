@@ -1,0 +1,167 @@
+From bb19399b4d940cb9b09e9872983e226a11174aef Mon Sep 17 00:00:00 2001
+From: Oliver Reiche <oliver.reiche@huawei.com>
+Date: Mon, 26 Jun 2023 16:53:35 +0200
+Subject: [PATCH] Fix asound patch
+
+---
+ .../0001-asound-time64.diff                   | 42 +++++++++----------
+ 1 file changed, 21 insertions(+), 21 deletions(-)
+
+diff --git a/patches/linux-headers-4.19.88-1/0001-asound-time64.diff b/patches/linux-headers-4.19.88-1/0001-asound-time64.diff
+index 1a23259..76520a2 100644
+--- a/patches/linux-headers-4.19.88-1/0001-asound-time64.diff
++++ b/patches/linux-headers-4.19.88-1/0001-asound-time64.diff
+@@ -1,16 +1,16 @@
+ diff -ur a/generic/include/sound/asound.h b/generic/include/sound/asound.h
+---- a/generic/include/sound/asound.h	2019-10-15 12:26:39.634141383 -0400
+-+++ b/generic/include/sound/asound.h	2020-01-30 21:43:56.477450321 -0500
+-@@ -35,6 +35,8 @@
+- #include <time.h>
+- #endif
++--- a/generic/include/sound/asound.h	2021-06-28 22:04:41.000000000 +0200
+++++ b/generic/include/sound/asound.h	2023-06-26 16:51:09.416627212 +0200
++@@ -32,6 +32,8 @@
++ 
++ #include <stdlib.h>
+  
+ +#include <asm/byteorder.h>
+ +
+  /*
+   *  protocol version
+   */
+-@@ -154,7 +156,7 @@
++@@ -151,7 +153,7 @@
+   *                                                                           *
+   *****************************************************************************/
+  
+@@ -19,7 +19,7 @@ diff -ur a/generic/include/sound/asound.h b/generic/include/sound/asound.h
+  
+  typedef unsigned long snd_pcm_uframes_t;
+  typedef signed long snd_pcm_sframes_t;
+-@@ -301,7 +303,9 @@
++@@ -298,7 +300,9 @@
+  #define SNDRV_PCM_INFO_DRAIN_TRIGGER	0x40000000		/* internal kernel flag - trigger in drain */
+  #define SNDRV_PCM_INFO_FIFO_IN_FRAMES	0x80000000	/* internal kernel flag - FIFO size is in frames */
+  
+@@ -29,8 +29,8 @@ diff -ur a/generic/include/sound/asound.h b/generic/include/sound/asound.h
+ +#endif
+  
+  typedef int __bitwise snd_pcm_state_t;
+- #define	SNDRV_PCM_STATE_OPEN		((__force snd_pcm_state_t) 0) /* stream is open */
+-@@ -317,8 +321,17 @@
++ #define	SNDRV_PCM_STATE_OPEN		((snd_pcm_state_t) 0) /* stream is open */
++@@ -314,8 +318,17 @@
+  
+  enum {
+  	SNDRV_PCM_MMAP_OFFSET_DATA = 0x00000000,
+@@ -50,7 +50,7 @@ diff -ur a/generic/include/sound/asound.h b/generic/include/sound/asound.h
+  };
+  
+  union snd_pcm_sync_id {
+-@@ -456,8 +469,13 @@
++@@ -453,8 +466,13 @@
+  	SNDRV_PCM_AUDIO_TSTAMP_TYPE_LAST = SNDRV_PCM_AUDIO_TSTAMP_TYPE_LINK_SYNCHRONIZED
+  };
+  
+@@ -64,7 +64,7 @@ diff -ur a/generic/include/sound/asound.h b/generic/include/sound/asound.h
+  	struct timespec trigger_tstamp;	/* time when stream was started/stopped/paused */
+  	struct timespec tstamp;		/* reference timestamp */
+  	snd_pcm_uframes_t appl_ptr;	/* appl ptr */
+-@@ -473,17 +491,48 @@
++@@ -470,17 +488,48 @@
+  	__u32 audio_tstamp_accuracy;	/* in ns units, only valid if indicated in audio_tstamp_data */
+  	unsigned char reserved[52-2*sizeof(struct timespec)]; /* must be filled with zero */
+  };
+@@ -117,7 +117,7 @@ diff -ur a/generic/include/sound/asound.h b/generic/include/sound/asound.h
+  	snd_pcm_uframes_t appl_ptr;	/* RW: appl ptr (0...boundary-1) */
+  	snd_pcm_uframes_t avail_min;	/* RW: min available frames for wakeup */
+  };
+-@@ -492,14 +541,59 @@
++@@ -489,14 +538,59 @@
+  #define SNDRV_PCM_SYNC_PTR_APPL		(1<<1)	/* get appl_ptr from driver (r/w op) */
+  #define SNDRV_PCM_SYNC_PTR_AVAIL_MIN	(1<<2)	/* get avail_min from driver */
+  
+@@ -180,7 +180,7 @@ diff -ur a/generic/include/sound/asound.h b/generic/include/sound/asound.h
+  		unsigned char reserved[64];
+  	} c;
+  };
+-@@ -584,6 +678,8 @@
++@@ -581,6 +675,8 @@
+  #define SNDRV_PCM_IOCTL_STATUS		_IOR('A', 0x20, struct snd_pcm_status)
+  #define SNDRV_PCM_IOCTL_DELAY		_IOR('A', 0x21, snd_pcm_sframes_t)
+  #define SNDRV_PCM_IOCTL_HWSYNC		_IO('A', 0x22)
+@@ -189,7 +189,7 @@ diff -ur a/generic/include/sound/asound.h b/generic/include/sound/asound.h
+  #define SNDRV_PCM_IOCTL_SYNC_PTR	_IOWR('A', 0x23, struct snd_pcm_sync_ptr)
+  #define SNDRV_PCM_IOCTL_STATUS_EXT	_IOWR('A', 0x24, struct snd_pcm_status)
+  #define SNDRV_PCM_IOCTL_CHANNEL_INFO	_IOR('A', 0x32, struct snd_pcm_channel_info)
+-@@ -614,7 +710,7 @@
++@@ -611,7 +707,7 @@
+   *  Raw MIDI section - /dev/snd/midi??
+   */
+  
+@@ -198,7 +198,7 @@ diff -ur a/generic/include/sound/asound.h b/generic/include/sound/asound.h
+  
+  enum {
+  	SNDRV_RAWMIDI_STREAM_OUTPUT = 0,
+-@@ -648,13 +744,16 @@
++@@ -645,13 +741,16 @@
+  	unsigned char reserved[16];	/* reserved for future use */
+  };
+  
+@@ -215,7 +215,7 @@ diff -ur a/generic/include/sound/asound.h b/generic/include/sound/asound.h
+  
+  #define SNDRV_RAWMIDI_IOCTL_PVERSION	_IOR('W', 0x00, int)
+  #define SNDRV_RAWMIDI_IOCTL_INFO	_IOR('W', 0x01, struct snd_rawmidi_info)
+-@@ -667,7 +766,7 @@
++@@ -664,7 +763,7 @@
+   *  Timer section - /dev/snd/timer
+   */
+  
+@@ -224,7 +224,7 @@ diff -ur a/generic/include/sound/asound.h b/generic/include/sound/asound.h
+  
+  enum {
+  	SNDRV_TIMER_CLASS_NONE = -1,
+-@@ -761,6 +860,7 @@
++@@ -758,6 +857,7 @@
+  	unsigned char reserved[60];	/* reserved */
+  };
+  
+@@ -232,7 +232,7 @@ diff -ur a/generic/include/sound/asound.h b/generic/include/sound/asound.h
+  struct snd_timer_status {
+  	struct timespec tstamp;		/* Timestamp - last update */
+  	unsigned int resolution;	/* current period resolution in ns */
+-@@ -769,10 +869,11 @@
++@@ -766,10 +866,11 @@
+  	unsigned int queue;		/* used queue size */
+  	unsigned char reserved[64];	/* reserved */
+  };
+@@ -245,7 +245,7 @@ diff -ur a/generic/include/sound/asound.h b/generic/include/sound/asound.h
+  #define SNDRV_TIMER_IOCTL_GINFO		_IOWR('T', 0x03, struct snd_timer_ginfo)
+  #define SNDRV_TIMER_IOCTL_GPARAMS	_IOW('T', 0x04, struct snd_timer_gparams)
+  #define SNDRV_TIMER_IOCTL_GSTATUS	_IOWR('T', 0x05, struct snd_timer_gstatus)
+-@@ -785,6 +886,15 @@
++@@ -782,6 +883,15 @@
+  #define SNDRV_TIMER_IOCTL_STOP		_IO('T', 0xa1)
+  #define SNDRV_TIMER_IOCTL_CONTINUE	_IO('T', 0xa2)
+  #define SNDRV_TIMER_IOCTL_PAUSE		_IO('T', 0xa3)
+@@ -261,7 +261,7 @@ diff -ur a/generic/include/sound/asound.h b/generic/include/sound/asound.h
+  
+  struct snd_timer_read {
+  	unsigned int resolution;
+-@@ -810,11 +920,15 @@
++@@ -807,11 +917,15 @@
+  	SNDRV_TIMER_EVENT_MRESUME = SNDRV_TIMER_EVENT_RESUME + 10,
+  };
+  
+@@ -277,7 +277,7 @@ diff -ur a/generic/include/sound/asound.h b/generic/include/sound/asound.h
+  
+  /****************************************************************************
+   *                                                                          *
+-@@ -955,8 +1069,7 @@
++@@ -952,8 +1066,7 @@
+  		} bytes;
+  		struct snd_aes_iec958 iec958;
+  	} value;		/* RO */
+-- 
+2.30.2
+

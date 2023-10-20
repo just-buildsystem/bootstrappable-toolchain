@@ -1,0 +1,29 @@
+From a097d475fa8806265f445d11f3074f506baf4a3e Mon Sep 17 00:00:00 2001
+From: Oliver Reiche <oliver.reiche@huawei.com>
+Date: Fri, 18 Aug 2023 14:36:57 +0200
+Subject: [PATCH 1/2] Strip build directory from fixinclues
+
+... to achieve a reproducible binary, which contains the
+configure string. For this to work, the user needs to set
+"BUILD_ROOT_DIR" before building.
+---
+ fixincludes/configure | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/fixincludes/configure b/fixincludes/configure
+index 6e2d67b65..b7d91c7ab 100755
+--- a/fixincludes/configure
++++ b/fixincludes/configure
+@@ -6374,6 +6374,9 @@ cat >"$ac_tmp/defines.awk" <<\_ACAWK ||
+ BEGIN {
+ _ACEOF
+ 
++# Remove host machine's build path from confdefs.h
++sed -i 's|'${BUILD_ROOT_DIR:-/nonexistent}'|/build|g' confdefs.h
++
+ # Transform confdefs.h into an awk script `defines.awk', embedded as
+ # here-document in config.status, that substitutes the proper values into
+ # config.h.in to produce config.h.
+-- 
+2.30.2
+

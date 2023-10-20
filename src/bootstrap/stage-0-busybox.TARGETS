@@ -1,0 +1,63 @@
+{ "bootstrap":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "target": "bootstrap-essentials"
+  }
+, "toolchain":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "target": "busybox"
+  }
+, "files": {"type": "install", "deps": [["TREE", null, "."]]}
+, "staged_bootstrap_sources":
+  { "type": "install"
+  , "dirs":
+    [["files", "src"], [["@", "scripts", "", "bootstrap-busybox"], "."]]
+  }
+, "bootstrap-essentials":
+  { "type": ["@", "rules", "CC/foreign/shell", "data"]
+  , "project": ["staged_bootstrap_sources"]
+  , "cmds":
+    [ "cd bootstrap-busybox"
+    , "./bootstrap.sh ../src editors awk >>build.log 2>&1 || (cat build.log && exit 1)"
+    , "./bootstrap.sh ../src editors cmp >>build.log 2>&1 || (cat build.log && exit 1)"
+    , "./bootstrap.sh ../src editors sed >>build.log 2>&1 || (cat build.log && exit 1)"
+    , "./bootstrap.sh ../src editors diff >>build.log 2>&1 || (cat build.log && exit 1)"
+    , "./bootstrap.sh ../src editors patch >>build.log 2>&1 || (cat build.log && exit 1)"
+    , "./bootstrap.sh ../src archival tar >>build.log 2>&1 || (cat build.log && exit 1)"
+    , "./bootstrap.sh ../src archival bzip2 >>build.log 2>&1 || (cat build.log && exit 1)"
+    , "./bootstrap.sh ../src findutils grep >>build.log 2>&1 || (cat build.log && exit 1)"
+    , "./bootstrap.sh ../src findutils find >>build.log 2>&1 || (cat build.log && exit 1)"
+    , "mv awk cmp sed diff patch tar bzip2 grep find ${DESTDIR}/bin/"
+    ]
+  , "outs":
+    [ "bin/awk"
+    , "bin/cmp"
+    , "bin/sed"
+    , "bin/diff"
+    , "bin/patch"
+    , "bin/tar"
+    , "bin/bzip2"
+    , "bin/grep"
+    , "bin/find"
+    ]
+  }
+, "staged-gcc":
+  {"type": "install", "dirs": [[["@", "gcc", "", "toolchain"], "gcc"]]}
+, "busybox":
+  { "type": ["@", "rules", "CC/foreign/shell", "data"]
+  , "project": ["files"]
+  , "localbase": ["bootstrap", ["@", "make", "", "bootstrap"], "staged-gcc"]
+  , "cmds":
+    [ "export NJOBS=$(nproc --all 2>/dev/null || echo 1)"
+    , "export PATH=${LOCALBASE}/bin:${LOCALBASE}/gcc/bin:$PATH"
+    , "export MAKE=${LOCALBASE}/bin/make"
+    , "export CC=${LOCALBASE}/gcc/bin/gcc"
+    , "export CXX=${LOCALBASE}/gcc/bin/g++"
+    , "${MAKE} HOSTCC=${CC} HOSTCXX=${CXX} CONFIG_EXTRA_LDLIBS=\"m resolv\" defconfig >configure.log 2>&1 || (cat configure.log && exit 1)"
+    , "${MAKE} -j${NJOBS} HOSTCC=${CC} HOSTCXX=${CXX} CONFIG_EXTRA_LDLIBS=\"m resolv\" >build.log 2>&1 || (cat configure.log build.log && exit 1)"
+    , "${MAKE} -j${NJOBS} HOSTCC=${CC} HOSTCXX=${CXX} CONFIG_EXTRA_LDLIBS=\"m resolv\" CONFIG_PREFIX=${DESTDIR} install >>build.log 2>&1 || (cat configure.log build.log && exit 1)"
+    ]
+  , "out_dirs": ["."]
+  }
+}

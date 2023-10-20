@@ -1,0 +1,42 @@
+From 0d902bfa02d5b5e6ef4e32dcdbe3b9c201c84fc6 Mon Sep 17 00:00:00 2001
+From: Oliver Reiche <oliver.reiche@huawei.com>
+Date: Mon, 14 Aug 2023 12:33:04 +0200
+Subject: [PATCH 1/5] Strip build directory from config arguments
+
+... to achieve a reproducible binary, which contains the
+configure string. For this to work, the user needs to set
+"BUILD_ROOT_DIR" before building.
+---
+ gcc/configure    | 2 ++
+ gcc/configure.ac | 2 ++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/gcc/configure b/gcc/configure
+index 530f4d695..65d8e64db 100755
+--- a/gcc/configure
++++ b/gcc/configure
+@@ -13162,6 +13162,8 @@ fi
+ sed -e 's/\\/\\\\/g; s/"/\\"/g' <<EOF >conftest.out
+ $gcc_config_arguments
+ EOF
++# Remove host machine's build path from config arguments
++sed -i 's|'${BUILD_ROOT_DIR:-/nonexistent}'|/build|g' conftest.out
+ gcc_config_arguments_str=`cat conftest.out`
+ rm -f conftest.out
+ 
+diff --git a/gcc/configure.ac b/gcc/configure.ac
+index 09082e8cc..98e33b293 100644
+--- a/gcc/configure.ac
++++ b/gcc/configure.ac
+@@ -2167,6 +2167,8 @@ fi
+ sed -e 's/\\/\\\\/g; s/"/\\"/g' <<EOF >conftest.out
+ $gcc_config_arguments
+ EOF
++# Remove host machine's build path from config arguments
++sed -i 's|'${BUILD_ROOT_DIR:-/nonexistent}'|/build|g' conftest.out
+ gcc_config_arguments_str=`cat conftest.out`
+ rm -f conftest.out
+ 
+-- 
+2.30.2
+

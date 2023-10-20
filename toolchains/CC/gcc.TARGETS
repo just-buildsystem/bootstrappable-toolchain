@@ -1,0 +1,38 @@
+{ "defaults":
+  { "type": ["@", "rules", "CC", "defaults"]
+  , "arguments_config": ["TOOLCHAIN_CONFIG"]
+  , "CC": ["gcc/bin/gcc"]
+  , "CXX": ["gcc/bin/g++"]
+  , "AR": ["gcc/bin/ar"]
+  , "LDFLAGS":
+    { "type": "if"
+    , "cond":
+      { "type": "lookup"
+      , "key": "STATIC_RUNLIBS"
+      , "map":
+        { "type": "var"
+        , "name": "TOOLCHAIN_CONFIG"
+        , "default": {"type": "empty_map"}
+        }
+      }
+    , "then": ["-static-libgcc", "-static-libstdc++"]
+    }
+  , "deps":
+    { "type": "if"
+    , "cond":
+      { "type": "lookup"
+      , "key": "STATIC_RUNLIBS"
+      , "map":
+        { "type": "var"
+        , "name": "TOOLCHAIN_CONFIG"
+        , "default": {"type": "empty_map"}
+        }
+      }
+    , "then": []
+    , "else": [["@", "gcc", "", "runlibs"]]
+    }
+  , "toolchain": ["staged-gcc"]
+  , "PATH": ["$(TOOLCHAIN)/gcc/bin", "/bin"]
+  }
+, "staged-gcc": {"type": "install", "dirs": [[["", "toolchain"], "gcc"]]}
+}

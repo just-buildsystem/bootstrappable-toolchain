@@ -1,0 +1,3 @@
+{ "toolchain":
+  {"type": "install", "dirs": [[["@", "make", "", "toolchain"], "."]]}
+}

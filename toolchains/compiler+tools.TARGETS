@@ -1,0 +1,8 @@
+{ "toolchain":
+  { "type": "install"
+  , "dirs":
+    [ [["@", "tools", "", "toolchain"], "."]
+    , [["@", "compiler", "", "toolchain"], "compiler"]
+    ]
+  }
+}

@@ -1,0 +1,43 @@
+{ "toolchain":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "target": "cmake"
+  }
+, "patched_sources":
+  { "type": ["@", "rules", "CC/foreign/shell", "data"]
+  , "project": [["TREE", null, "."]]
+  , "cmds":
+    [ "cp -r . ${DESTDIR}/."
+    , "cd ${DESTDIR}"
+    , "mv Utilities/cmcurl/curltest.c Utilities/cmcurl/curltest.cpp"
+    , "sed -i 's/curltest\\.c)/curltest\\.cpp)/' Utilities/cmcurl/CMakeLists.txt"
+    ]
+  , "out_dirs": ["."]
+  }
+, "libssl":
+  { "type": "configure"
+  , "config":
+    { "type": "let*"
+    , "bindings": [["ADD_CFLAGS", ["-fPIE"]], ["ADD_CXXFLAGS", ["-fPIE"]]]
+    , "body": {"type": "env", "vars": ["ADD_CFLAGS", "ADD_CXXFLAGS"]}
+    }
+  , "target": ["@", "ssl", "", "ssl"]
+  }
+, "cmake":
+  { "type": ["@", "rules", "CC/foreign/shell", "data"]
+  , "project": ["patched_sources"]
+  , "deps": ["libssl"]
+  , "cmds":
+    [ "export NJOBS=$(nproc --all 2>/dev/null || echo 1)"
+    , "export PKG_CONFIG=false"
+    , "mkdir ${TMPDIR}/build"
+    , "cd ${TMPDIR}/build"
+    , "export LDFLAGS='-static'"
+    , "export CFLAGS='-D__FILE__=__FILE_NAME__ -Wno-builtin-macro-redefined'"
+    , "export CXXFLAGS='-D__FILE__=__FILE_NAME__ -Wno-builtin-macro-redefined'"
+    , "${WORKDIR}/bootstrap --parallel=${NJOBS} -- -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=${LOCALBASE} -DCMAKE_INSTALL_PREFIX=/ >bootstrap.log 2>&1 || (cat bootstrap.log && exit 1)"
+    , "${MAKE} -j${NJOBS} install >build.log 2>&1 || (cat bootstrap.log && cat build.log && exit 1)"
+    ]
+  , "out_dirs": ["."]
+  }
+}

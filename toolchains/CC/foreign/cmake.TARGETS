@@ -1,0 +1,8 @@
+{ "defaults":
+  { "type": ["@", "rules", "CC/foreign", "defaults"]
+  , "CMAKE": ["cmake/bin/cmake"]
+  , "toolchain": ["staged-cmake"]
+  , "PATH": ["$(TOOLCHAIN)/cmake/bin"]
+  }
+, "staged-cmake": {"type": "install", "dirs": [[["", "toolchain"], "cmake"]]}
+}

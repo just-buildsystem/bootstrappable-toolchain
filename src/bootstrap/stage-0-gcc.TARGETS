@@ -1,0 +1,150 @@
+{ "toolchain":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "target": "gcc-4.7.4"
+  }
+, "files": {"type": "install", "deps": [["TREE", null, "."]]}
+, "separate_sources_and_patches":
+  { "type": "install"
+  , "dirs":
+    [ ["files", "gcc"]
+    , [["@", "gmp", "", "files"], "gmp"]
+    , [["@", "mpc", "", "files"], "mpc"]
+    , [["@", "mpfr", "", "files"], "mpfr"]
+    , [["@", "patches", "", "gcc-4.7.4"], "patches"]
+    ]
+  }
+, "combined_patched_sources":
+  { "type": ["@", "rules", "CC/foreign/shell", "data"]
+  , "project": ["separate_sources_and_patches"]
+  , "localbase": [["@", "busybox", "", "bootstrap"]]
+  , "cmds":
+    [ "export PATCH=${LOCALBASE}/bin/patch"
+    , "mv gmp mpc mpfr gcc/."
+    , "cp -r gcc/. ${DESTDIR}/. && chmod -R +w ${DESTDIR}/*"
+    , "cd ${DESTDIR}"
+    , "echo '#include <sys/ucontext.h>\nucontext_t foo;' > ${TMPDIR}/test.c"
+    , "if \"${CC}\" -c ${TMPDIR}/test.c -o ${TMPDIR}/test.o >/dev/null 2>&1; then"
+    , "  ${PATCH} -p1 < ${WORKDIR}/patches/gcc-4.7.4/use-ucontext_t.patch >/dev/null"
+    , "fi"
+    , "for p in $(cat ${WORKDIR}/patches/gcc-4.7.4/various-fixes/series); do"
+    , "  ${PATCH} -p1 < ${WORKDIR}/patches/gcc-4.7.4/various-fixes/$p >/dev/null"
+    , "done"
+    , "for p in $(cat ${WORKDIR}/patches/gcc-4.7.4/musl-support/series); do"
+    , "  ${PATCH} -p1 < ${WORKDIR}/patches/gcc-4.7.4/musl-support/$p >/dev/null"
+    , "done"
+    , "for p in $(cat ${WORKDIR}/patches/gcc-4.7.4/reproducibility/series); do"
+    , "  ${PATCH} -p1 < ${WORKDIR}/patches/gcc-4.7.4/reproducibility/$p >/dev/null"
+    , "done"
+    ]
+  , "out_dirs": ["."]
+  }
+, "staged_sources_and_binutils":
+  { "type": "install"
+  , "dirs":
+    [ ["combined_patched_sources", "src"]
+    , [["@", "binutils", "", "toolchain"], "binutils"]
+    ]
+  }
+, "gcc-4.7.4":
+  { "type": ["@", "rules", "CC/foreign/shell", "data"]
+  , "arguments_config": ["TOOLCHAIN_CONFIG"]
+  , "project": ["staged_sources_and_binutils"]
+  , "localbase":
+    [["@", "busybox", "", "bootstrap"], ["@", "make", "", "bootstrap"]]
+  , "cmds":
+    [ { "type": "join"
+      , "$1":
+        [ "HOST_SYSTEM_HDR_DIR='"
+        , { "type": "lookup"
+          , "key": "HOST_SYSTEM_HDR_DIR"
+          , "map":
+            { "type": "var"
+            , "name": "TOOLCHAIN_CONFIG"
+            , "default": {"type": "empty_map"}
+            }
+          , "default": ""
+          }
+        , "'"
+        ]
+      }
+    , { "type": "join"
+      , "$1":
+        [ "HOST_SYSTEM_LIB_DIR='"
+        , { "type": "lookup"
+          , "key": "HOST_SYSTEM_LIB_DIR"
+          , "map":
+            { "type": "var"
+            , "name": "TOOLCHAIN_CONFIG"
+            , "default": {"type": "empty_map"}
+            }
+          , "default": ""
+          }
+        , "'"
+        ]
+      }
+    , { "type": "join"
+      , "$1":
+        [ "HOST_DYNAMIC_LINKER='"
+        , { "type": "lookup"
+          , "key": "HOST_DYNAMIC_LINKER"
+          , "map":
+            { "type": "var"
+            , "name": "TOOLCHAIN_CONFIG"
+            , "default": {"type": "empty_map"}
+            }
+          , "default": ""
+          }
+        , "'"
+        ]
+      }
+    , "export NJOBS=$(nproc --all 2>/dev/null || echo 1)"
+    , "export MAKEINFO=missing"
+    , "export MAKE=${LOCALBASE}/bin/make"
+    , "export PATH=$(pwd)/binutils/bin:${LOCALBASE}/bin:$PATH"
+    , "export BUILD_ROOT_DIR=${ACTION_DIR}"
+    , "unset CFLAGS LDFLAGS"
+    , "CONF_ARGS="
+    , "if [ -n \"$HOST_SYSTEM_HDR_DIR\" ]; then"
+    , "  CONF_ARGS=\"$CONF_ARGS --with-sysroot=/ --with-native-system-header-dir=$HOST_SYSTEM_HDR_DIR\""
+    , "fi"
+    , "LINK_ARGS="
+    , "if [ -n \"$HOST_SYSTEM_LIB_DIR\" ]; then"
+    , "  export LIBRARY_PATH=\"$HOST_SYSTEM_LIB_DIR\""
+    , "  LINK_ARGS=\"$LINK_ARGS -B$HOST_SYSTEM_LIB_DIR -L$HOST_SYSTEM_LIB_DIR\""
+    , "  LINK_ARGS=\"$LINK_ARGS -Xlinker -rpath -Xlinker $HOST_SYSTEM_LIB_DIR\""
+    , "fi"
+    , "if [ -n \"$HOST_DYNAMIC_LINKER\" ]; then"
+    , "  mv src/gcc/config src/gcc/config.orig"
+    , "  cp -r src/gcc/config.orig src/gcc/config"
+    , "  chmod -R +w src/gcc/config"
+    , "  for h in src/gcc/config/*/*.h; do"
+    , "    grep -q _DYNAMIC_LINKER \"$h\" || continue"
+    , "    sed -i 's|\\(^#define [A-Z]*_DYNAMIC_LINKER[A-Z0-9]* *\"\\).*\"|\\1'$HOST_DYNAMIC_LINKER'\"|g' \"$h\""
+    , "  done"
+    , "fi"
+    , "export LDFLAGS_FOR_TARGET=\"${LINK_ARGS}\""
+    , "if [ -f /lib/ld-musl-$(uname -m).so.1 ]; then"
+    , "  ln -s /lib/ld-musl-$(uname -m).so.1 ${TMPDIR}/ldd"
+    , "  export PATH=$PATH:${TMPDIR}"
+    , "fi"
+    , "cp -r binutils/. ${DESTDIR}/."
+    , "chmod -R +w ${DESTDIR}/*"
+    , "cd src"
+    , "export check_msgfmt=no   # do not use system's msgfmt, if available"
+    , "./configure --prefix=/ --enable-languages=c,c++ --disable-multilib --disable-shared --disable-lto --disable-gcov --disable-libmudflap --disable-libgomp --disable-libssp --disable-nls --disable-libitm ${CONF_ARGS} >configure.log 2>&1 || (cat configure.log && exit 1)"
+    , "${MAKE} -j${NJOBS} >build.log 2>&1 || (cat configure.log build.log && exit 1)"
+    , "${MAKE} -j${NJOBS} DESTDIR=${DESTDIR} install-strip >>build.log 2>&1 || (cat configure.log build.log && exit 1)"
+    , "cd ${DESTDIR}"
+    , "for f in $(find . -type f | grep '\\.o$'); do strip -g $f; done"
+    , "for f in $(find . -type f | grep '\\.a$'); do strip -g $f; done"
+    , "cd ${DESTDIR}/bin"
+    , "mv gcc gcc.real"
+    , "mv g++ g++.real"
+    , "printf '#!/bin/sh\\nexport PATH=\"$(dirname $0):$PATH\"\\nexec gcc.real %s \"$@\"' \"${LINK_ARGS}\" >gcc"
+    , "printf '#!/bin/sh\\nexport PATH=\"$(dirname $0):$PATH\"\\nexec g++.real %s \"$@\"' \"${LINK_ARGS}\" >g++"
+    , "chmod +x gcc g++"
+    ]
+  , "out_dirs": ["."]
+  }
+}

@@ -1,0 +1,7 @@
+0001-config.sub-add-musl-support-for-gmp-mpc-mpfr.patch
+0002-config.sub-add-musl-support-for-gcc.patch
+0003-musl-libc-config.patch
+0004-x86-musl-support.patch
+0005-libstdc-workaround-for-musl.patch
+0006-config.guess-add-musl-support.patch
+0007-config.guess-detect-glibc-via-__GLIBC__.patch

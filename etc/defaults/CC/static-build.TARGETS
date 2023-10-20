@@ -1,0 +1,12 @@
+{ "defaults":
+  { "type": ["CC", "defaults"]
+  , "CC": ["gcc/bin/gcc"]
+  , "CXX": ["gcc/bin/g++"]
+  , "AR": ["gcc/bin/ar"]
+  , "LDFLAGS": ["-static"]
+  , "toolchain": ["staged-gcc"]
+  , "PATH": ["$(TOOLCHAIN)/gcc/bin", "/bin", "/usr/bin"]
+  }
+, "staged-gcc":
+  {"type": "install", "dirs": [[["@", "gcc-musl", "", "toolchain"], "gcc"]]}
+}

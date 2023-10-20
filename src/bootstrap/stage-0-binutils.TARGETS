@@ -1,0 +1,74 @@
+{ "bootstrap":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "target": "bootstrap-ar"
+  }
+, "toolchain":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "target": "binutils"
+  }
+, "files": {"type": "install", "deps": [["TREE", null, "."]]}
+, "flag_files":
+  { "type": ["@", "rules", "CC/foreign/shell", "data"]
+  , "cmds":
+    [ "echo 'int main() {int i=1; return *((char*)&i) == 1;}' > endian_test.c"
+    , "${CC} -o endian_test endian_test.c"
+    , "CFLAGS=\"-D__$(./endian_test && echo BIG || echo LITTLE)_ENDIAN__=1\""
+    , "echo \"${CFLAGS}\" > ${DESTDIR}/cflags"
+    ]
+  , "outs": ["cflags"]
+  }
+, "staged_bootstrap_sources_and_flags":
+  { "type": "install"
+  , "dirs":
+    [ ["files", "src"]
+    , ["flag_files", "flags"]
+    , [["@", "scripts", "", "bootstrap-ar"], "."]
+    ]
+  }
+, "bootstrap-ar":
+  { "type": ["@", "rules", "CC/foreign/shell", "data"]
+  , "project": ["staged_bootstrap_sources_and_flags"]
+  , "localbase":
+    [["@", "busybox", "", "bootstrap"], ["@", "make", "", "bootstrap"]]
+  , "cmds":
+    [ "export LD=${CC}"
+    , "export MAKE=${LOCALBASE}/bin/make"
+    , "export PATH=${LOCALBASE}/bin:$PATH"
+    , "export CFLAGS=\"$(cat flags/cflags)\""
+    , "./bootstrap-ar.sh src >build.log 2>&1 || (cat build.log && exit 1)"
+    , "mv ar ${DESTDIR}/bin/"
+    ]
+  , "outs": ["bin/ar"]
+  }
+, "binutils":
+  { "type": ["@", "rules", "CC/foreign/shell", "data"]
+  , "project": ["staged_bootstrap_sources_and_flags"]
+  , "localbase":
+    [ ["@", "busybox", "", "bootstrap"]
+    , ["@", "make", "", "bootstrap"]
+    , "bootstrap"
+    ]
+  , "cmds":
+    [ "export LD=${CC}"
+    , "export RANLIB=true"
+    , "export AR=${LOCALBASE}/bin/ar"
+    , "export MAKE=${LOCALBASE}/bin/make"
+    , "export PATH=${LOCALBASE}/bin:$PATH"
+    , "export CFLAGS=\"$(cat flags/cflags)\""
+    , "unset LDFLAGS"
+    , "if [ -f /lib/ld-musl-$(uname -m).so.1 ]; then"
+    , "  ln -s /lib/ld-musl-$(uname -m).so.1 ${TMPDIR}/ldd"
+    , "  export PATH=$PATH:${TMPDIR}"
+    , "fi"
+    , "mkdir build"
+    , "cd build"
+    , "../src/configure --prefix=/ --disable-nls --enable-gprofng=no --disable-werror --enable-deterministic-archives >configure.log 2>&1 || (cat configure.log && exit 1)"
+    , "${MAKE} -j1 MAKEINFO=true >build.log 2>&1 || (cat configure.log build.log && exit 1)"
+    , "${MAKE} -j1 MAKEINFO=true DESTDIR=${DESTDIR} install-strip >>build.log 2>&1 || (cat configure.log build.log && exit 1)"
+    , "for f in $(find ${DESTDIR} -type f -name '*.la'); do sed -i 's|'$(pwd)'|/build|g' $f; done"
+    ]
+  , "out_dirs": ["."]
+  }
+}

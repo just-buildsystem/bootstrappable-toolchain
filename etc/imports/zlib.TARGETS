@@ -1,0 +1,17 @@
+{ "zlib":
+  { "type": "export"
+  , "target": "libz"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  }
+, "libz":
+  { "type": ["@", "rules", "CC/foreign/shell", "data"]
+  , "project": [["TREE", null, "."]]
+  , "cmds":
+    [ "export NJOBS=$(nproc --all 2>/dev/null || echo 1)"
+    , "rm Makefile"
+    , "./configure --static --prefix=/ >configure.log 2>&1 || (cat configure.log && exit 1)"
+    , "${MAKE} -j${NJOBS} install DESTDIR=${DESTDIR} >build.log 2>&1 || (cat configure.log build.log && exit 1)"
+    ]
+  , "out_dirs": ["."]
+  }
+}

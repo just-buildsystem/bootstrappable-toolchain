@@ -1,0 +1,5 @@
+{ "defaults":
+  { "type": ["@", "rules", "CC/foreign", "defaults"]
+  , "base": [["@", "tools", "CC/foreign", "defaults"]]
+  }
+}

@@ -1,0 +1,260 @@
+{ "helloworld-c":
+  { "type": ["@", "rules", "CC", "binary"]
+  , "pure C": ["yes"]
+  , "name": ["helloworld"]
+  , "srcs": ["main.c"]
+  , "private-cflags": ["-Wno-unused-command-line-argument"]
+  }
+, "helloworld-cpp":
+  { "type": ["@", "rules", "CC", "binary"]
+  , "name": ["helloworld"]
+  , "srcs": ["main.cpp"]
+  , "private-cflags": ["-Wno-unused-command-line-argument"]
+  }
+, "installed helloworld-c":
+  { "type": ["@", "rules", "CC", "install-with-deps"]
+  , "targets": ["helloworld-c"]
+  }
+, "installed helloworld-cpp":
+  { "type": ["@", "rules", "CC", "install-with-deps"]
+  , "targets": ["helloworld-cpp"]
+  }
+, "test-c":
+  { "type": ["@", "rules", "shell/test", "script"]
+  , "arguments_config": ["TEST_NAME_SUFFIX"]
+  , "name":
+    { "type": "++"
+    , "$1": [["test-c"], {"type": "var", "name": "TEST_NAME_SUFFIX"}]
+    }
+  , "test": ["test.sh"]
+  , "deps": ["installed helloworld-c"]
+  }
+, "test-cpp":
+  { "type": ["@", "rules", "shell/test", "script"]
+  , "arguments_config": ["TEST_NAME_SUFFIX"]
+  , "name":
+    { "type": "++"
+    , "$1": [["test-cpp"], {"type": "var", "name": "TEST_NAME_SUFFIX"}]
+    }
+  , "test": ["test.sh"]
+  , "deps": ["installed helloworld-cpp"]
+  }
+, "config":
+  { "type": "configure"
+  , "arguments_config":
+    [ "CONFIG_TARGET"
+    , "ARCH"
+    , "TOOLCHAIN_CONFIG"
+    , "STATIC_FULL"
+    , "STATIC_RUNLIBS"
+    , "USE_LIBCXX"
+    , "ENV"
+    ]
+  , "tainted": ["test"]
+  , "target": {"type": "var", "name": "CONFIG_TARGET"}
+  , "config":
+    { "type": "let*"
+    , "bindings":
+      [ ["ARCH", {"type": "var", "name": "ARCH", "default": "x86_64"}]
+      , [ "STATIC_RUNLIBS"
+        , { "type": "if"
+          , "cond": {"type": "var", "name": "STATIC_FULL"}
+          , "then": true
+          , "else": {"type": "var", "name": "STATIC_RUNLIBS"}
+          }
+        ]
+      , [ "TOOLCHAIN_CONFIG"
+        , { "type": "map_union"
+          , "$1":
+            [ { "type": "var"
+              , "name": "TOOLCHAIN_CONFIG"
+              , "default": {"type": "empty_map"}
+              }
+            , {"type": "env", "vars": ["STATIC_RUNLIBS", "USE_LIBCXX"]}
+            ]
+          }
+        ]
+      , [ "ADD_LDFLAGS"
+        , { "type": "if"
+          , "cond": {"type": "var", "name": "STATIC_FULL"}
+          , "then": ["-static", "-s"]
+          }
+        ]
+      , [ "TEST_NAME_SUFFIX"
+        , { "type": "++"
+          , "$1":
+            [ { "type": "if"
+              , "cond": {"type": "var", "name": "STATIC_FULL"}
+              , "then": ["_static"]
+              , "else":
+                { "type": "if"
+                , "cond": {"type": "var", "name": "STATIC_RUNLIBS"}
+                , "then": ["_mixed"]
+                , "else": ["_shared"]
+                }
+              }
+            , { "type": "if"
+              , "cond": {"type": "var", "name": "USE_LIBCXX"}
+              , "then": ["-llvmlibs"]
+              , "else": ["-gnulibs"]
+              }
+            ]
+          }
+        ]
+      , ["TEST_ENV", {"type": "var", "name": "ENV"}]
+      ]
+    , "body":
+      { "type": "env"
+      , "vars":
+        [ "ARCH"
+        , "TOOLCHAIN_CONFIG"
+        , "ADD_LDFLAGS"
+        , "TEST_NAME_SUFFIX"
+        , "TEST_ENV"
+        ]
+      }
+    }
+  }
+, "test-c_shared-gnulibs":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config":
+    { "STATIC_FULL": false
+    , "STATIC_RUNLIBS": false
+    , "USE_LIBCXX": false
+    , "CONFIG_TARGET": "test-c"
+    }
+  , "target": "config"
+  }
+, "test-cpp_shared-gnulibs":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config":
+    { "STATIC_FULL": false
+    , "STATIC_RUNLIBS": false
+    , "USE_LIBCXX": false
+    , "CONFIG_TARGET": "test-cpp"
+    }
+  , "target": "config"
+  }
+, "test-cpp_shared-llvmlibs":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config":
+    { "STATIC_FULL": false
+    , "STATIC_RUNLIBS": false
+    , "USE_LIBCXX": true
+    , "CONFIG_TARGET": "test-cpp"
+    }
+  , "target": "config"
+  }
+, "test-c_mixed-gnulibs":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config":
+    { "STATIC_FULL": false
+    , "STATIC_RUNLIBS": true
+    , "USE_LIBCXX": false
+    , "CONFIG_TARGET": "test-c"
+    }
+  , "target": "config"
+  }
+, "test-cpp_mixed-gnulibs":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config":
+    { "STATIC_FULL": false
+    , "STATIC_RUNLIBS": true
+    , "USE_LIBCXX": false
+    , "CONFIG_TARGET": "test-cpp"
+    }
+  , "target": "config"
+  }
+, "test-cpp_mixed-llvmlibs":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config":
+    { "STATIC_FULL": false
+    , "STATIC_RUNLIBS": true
+    , "USE_LIBCXX": true
+    , "CONFIG_TARGET": "test-cpp"
+    }
+  , "target": "config"
+  }
+, "test-c_static-gnulibs":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config":
+    { "STATIC_FULL": true
+    , "STATIC_RUNLIBS": true
+    , "USE_LIBCXX": false
+    , "CONFIG_TARGET": "test-c"
+    }
+  , "target": "config"
+  }
+, "test-cpp_static-gnulibs":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config":
+    { "STATIC_FULL": true
+    , "STATIC_RUNLIBS": true
+    , "USE_LIBCXX": false
+    , "CONFIG_TARGET": "test-cpp"
+    }
+  , "target": "config"
+  }
+, "test-cpp_static-llvmlibs":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config":
+    { "STATIC_FULL": true
+    , "STATIC_RUNLIBS": true
+    , "USE_LIBCXX": true
+    , "CONFIG_TARGET": "test-cpp"
+    }
+  , "target": "config"
+  }
+, "ALL":
+  { "type": "install"
+  , "arguments_config": ["SKIP_STATIC", "SKIP_SHARED", "HAVE_LIBCXX"]
+  , "tainted": ["test"]
+  , "deps":
+    { "type": "++"
+    , "$1":
+      [ { "type": "if"
+        , "cond": {"type": "var", "name": "SKIP_SHARED"}
+        , "then": []
+        , "else":
+          [ "test-c_shared-gnulibs"
+          , "test-cpp_shared-gnulibs"
+          , "test-c_mixed-gnulibs"
+          , "test-cpp_mixed-gnulibs"
+          ]
+        }
+      , { "type": "if"
+        , "cond": {"type": "var", "name": "SKIP_STATIC"}
+        , "then": []
+        , "else": ["test-c_static-gnulibs", "test-cpp_static-gnulibs"]
+        }
+      , { "type": "if"
+        , "cond": {"type": "var", "name": "HAVE_LIBCXX"}
+        , "then":
+          { "type": "if"
+          , "cond": {"type": "var", "name": "SKIP_SHARED"}
+          , "then": []
+          , "else": ["test-cpp_shared-llvmlibs", "test-cpp_mixed-llvmlibs"]
+          }
+        }
+      , { "type": "if"
+        , "cond": {"type": "var", "name": "HAVE_LIBCXX"}
+        , "then":
+          { "type": "if"
+          , "cond": {"type": "var", "name": "SKIP_STATIC"}
+          , "then": []
+          , "else": ["test-cpp_static-llvmlibs"]
+          }
+        }
+      ]
+    }
+  }
+}

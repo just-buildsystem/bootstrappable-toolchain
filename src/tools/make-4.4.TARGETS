@@ -1,0 +1,20 @@
+{ "toolchain":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "target": "make"
+  }
+, "make":
+  { "type": ["@", "rules", "CC/foreign/shell", "data"]
+  , "project": [["TREE", null, "."]]
+  , "cmds":
+    [ "export NJOBS=$(nproc --all 2>/dev/null || echo 1)"
+    , "unset CFLAGS"
+    , "export CXX=unused"
+    , "export LDFLAGS='-static'"
+    , "./configure --prefix=/ --disable-rpath --disable-load >configure.log 2>&1 || (cat configure.log && exit 1)"
+    , "${MAKE} -j${NJOBS} MAKEINFO=missing >build.log 2>&1 || (cat configure.log build.log && exit 1)"
+    , "${MAKE} -j${NJOBS} MAKEINFO=missing DESTDIR=${DESTDIR} install-strip >>build.log 2>&1 || (cat configure.log build.log && exit 1)"
+    ]
+  , "outs": ["bin/make"]
+  }
+}

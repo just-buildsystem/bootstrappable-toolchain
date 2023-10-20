@@ -1,0 +1,44 @@
+{ "config.mak":
+  { "type": "file_gen"
+  , "name": "config.mak"
+  , "data":
+    { "type": "join"
+    , "separator": "\n"
+    , "$1":
+      [ "BINUTILS_VER = latest"
+      , "MUSL_VER = latest"
+      , "GMP_VER = latest"
+      , "MPC_VER = latest"
+      , "MPFR_VER = latest"
+      , "BINUTILS_CONFIG += --enable-gprofng=no     # needs bison"
+      , ""
+      ]
+    }
+  }
+, "separate_sources_and_patches":
+  { "type": "install"
+  , "files": {"config.mak": "config.mak"}
+  , "dirs":
+    [ [["TREE", null, "."], "src"]
+    , [["@", "config", "", "files"], "config"]
+    , [["@", "linux-headers", "", "files"], "linux-headers"]
+    , [["@", "patches", "", "musl-cross-make-fe915821"], "patches"]
+    ]
+  }
+, "combined_sources_and_patches":
+  { "type": ["@", "rules", "CC/foreign/shell", "data"]
+  , "project": ["separate_sources_and_patches"]
+  , "cmds":
+    [ "cp -r src/. ${DESTDIR}/."
+    , "cd ${DESTDIR}"
+    , "chmod -R +w *"
+    , "patch -p1 < ${WORKDIR}/patches/musl-cross-make-fe915821/fix-asound-patch.patch >/dev/null"
+    , "mkdir sources"
+    , "mv \"${WORKDIR}/config.mak\" ."
+    , "mv \"${WORKDIR}/config/config.sub\" sources/config.sub"
+    , "mv \"${WORKDIR}/linux-headers\" linux-headers-4.19.88-1.orig"
+    , "cp -r \"${WORKDIR}/patches/musl-cross-make-fe915821/patches/.\" patches/."
+    ]
+  , "out_dirs": ["."]
+  }
+}

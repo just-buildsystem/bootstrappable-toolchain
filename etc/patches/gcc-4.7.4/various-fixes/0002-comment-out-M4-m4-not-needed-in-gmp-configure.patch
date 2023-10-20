@@ -1,0 +1,35 @@
+From 220a31382c25e511b30ef675711d9bcd057c1083 Mon Sep 17 00:00:00 2001
+From: Oliver Reiche <oliver.reiche@huawei.com>
+Date: Thu, 29 Jun 2023 15:47:27 +0200
+Subject: [PATCH 2/4] Comment out M4=m4-not-needed in gmp/configure
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Backport from GMP 5.0.2
+  Mercurial changeset IDs: d32fa7b198d3 and 2b1c397a9463
+
+Co-authored-by: Niels Möller <nisse@lysator.liu.se>
+Co-authored-by: Torbjorn Granlund <tege@gmplib.org>
+---
+ gmp/configure | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gmp/configure b/gmp/configure
+index c72990c07..c5f247948 100755
+--- a/gmp/configure
++++ b/gmp/configure
+@@ -28982,8 +28982,8 @@ echo "${ECHO_T}$gmp_cv_m4_m4wrap_spurious" >&6
+ echo "define(<M4WRAP_SPURIOUS>,<$gmp_cv_m4_m4wrap_spurious>)" >> $gmp_tmpconfigm4
+ 
+ 
+-else
+-  M4=m4-not-needed
++#else
++#  M4=m4-not-needed
+ fi
+ 
+ # Only do the GMP_ASM checks if there's a .S or .asm wanting them.
+-- 
+2.30.2
+
