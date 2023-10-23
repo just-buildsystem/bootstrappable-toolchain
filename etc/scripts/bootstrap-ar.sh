@@ -31,7 +31,7 @@ SRCDIR=$1
   echo '#error fail here' > dlfcn.h
 
   # configure and build object files for bfd, libiberty, zlib, and libsframe
-  ./configure --prefix=/ --disable-nls --enable-gprofng=no --disable-werror --enable-deterministic-archives
+  ./configure --prefix=/ --disable-nls --enable-gprofng=no --disable-werror --enable-deterministic-archives --without-zstd
   ${MAKE} MAKEINFO=true all-binutils || true
 
   export CFLAGS="${CFLAGS} -DDEFAULT_AR_DETERMINISTIC=1 -Dbin_dummy_emulation="bin_vanilla_emulation" -Iinclude -Ibfd "
