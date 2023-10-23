@@ -122,12 +122,12 @@ All compiler toolchains additionally provide:
   The `CC` toolchain definition for use with
   [rules-cc](https://github.com/just-buildsystem/rules-cc)
 
-All tool toolchains (including `<compiler>+tools`) provide:
+All tool toolchains (including `<toolchain>+tools`) provide:
 - `["CC/foreign", "defaults"]`:
   The `CC/foreign` toolchain definition for use with
   [rules-cc](https://github.com/just-buildsystem/rules-cc)
 
-The `busybox` toolchain (including `<compiler>+tools`) additionally provides:
+The `busybox` toolchains (including `<toolchain>+tools`) additionally provide:
 - `["patch", "defaults"]`:
   The `patch` toolchain definition for use with
   [rules-cc](https://github.com/just-buildsystem/rules-cc)
@@ -182,5 +182,5 @@ Example configuration for bootstrapping on NixOS (hashes may vary):
 ## License
 
 All files are copyright Huawei Cloud Computing Technology Co., Ltd., license
-Apache-2.0, expect for the patches in `etc/patches`, which are license GPL-2.0
+Apache-2.0, except for the patches in `etc/patches`, which are license GPL-2.0
 (the same license as the respective upstream project).
