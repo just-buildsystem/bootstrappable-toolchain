@@ -107,7 +107,10 @@
       , "  cp -l $f $(echo $f | sed 's|/'${TARGET}-'|/|g')"
       , "done"
       , "cp -rl ./${TARGET}/lib/. ./lib/."
-      , "find . -type l ! -exec test -e {} \\; -delete"
+      , "find . -type l -exec sh -c 'expr match \"$(readlink {})\" \"/\" >/dev/null' \\; -delete"
+      , "GCC_LIBDIR=\"lib/gcc/$(./bin/gcc -dumpmachine)/$(./bin/gcc -dumpfullversion -dumpversion)\""
+      , "mv ${GCC_LIBDIR}/include-fixed ${TMPDIR}/"
+      , "cp -rL ${TMPDIR}/include-fixed ${GCC_LIBDIR}/.   # resolve symlinks"
       ]
     }
   , "out_dirs": ["."]
@@ -146,16 +149,16 @@
   { "type": "generic"
   , "arguments_config": ["ENV"]
   , "deps": ["toolchain_for_target"]
-  , "cmds": [":"]
-  , "outs": ["lib/libstdc++.so.6"]
+  , "cmds": ["cp -L lib/libstdc++.so.6 ."]
+  , "outs": ["libstdc++.so.6"]
   , "env": {"type": "var", "name": "ENV", "default": {"type": "empty_map"}}
   }
 , "libgcc_s_files":
   { "type": "generic"
   , "arguments_config": ["ENV"]
   , "deps": ["toolchain_for_target"]
-  , "cmds": [":"]
-  , "outs": ["lib/libgcc_s.so.1"]
+  , "cmds": ["cp -L lib/libgcc_s.so.1 ."]
+  , "outs": ["libgcc_s.so.1"]
   , "env": {"type": "var", "name": "ENV", "default": {"type": "empty_map"}}
   }
 }

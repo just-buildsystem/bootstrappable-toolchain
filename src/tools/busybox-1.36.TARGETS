@@ -15,6 +15,9 @@
     , "${MAKE} HOSTCC=\"${CC} -static\" HOSTCXX=\"${CXX} -static\" defconfig >configure.log 2>&1 || (cat configure.log && exit 1)"
     , "${MAKE} -j${NJOBS} HOSTCC=\"${CC} -static\" HOSTCXX=\"${CXX} -static\" >build.log 2>&1 || (cat configure.log build.log && exit 1)"
     , "${MAKE} -j${NJOBS} HOSTCC=\"${CC} -static\" HOSTCXX=\"${CXX} -static\" CONFIG_PREFIX=${DESTDIR} install >>build.log 2>&1 || (cat configure.log build.log && exit 1)"
+    , "cd ${DESTDIR}"
+    , "for d in sbin usr/bin usr/sbin; do cp -l bin/busybox $d; done"
+    , "for l in $(find sbin usr/bin usr/sbin -type l); do ln -sf busybox $l; done"
     ]
   , "out_dirs": ["."]
   }

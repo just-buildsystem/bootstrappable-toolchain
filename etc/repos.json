@@ -10,11 +10,11 @@
   , "toolchains": {"repository": {"type": "file", "path": "toolchains"}}
   , "rules":
     { "repository":
-      { "type": "git"
-      , "branch": "master"
-      , "commit": "90185a3c608f1428b4ce3c32bc2451f31041acc2"
-      , "repository": "https://github.com/just-buildsystem/rules-cc"
-      , "subdir": "rules"
+      { "type": "archive"
+      , "content": "114266e2768df3fca92c13c359fb9dfccb53aa97"
+      , "fetch": "https://github.com/just-buildsystem/rules-cc/archive/1f8e8d060c0c554f4374351d350bf3d661126579.tar.gz"
+      , "sha256": "3689742cfa30a36538ffee5d56f4d2705d8d5e10e2a1c161740d1f6fc44dd42e"
+      , "subdir": "rules-cc-1f8e8d060c0c554f4374351d350bf3d661126579/rules"
       }
     }
   , "rules/stage-0":
