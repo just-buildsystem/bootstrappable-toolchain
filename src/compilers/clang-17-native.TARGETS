@@ -113,7 +113,7 @@
     , "GCC_TOOLCHAIN=$(dirname ${CC})/.."
     , "export PATH=${LOCALBASE}/bin:$PATH"
     , "export PKG_CONFIG=false"
-    , "export LD_LIBRARY_PATH=\"${GCC_TOOLCHAIN}/lib:${GCC_TOOLCHAIN}/lib32:${GCC_TOOLCHAIN}/lib64\""
+    , "export LD_LIBRARY_PATH=\"${GCC_TOOLCHAIN}/lib64\""
     , "unset LDFLAGS"
     , "CONF_ARGS="
     , "INCL_ARGS="
@@ -143,8 +143,10 @@
     , "find . -type f -name '*.so*' -exec sh -c \"strip {} 2>/dev/null\" \\;"
     , "find . -type f -name '*.a' -exec sh -c \"strip -g {}\" \\;"
     , "find . -type f -name '*.o' -exec sh -c \"strip -g {}\" \\;"
-    , "cp -r ${GCC_TOOLCHAIN}/include ${GCC_TOOLCHAIN}/lib* ${DESTDIR}/."
-    , "cp -rl ${DESTDIR}/lib[0-9]*/* ${DESTDIR}/lib/."
+    , "cp -r ${GCC_TOOLCHAIN}/include/c++ ${DESTDIR}/include/."
+    , "cp -r ${GCC_TOOLCHAIN}/lib/gcc ${DESTDIR}/lib/."
+    , "cp -r ${GCC_TOOLCHAIN}/lib64/. ${DESTDIR}/lib/."
+    , "ln -s lib ${DESTDIR}/lib64"
     , "if [ -n \"${INCL_ARGS}${LINK_ARGS}\" ]; then"
     , "  cd ${DESTDIR}/bin"
     , "  mv clang clang.real"
@@ -195,7 +197,7 @@
   { "type": "generic"
   , "arguments_config": ["ENV"]
   , "deps": ["toolchain"]
-  , "cmds": ["cp -L lib/$(uname -m)-*/libc++.so.1 ."]
+  , "cmds": ["cp -L lib/$(./bin/clang -dumpmachine)/libc++.so.1 ."]
   , "outs": ["libc++.so.1"]
   , "env": {"type": "var", "name": "ENV", "default": {"type": "empty_map"}}
   }
@@ -203,7 +205,7 @@
   { "type": "generic"
   , "arguments_config": ["ENV"]
   , "deps": ["toolchain"]
-  , "cmds": ["cp -L lib/$(uname -m)-*/libc++abi.so.1 ."]
+  , "cmds": ["cp -L lib/$(./bin/clang -dumpmachine)/libc++abi.so.1 ."]
   , "outs": ["libc++abi.so.1"]
   , "env": {"type": "var", "name": "ENV", "default": {"type": "empty_map"}}
   }

@@ -104,9 +104,8 @@
       , "find . -type f -name '*.a' -exec sh -c \"${TARGET_STRIP} -g {}\" \\;"
       , "find . -type f -name '*.o' -exec sh -c \"${TARGET_STRIP} -g {}\" \\;"
       , "for f in $(ls ./bin/${TARGET}-*); do"
-      , "  cp -l $f $(echo $f | sed 's|/'${TARGET}-'|/|g')"
+      , "  ln -s $(basename $f) $(echo $f | sed 's|/'${TARGET}-'|/|g')"
       , "done"
-      , "cp -rl ./${TARGET}/lib/. ./lib/."
       , "find . -type l -exec sh -c 'expr match \"$(readlink {})\" \"/\" >/dev/null' \\; -delete"
       , "GCC_LIBDIR=\"lib/gcc/$(./bin/gcc -dumpmachine)/$(./bin/gcc -dumpfullversion -dumpversion)\""
       , "mv ${GCC_LIBDIR}/include-fixed ${TMPDIR}/"
@@ -149,7 +148,7 @@
   { "type": "generic"
   , "arguments_config": ["ENV"]
   , "deps": ["toolchain_for_target"]
-  , "cmds": ["cp -L lib/libstdc++.so.6 ."]
+  , "cmds": ["cp -L $(./bin/gcc -dumpmachine)/lib/libstdc++.so.6 ."]
   , "outs": ["libstdc++.so.6"]
   , "env": {"type": "var", "name": "ENV", "default": {"type": "empty_map"}}
   }
@@ -157,7 +156,7 @@
   { "type": "generic"
   , "arguments_config": ["ENV"]
   , "deps": ["toolchain_for_target"]
-  , "cmds": ["cp -L lib/libgcc_s.so.1 ."]
+  , "cmds": ["cp -L $(./bin/gcc -dumpmachine)/lib/libgcc_s.so.1 ."]
   , "outs": ["libgcc_s.so.1"]
   , "env": {"type": "var", "name": "ENV", "default": {"type": "empty_map"}}
   }

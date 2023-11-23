@@ -44,7 +44,7 @@ library features (`gcc-13.2.0-native`) and build tools (`busybox`, `make`,
 newly built Clang is used to build any of the remaining targets. To ensure that
 the Clang from the first step can be used during the entire build process, GCC's
 runtime libraries (`libgcc`, `libstdc++`) must be locatable by setting
-`LD_LIBRARY_PATH=${GCC_TOOLCHAIN}/lib{32,64}`. For building reproducibly, it is
+`LD_LIBRARY_PATH=${GCC_TOOLCHAIN}/lib64`. For building reproducibly, it is
 required to set `LIBCXXABI_ENABLE_ASSERTIONS` and `LIBUNWIND_ENABLE_ASSERTIONS`
 to `OFF`, as both are enabled by default and cause leaking absolute paths to
 the build directory.

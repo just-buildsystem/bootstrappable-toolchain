@@ -29,7 +29,7 @@
     , "find ./bin -type f -name '*-config' -exec sh -c \"sed -i 's|${ACTION_DIR}|/build|g' {}\" \\;"
     , "find ./lib -type f -name 'Makefile' -exec sh -c \"sed -i 's|${ACTION_DIR}|/build|g' {}\" \\;"
     , "find ./lib -type f -name '_sysconfigdata_*' -exec sh -c \"sed -i 's|${ACTION_DIR}|/build|g' {}\" \\;"
-    , "cp -l bin/python3 bin/python"
+    , "ln -s python3 bin/python"
     ]
   , "out_dirs": ["."]
   }
