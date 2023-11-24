@@ -9,7 +9,7 @@ Available compiler toolchains are:
 - `gcc-latest-native`
 - `gcc-13.2.0-native`
 - `clang-latest-native`
-- `clang-17.0.1-native`
+- `clang-17.0.5-native`
 - `clang-16.0.6-native`
 - `gcc-latest-musl`
 - `gcc-13.2.0-musl`

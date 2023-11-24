@@ -373,13 +373,13 @@
       , "patches": "patches"
       }
     }
-  , "compilers/clang-17.0.1-native":
+  , "compilers/clang-17.0.5-native":
     { "repository":
       { "type": "archive"
-      , "content": "8ac42d74d5689f28a8eae1f9d46330d196f84c2a"
-      , "fetch": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-17.0.1.tar.gz"
-      , "sha256": "d51b10be66c10a6a81f4c594b554ffbf1063ffbadcb810af37d1f88d6e0b49dd"
-      , "subdir": "llvm-project-llvmorg-17.0.1"
+      , "content": "2cbe7f083fd3e36e69e2f507acba8d9817ae73b3"
+      , "fetch": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-17.0.5.tar.gz"
+      , "sha256": "432c1eda3d1c9379cd52a9bee8e0ea6f7b204bff5075895f963fd8e575aa4fb8"
+      , "subdir": "llvm-project-llvmorg-17.0.5"
       , "pragma": {"special": "resolve-partially"}
       }
     , "target_root": "compilers"
@@ -471,12 +471,12 @@
   , "clang-latest-native":
     { "repository": "toolchains"
     , "target_file_name": "clang.TARGETS"
-    , "bindings": {"rules": "rules", "clang": "compilers/clang-17.0.1-native"}
+    , "bindings": {"rules": "rules", "clang": "compilers/clang-17.0.5-native"}
     }
-  , "clang-17.0.1-native":
+  , "clang-17.0.5-native":
     { "repository": "toolchains"
     , "target_file_name": "clang.TARGETS"
-    , "bindings": {"rules": "rules", "clang": "compilers/clang-17.0.1-native"}
+    , "bindings": {"rules": "rules", "clang": "compilers/clang-17.0.5-native"}
     }
   , "clang-16.0.6-native":
     { "repository": "toolchains"
@@ -585,13 +585,13 @@
       , "compiler": "clang-latest-native"
       }
     }
-  , "clang-17.0.1-native+tools":
+  , "clang-17.0.5-native+tools":
     { "repository": "toolchains"
     , "target_file_name": "compiler+tools.TARGETS"
     , "bindings":
       { "rules": "rules"
       , "tools": "tools-all"
-      , "compiler": "clang-17.0.1-native"
+      , "compiler": "clang-17.0.5-native"
       }
     }
   , "clang-16.0.6-native+tools":
