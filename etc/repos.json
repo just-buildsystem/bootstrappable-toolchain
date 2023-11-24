@@ -45,7 +45,7 @@
       , "gcc": "stage-1/gcc"
       }
     }
-  , "rules/clang":
+  , "rules/clang_with_gcc13":
     { "repository": "rules"
     , "target_root": "defaults"
     , "target_file_name": "clang.TARGETS"
@@ -368,7 +368,7 @@
     , "target_root": "compilers"
     , "target_file_name": "clang-16-native.TARGETS"
     , "bindings":
-      { "rules": "rules/clang"
+      { "rules": "rules/clang_with_gcc13"
       , "binutils": "imports/binutils-latest"
       , "patches": "patches"
       }
@@ -385,7 +385,7 @@
     , "target_root": "compilers"
     , "target_file_name": "clang-17-native.TARGETS"
     , "bindings":
-      { "rules": "rules/clang"
+      { "rules": "rules/clang_with_gcc13"
       , "binutils": "imports/binutils-latest"
       , "patches": "patches"
       }
