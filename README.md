@@ -47,16 +47,17 @@ Details about toolchain variants:
       the target system*)
     - **supports fully static linking (unlike *glibc* toolchains)**
     - **supports cross-compilation for project's `TARGET_ARCH`**
-- `<compiler>-musl-static`: statically linked compiler with musl support
+- `<compiler>-musl-static`: statically linked *cross* compiler with musl support
     - runs on systems without any existing C library
     - **links against bundled *musl libc***  
       (*note that dynamically linked binaries require a working musl ld+libc on
       the target system*)
     - **supports fully static linking (unlike *glibc* toolchains)**
+    - **supports cross-compilation for project's `TARGET_ARCH`**
 - `<toolchain>+tools` (e.g., `gcc-13.2.0-native+tools`)  
     - `<toolchain>` bundled with all latest tools (see `tools-all` above)
 
-Non-static `musl` variants support cross-compilation. In your project, make sure
+All `musl` variants support cross-compilation. In your project, make sure
 that the variables `ARCH` and `TARGET_ARCH` are set to one of the following
 values: `x86`, `x86_64`, `arm`, or `arm64`.
 
