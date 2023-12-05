@@ -28,9 +28,20 @@
   , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
   , "target": "libgcc_s"
   }
+, "strip_for_host":
+  { "type": "configure"
+  , "arguments_config": ["ARCH"]
+  , "config":
+    { "type": "singleton_map"
+    , "key": "TARGET_ARCH"
+    , "value": {"type": "var", "name": "ARCH"}
+    }
+  , "target": ["@", "binutils", "", "multi-target strip"]
+  }
 , "gcc-musl-static":
   { "type": ["@", "rules", "CC/foreign/shell", "data"]
   , "project": [["@", "gcc-musl", "", "combined_patched_sources"]]
+  , "localbase": ["strip_for_host"]
   , "arguments_config": ["BUILD_ARCH"]
   , "cmds":
     { "type": "let*"
@@ -72,11 +83,11 @@
       , "${MAKE} -j${NJOBS} TARGET=${TARGET} CC=${TMPDIR}/cc CXX=${TMPDIR}/c++ LDFLAGS='-static' LDFLAGS_FOR_TARGET='-static' >build.log 2>&1 || (cat build.log && exit 1)"
       , "${MAKE} -j${NJOBS} TARGET=${TARGET} CC=${TMPDIR}/cc CXX=${TMPDIR}/c++ LDFLAGS='-static' LDFLAGS_FOR_TARGET='-static' OUTPUT= DESTDIR=${DESTDIR} install >>build.log 2>&1 || (cat build.log && exit 1)"
       , "cd ${DESTDIR}"
-      , "TARGET_STRIP=./bin/${TARGET}-strip"
-      , "find ./bin/ ./${TARGET}/bin/ ./libexec/gcc/ -type f -exec sh -c \"strip {} 2>/dev/null\" \\;"
-      , "find . -type f -name '*.so*' -exec sh -c \"${TARGET_STRIP} {} 2>/dev/null\" \\;"
-      , "find . -type f -name '*.a' -exec sh -c \"${TARGET_STRIP} -g {}\" \\;"
-      , "find . -type f -name '*.o' -exec sh -c \"${TARGET_STRIP} -g {}\" \\;"
+      , "STRIP=${LOCALBASE}/bin/strip"
+      , "find ./bin/ ./${TARGET}/bin/ ./libexec/gcc/ -type f -exec sh -c \"${STRIP} {} 2>/dev/null\" \\;"
+      , "find . -type f -name '*.so*' -exec sh -c \"${STRIP} {} 2>/dev/null\" \\;"
+      , "find . -type f -name '*.a' -exec sh -c \"${STRIP} -g {} 2>/dev/null\" \\;"
+      , "find . -type f -name '*.o' -exec sh -c \"${STRIP} -g {} 2>/dev/null\" \\;"
       , "for f in $(ls ./bin/${TARGET}-*); do"
       , "  ln -s $(basename $f) $(echo $f | sed 's|/'${TARGET}-'|/|g')"
       , "done"
