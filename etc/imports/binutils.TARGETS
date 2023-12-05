@@ -4,6 +4,11 @@
   , "target": "binutils binaries"
   , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
   }
+, "multi-target strip":
+  { "type": "export"
+  , "target": "multi-target strip binary"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  }
 , "binutils binaries":
   { "type": ["@", "rules", "CC/foreign/shell", "data"]
   , "project": ["files"]
@@ -22,5 +27,23 @@
     , "find ${DESTDIR} -type f -name '*.la' -exec sed -i 's|'$(pwd)'|/build|g' {} \\;"
     ]
   , "out_dirs": ["."]
+  }
+, "multi-target strip binary":
+  { "type": ["@", "rules", "CC/foreign/shell", "data"]
+  , "project": ["files"]
+  , "cmds":
+    [ "export NJOBS=$(nproc --all 2>/dev/null || echo 1)"
+    , "unset LDFLAGS"
+    , "if [ -f /lib/ld-musl-$(uname -m).so.1 ]; then"
+    , "  ln -s /lib/ld-musl-$(uname -m).so.1 ${TMPDIR}/ldd"
+    , "  export PATH=$PATH:${TMPDIR}"
+    , "fi"
+    , "mkdir build"
+    , "cd build"
+    , "../configure --prefix=/ --enable-targets=all --enable-deterministic-archives --disable-nls --disable-gprofng --disable-ld --disable-gdb --disable-werror >configure.log 2>&1 || (cat configure.log && exit 1)"
+    , "${MAKE} -j${NJOBS} MAKEINFO=true all-binutils >build.log 2>&1 || (cat configure.log build.log && exit 1)"
+    , "${MAKE} -j${NJOBS} MAKEINFO=true DESTDIR=${DESTDIR} install-strip-binutils >>build.log 2>&1 || (cat configure.log build.log && exit 1)"
+    ]
+  , "outs": ["bin/strip"]
   }
 }
