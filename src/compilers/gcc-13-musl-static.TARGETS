@@ -73,6 +73,7 @@
         }
       , "export NJOBS=$(nproc --all 2>/dev/null || echo 1)"
       , "export MAKEINFO=missing"
+      , "export BUILD_ROOT_DIR=${ACTION_DIR}"
       , "unset CFLAGS CXXFLAGS LDFLAGS"
       , "printf '#!/bin/sh\\nexec \"%s\" -static \"$@\"' \"${CC}\" >${TMPDIR}/cc"
       , "printf '#!/bin/sh\\nexec \"%s\" -static \"$@\"' \"${CXX}\" >${TMPDIR}/c++"
