@@ -26,7 +26,7 @@
 , "runlibs":
   { "type": "export"
   , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
-  , "target": "libgcc_s"
+  , "target": "libc"
   }
 , "strip_for_host":
   { "type": "configure"
@@ -83,8 +83,8 @@
       , "mv musl-latest.orig musl.readonly"
       , "cp -r musl.readonly musl-latest.orig && chmod -R +w musl-latest.orig"
       , "export check_msgfmt=no   # do not use system's msgfmt, if available"
-      , "${MAKE} -j${NJOBS} TARGET=${TARGET} LDFLAGS='-static' LDFLAGS_FOR_TARGET='-static' >build.log 2>&1 || (cat build.log && exit 1)"
-      , "${MAKE} -j${NJOBS} TARGET=${TARGET} LDFLAGS='-static' LDFLAGS_FOR_TARGET='-static' OUTPUT= DESTDIR=${DESTDIR} install >>build.log 2>&1 || (cat build.log && exit 1)"
+      , "${MAKE} -j${NJOBS} TARGET=${TARGET} LDFLAGS='-static' LDFLAGS_FOR_TARGET='-static' GCC_CONFIG='--disable-shared' >build.log 2>&1 || (cat build.log && exit 1)"
+      , "${MAKE} -j${NJOBS} TARGET=${TARGET} LDFLAGS='-static' LDFLAGS_FOR_TARGET='-static' GCC_CONFIG='--disable-shared' OUTPUT= DESTDIR=${DESTDIR} install >>build.log 2>&1 || (cat build.log && exit 1)"
       , "cd ${DESTDIR}"
       , "STRIP=${LOCALBASE}/bin/strip"
       , "find ./bin/ ./${TARGET}/bin/ ./libexec/gcc/ -type f -exec sh -c \"${STRIP} {} 2>/dev/null\" \\;"
@@ -121,24 +121,10 @@
     }
   , "target": "toolchain_cross"
   }
-, "libgcc_s":
-  { "type": ["@", "rules", "CC/prebuilt", "library"]
-  , "name": ["libgcc"]
-  , "lib": ["libgcc_s_files"]
-  , "deps": ["libc"]
-  }
 , "libc":
   { "type": ["@", "rules", "CC/prebuilt", "library"]
   , "name": ["libc"]
   , "lib": ["libc_files"]
-  }
-, "libgcc_s_files":
-  { "type": "generic"
-  , "arguments_config": ["ENV"]
-  , "deps": ["toolchain_for_target"]
-  , "cmds": ["cp -L $(./bin/gcc -dumpmachine)/lib/libgcc_s.so.1 ."]
-  , "outs": ["libgcc_s.so.1"]
-  , "env": {"type": "var", "name": "ENV", "default": {"type": "empty_map"}}
   }
 , "libc_files":
   { "type": "generic"
