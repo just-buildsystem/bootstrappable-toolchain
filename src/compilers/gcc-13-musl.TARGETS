@@ -1,4 +1,17 @@
 { "toolchain":
+  { "type": "export"
+  , "flexible_config":
+    ["ARCH", "TARGET_ARCH", "BUILD_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"MUSL_BUILD_STATIC": false}
+  , "target": "toolchain_internal"
+  }
+, "runlibs":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"MUSL_BUILD_STATIC": false}
+  , "target": "runlibs_internal"
+  }
+, "toolchain_internal":
   { "type": "configure"
   , "arguments_config": ["ARCH", "BUILD_ARCH"]
   , "config":
@@ -17,16 +30,34 @@
     }
   , "target": "toolchain_cross"
   }
+, "toolchain_non_static_for_host":
+  { "type": "configure"
+  , "arguments_config": ["ARCH"]
+  , "config":
+    { "type": "let*"
+    , "bindings":
+      [ ["BUILD_ARCH", {"type": "var", "name": "ARCH"}]
+      , ["TARGET_ARCH", {"type": "var", "name": "ARCH"}]
+      , ["MUSL_BUILD_STATIC", false]
+      ]
+    , "body":
+      { "type": "env"
+      , "vars": ["TARGET_ARCH", "BUILD_ARCH", "MUSL_BUILD_STATIC"]
+      }
+    }
+  , "target": "toolchain_internal"
+  }
 , "toolchain_cross":
   { "type": "export"
   , "flexible_config":
-    ["ARCH", "TARGET_ARCH", "BUILD_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+    [ "ARCH"
+    , "TARGET_ARCH"
+    , "BUILD_ARCH"
+    , "TOOLCHAIN_CONFIG"
+    , "ENV"
+    , "MUSL_BUILD_STATIC"
+    ]
   , "target": "gcc-musl"
-  }
-, "runlibs":
-  { "type": "export"
-  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
-  , "target": "libstdc++"
   }
 , "separate_patched_sources":
   { "type": "install"
@@ -66,11 +97,25 @@
     }
   , "target": ["@", "binutils", "", "multi-target strip"]
   }
+, "gcc-musl_localbase":
+  { "type": "install"
+  , "arguments_config": ["MUSL_BUILD_STATIC"]
+  , "dirs":
+    { "type": "++"
+    , "$1":
+      [ [["strip_for_host", "binutils"]]
+      , { "type": "if"
+        , "cond": {"type": "var", "name": "MUSL_BUILD_STATIC"}
+        , "then": [["toolchain_non_static_for_host", "hostcc"]]
+        }
+      ]
+    }
+  }
 , "gcc-musl":
   { "type": ["@", "rules", "CC/foreign/shell", "data"]
   , "project": ["combined_patched_sources"]
-  , "localbase": ["strip_for_host"]
-  , "arguments_config": ["BUILD_ARCH"]
+  , "localbase": ["gcc-musl_localbase"]
+  , "arguments_config": ["BUILD_ARCH", "MUSL_BUILD_STATIC"]
   , "cmds":
     { "type": "let*"
     , "bindings":
@@ -96,32 +141,53 @@
         ]
       ]
     , "body":
-      [ { "type": "join"
-        , "$1": ["TARGET=", {"type": "var", "name": "TARGET"}, "-linux-musl"]
-        }
-      , "export NJOBS=$(nproc --all 2>/dev/null || echo 1)"
-      , "export MAKEINFO=missing"
-      , "export BUILD_ROOT_DIR=${ACTION_DIR}"
-      , "unset CFLAGS CXXFLAGS LDFLAGS"
-      , "mv musl-latest.orig musl.readonly"
-      , "cp -r musl.readonly musl-latest.orig && chmod -R +w musl-latest.orig"
-      , "export check_msgfmt=no   # do not use system's msgfmt, if available"
-      , "${MAKE} -j${NJOBS} TARGET=${TARGET} >build.log 2>&1 || (cat build.log && exit 1)"
-      , "${MAKE} -j${NJOBS} TARGET=${TARGET} OUTPUT= DESTDIR=${DESTDIR} install >>build.log 2>&1 || (cat build.log && exit 1)"
-      , "cd ${DESTDIR}"
-      , "STRIP=${LOCALBASE}/bin/strip"
-      , "find ./bin/ ./${TARGET}/bin/ ./libexec/gcc/ -type f -exec sh -c \"${STRIP} {} 2>/dev/null\" \\;"
-      , "find . -type f -name '*.so*' -exec sh -c \"${STRIP} {} 2>/dev/null\" \\;"
-      , "find . -type f -name '*.a' -exec sh -c \"${STRIP} -g {} 2>/dev/null\" \\;"
-      , "find . -type f -name '*.o' -exec sh -c \"${STRIP} -g {} 2>/dev/null\" \\;"
-      , "for f in $(ls ./bin/${TARGET}-*); do"
-      , "  ln -s $(basename $f) $(echo $f | sed 's|/'${TARGET}-'|/|g')"
-      , "done"
-      , "find . -type l -exec sh -c 'expr match \"$(readlink {})\" \"/\" >/dev/null' \\; -delete"
-      , "GCC_LIBDIR=\"lib/gcc/$(./bin/gcc -dumpmachine)/$(./bin/gcc -dumpfullversion -dumpversion)\""
-      , "mv ${GCC_LIBDIR}/include-fixed ${TMPDIR}/"
-      , "cp -rL ${TMPDIR}/include-fixed ${GCC_LIBDIR}/.   # resolve symlinks"
-      ]
+      { "type": "++"
+      , "$1":
+        [ [ { "type": "join"
+            , "$1":
+              ["TARGET=", {"type": "var", "name": "TARGET"}, "-linux-musl"]
+            }
+          , "export NJOBS=$(nproc --all 2>/dev/null || echo 1)"
+          , "export MAKEINFO=missing"
+          , "export BUILD_ROOT_DIR=${ACTION_DIR}"
+          , "unset CFLAGS CXXFLAGS LDFLAGS"
+          , "GCC_CONFIG="
+          ]
+        , { "type": "if"
+          , "cond": {"type": "var", "name": "MUSL_BUILD_STATIC"}
+          , "then":
+            [ "printf '#!/bin/sh\\nexec \"%s\" -static \"$@\"' \"${LOCALBASE}/hostcc/bin/gcc\" >${TMPDIR}/host-gcc"
+            , "printf '#!/bin/sh\\nexec \"%s\" -static \"$@\"' \"${LOCALBASE}/hostcc/bin/g++\" >${TMPDIR}/host-g++"
+            , "chmod +x ${TMPDIR}/host-gcc ${TMPDIR}/host-g++"
+            , "export CC=\"${TMPDIR}/host-gcc\""
+            , "export CXX=\"${TMPDIR}/host-g++\""
+            , "export LDFLAGS='-static'"
+            , "export LDFLAGS_FOR_TARGET='-static'"
+            , "GCC_CONFIG='--disable-shared'"
+            ]
+          , "else": ["export LD_LIBRARY_PATH=\"$(dirname ${CC})/../lib64\""]
+          }
+        , [ "mv musl-latest.orig musl.readonly"
+          , "cp -r musl.readonly musl-latest.orig && chmod -R +w musl-latest.orig"
+          , "export check_msgfmt=no   # do not use system's msgfmt, if available"
+          , "${MAKE} -j${NJOBS} TARGET=${TARGET} GCC_CONFIG=\"${GCC_CONFIG}\" >build.log 2>&1 || (cat build.log && exit 1)"
+          , "${MAKE} -j${NJOBS} TARGET=${TARGET} GCC_CONFIG=\"${GCC_CONFIG}\" OUTPUT= DESTDIR=${DESTDIR} install >>build.log 2>&1 || (cat build.log && exit 1)"
+          , "cd ${DESTDIR}"
+          , "STRIP=${LOCALBASE}/binutils/bin/strip"
+          , "find ./bin/ ./${TARGET}/bin/ ./libexec/gcc/ -type f -exec sh -c \"${STRIP} {} 2>/dev/null\" \\;"
+          , "find . -type f -name '*.so*' -exec sh -c \"${STRIP} {} 2>/dev/null\" \\;"
+          , "find . -type f -name '*.a' -exec sh -c \"${STRIP} -g {} 2>/dev/null\" \\;"
+          , "find . -type f -name '*.o' -exec sh -c \"${STRIP} -g {} 2>/dev/null\" \\;"
+          , "for f in $(ls ./bin/${TARGET}-*); do"
+          , "  ln -s $(basename $f) $(echo $f | sed 's|/'${TARGET}-'|/|g')"
+          , "done"
+          , "find . -type l -exec sh -c 'expr match \"$(readlink {})\" \"/\" >/dev/null' \\; -delete"
+          , "GCC_LIBDIR=\"lib/gcc/$(./bin/gcc -dumpmachine)/$(./bin/gcc -dumpfullversion -dumpversion)\""
+          , "mv ${GCC_LIBDIR}/include-fixed ${TMPDIR}/"
+          , "cp -rL ${TMPDIR}/include-fixed ${GCC_LIBDIR}/.   # resolve symlinks"
+          ]
+        ]
+      }
     }
   , "out_dirs": ["."]
   }
@@ -142,7 +208,17 @@
         }
       }
     }
-  , "target": "toolchain_cross"
+  , "target": "toolchain_internal"
+  }
+, "runlibs_internal":
+  { "type": "configure"
+  , "arguments_config": ["MUSL_BUILD_STATIC"]
+  , "target":
+    { "type": "if"
+    , "cond": {"type": "var", "name": "MUSL_BUILD_STATIC"}
+    , "then": "libc"
+    , "else": "libstdc++"
+    }
   }
 , "libstdc++":
   { "type": ["@", "rules", "CC/prebuilt", "library"]

@@ -353,11 +353,7 @@
   , "compilers/gcc-13.2.0-musl-static":
     { "repository": "compilers"
     , "target_file_name": "gcc-13-musl-static.TARGETS"
-    , "bindings":
-      { "rules": "rules/static-build"
-      , "binutils": "imports/binutils-latest"
-      , "gcc-musl": "compilers/gcc-13.2.0-musl"
-      }
+    , "bindings": {"gcc-musl": "compilers/gcc-13.2.0-musl"}
     }
   , "compilers/clang-16.0.6-native":
     { "repository":
