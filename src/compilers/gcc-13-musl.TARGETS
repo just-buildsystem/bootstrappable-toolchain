@@ -148,12 +148,18 @@
   { "type": ["@", "rules", "CC/prebuilt", "library"]
   , "name": ["libstdc++"]
   , "lib": ["libstdc++_files"]
-  , "deps": ["libgcc_s"]
+  , "deps": ["libc", "libgcc_s"]
   }
 , "libgcc_s":
   { "type": ["@", "rules", "CC/prebuilt", "library"]
   , "name": ["libgcc_s"]
   , "lib": ["libgcc_s_files"]
+  , "deps": ["libc"]
+  }
+, "libc":
+  { "type": ["@", "rules", "CC/prebuilt", "library"]
+  , "name": ["libc"]
+  , "lib": ["libc_files"]
   }
 , "libstdc++_files":
   { "type": "generic"
@@ -169,6 +175,14 @@
   , "deps": ["toolchain_for_target"]
   , "cmds": ["cp -L $(./bin/gcc -dumpmachine)/lib/libgcc_s.so.1 ."]
   , "outs": ["libgcc_s.so.1"]
+  , "env": {"type": "var", "name": "ENV", "default": {"type": "empty_map"}}
+  }
+, "libc_files":
+  { "type": "generic"
+  , "arguments_config": ["ENV"]
+  , "deps": ["toolchain_for_target"]
+  , "cmds": ["cp -L $(./bin/gcc -dumpmachine)/lib/libc.so ."]
+  , "outs": ["libc.so"]
   , "env": {"type": "var", "name": "ENV", "default": {"type": "empty_map"}}
   }
 }
