@@ -1,5 +1,5 @@
 0001-strip-build-directory-from-config-arguments.patch
-0002-strip-build-directory-from-fixinclues.patch
+0002-strip-build-directory-from-fixincludes.patch
 0003-strip-build-directory-from-mkheaders.conf.patch
 0004-compute-reproducible-checksums.patch
 0005-do-not-hardcode-rpath-into-cc1-libs.patch

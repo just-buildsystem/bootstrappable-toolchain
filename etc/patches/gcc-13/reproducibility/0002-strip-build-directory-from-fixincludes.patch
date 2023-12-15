@@ -1,7 +1,7 @@
 From a6fc1b1f0a05fbd6ba664393695ad20d3577a517 Mon Sep 17 00:00:00 2001
 From: Oliver Reiche <oliver.reiche@huawei.com>
 Date: Fri, 18 Aug 2023 14:36:57 +0200
-Subject: [PATCH 2/5] Strip build directory from fixinclues
+Subject: [PATCH 2/5] Strip build directory from fixincludes
 
 ... to achieve a reproducible binary, which contains the
 configure string. For this to work, the user needs to set

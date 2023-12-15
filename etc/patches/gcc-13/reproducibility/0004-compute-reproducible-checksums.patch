@@ -48,7 +48,7 @@ index b3b12dcff..1733b40a7 100644
 +	  rm -rf stripped_c_checksum_inputs; \
 +	  mkdir stripped_c_checksum_inputs; \
 +	  cp $(C_OBJS) $(BACKEND) $(LIBDEPS) stripped_c_checksum_inputs/; \
-+	  strip -g stripped_c_checksum_inputs/*; \
++	  $(STRIP_FOR_TARGET) -g stripped_c_checksum_inputs/*; \
 +	  build/genchecksum$(build_exeext) $$(ls stripped_c_checksum_inputs/* | LC_ALL=C sort) \
                       checksum-options > cc1-checksum.cc.tmp && 		 \
  	  $(srcdir)/../move-if-change cc1-checksum.cc.tmp cc1-checksum.cc; \
@@ -65,7 +65,7 @@ index 4ee26fad9..30fe695ec 100644
 +	  rm -rf stripped_cp_checksum_inputs; \
 +	  mkdir stripped_cp_checksum_inputs; \
 +	  cp $(CXX_OBJS) $(BACKEND) $(CODYLIB) $(LIBDEPS) stripped_cp_checksum_inputs; \
-+	  strip -g stripped_cp_checksum_inputs/*; \
++	  $(STRIP_FOR_TARGET) -g stripped_cp_checksum_inputs/*; \
 +	  build/genchecksum$(build_exeext) $$(ls stripped_cp_checksum_inputs/* | LC_ALL=C sort) \
                       checksum-options > cc1plus-checksum.cc.tmp &&	   \
  	  $(srcdir)/../move-if-change cc1plus-checksum.cc.tmp cc1plus-checksum.cc; \
