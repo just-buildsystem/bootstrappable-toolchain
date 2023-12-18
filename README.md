@@ -90,9 +90,25 @@ You can install a portable version of any provided toolchain (e.g.,
 $ just-mr --main gcc-latest-musl install toolchain -D'{"ARCH":"x86_64"}' -o /opt/gcc
 ~~~
 
-*Note that the configuration variable `ARCH` should be set to the host
-architecture. For installing a cross-compiler, you can additionally set
-`BUILD_ARCH` to specify a different target architecture.*
+*Note that the configuration variable `ARCH` should be set to the build host
+architecture.*
+
+For installing a *cross compiler*, you can additionally set `BUILD_ARCH` to
+specify the architecture the compiler should build for:
+
+~~~ sh
+$ just-mr --main gcc-latest-musl install toolchain \
+    -D'{"ARCH":"x86_64","BUILD_ARCH":"arm64"}' -o /opt/gcc-for-arm64
+~~~
+
+For installing a *crossed native compiler*, you have to also set the variable
+`TARGET_ARCH` (the architecture the compiler is build for) to the same value as
+`BUILD_ARCH`:
+
+~~~ sh
+$ just-mr --main gcc-latest-musl install toolchain \
+    -D'{"ARCH":"x86_64","TARGET_ARCH":"arm64","BUILD_ARCH":"arm64"}' -o /opt/arm64-gcc-for-arm64
+~~~
 
 ## Initial requirements
 
