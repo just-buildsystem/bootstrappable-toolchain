@@ -150,7 +150,7 @@
           , "export MAKEINFO=missing"
           , "export BUILD_ROOT_DIR=${ACTION_DIR}"
           , "unset CFLAGS CXXFLAGS LDFLAGS"
-          , "GCC_CONFIG="
+          , "GCC_CONFIG='--disable-fixincludes'"
           ]
         , { "type": "if"
           , "cond": {"type": "var", "name": "MUSL_BUILD_STATIC"}
@@ -162,7 +162,7 @@
             , "export CXX=\"${TMPDIR}/host-g++\""
             , "export LDFLAGS='-static'"
             , "export LDFLAGS_FOR_TARGET='-static'"
-            , "GCC_CONFIG='--disable-shared'"
+            , "GCC_CONFIG=\"$GCC_CONFIG --disable-shared\""
             ]
           , "else": ["export LD_LIBRARY_PATH=\"$(dirname ${CC})/../lib64\""]
           }
@@ -181,9 +181,6 @@
           , "  ln -s $(basename $f) $(echo $f | sed 's|/'${TARGET}-'|/|g')"
           , "done"
           , "find . -type l -exec sh -c 'expr match \"$(readlink {})\" \"/\" >/dev/null' \\; -delete"
-          , "GCC_LIBDIR=\"lib/gcc/$(./bin/gcc -dumpmachine)/$(./bin/gcc -dumpfullversion -dumpversion)\""
-          , "mv ${GCC_LIBDIR}/include-fixed ${TMPDIR}/"
-          , "cp -rL ${TMPDIR}/include-fixed ${GCC_LIBDIR}/.   # resolve symlinks"
           ]
         ]
       }
