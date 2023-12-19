@@ -11,10 +11,10 @@
   , "rules":
     { "repository":
       { "type": "archive"
-      , "content": "114266e2768df3fca92c13c359fb9dfccb53aa97"
-      , "fetch": "https://github.com/just-buildsystem/rules-cc/archive/1f8e8d060c0c554f4374351d350bf3d661126579.tar.gz"
-      , "sha256": "3689742cfa30a36538ffee5d56f4d2705d8d5e10e2a1c161740d1f6fc44dd42e"
-      , "subdir": "rules-cc-1f8e8d060c0c554f4374351d350bf3d661126579/rules"
+      , "content": "2b5d40c87b685c8bd085a2edca7b442a2448f146"
+      , "fetch": "https://github.com/just-buildsystem/rules-cc/archive/5b820def58f4d4ec30f0b3e4e8db49ce1fef8dd9.tar.gz"
+      , "sha256": "a8042554028de60de8405f4a7be79eb6675e46aedf1753eaab908192e3eb0f57"
+      , "subdir": "rules-cc-5b820def58f4d4ec30f0b3e4e8db49ce1fef8dd9/rules"
       }
     }
   , "rules/stage-0":
