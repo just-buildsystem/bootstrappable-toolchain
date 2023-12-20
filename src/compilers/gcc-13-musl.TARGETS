@@ -119,7 +119,7 @@
   , "cmds":
     { "type": "let*"
     , "bindings":
-      [ [ "TARGET"
+      [ [ "MUSL_TARGET"
         , { "type": "case"
           , "expr":
             { "type": "var"
@@ -127,10 +127,10 @@
             , "default": {"type": "fail", "msg": "BUILD_ARCH is missing."}
             }
           , "case":
-            { "x86": "i686"
-            , "x86_64": "x86_64"
-            , "arm": "arm"
-            , "arm64": "aarch64"
+            { "x86": "i686-linux-musl"
+            , "x86_64": "x86_64-linux-musl"
+            , "arm": "arm-linux-musleabi"
+            , "arm64": "aarch64-linux-musl"
             }
           , "default":
             { "type": "fail"
@@ -144,8 +144,7 @@
       { "type": "++"
       , "$1":
         [ [ { "type": "join"
-            , "$1":
-              ["TARGET=", {"type": "var", "name": "TARGET"}, "-linux-musl"]
+            , "$1": ["TARGET=", {"type": "var", "name": "MUSL_TARGET"}]
             }
           , "export NJOBS=$(nproc --all 2>/dev/null || echo 1)"
           , "export MAKEINFO=missing"
