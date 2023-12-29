@@ -1,7 +1,16 @@
 { "bootstrap":
-  { "type": "export"
-  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
-  , "target": "bootstrap-essentials"
+  { "type": "install"
+  , "files":
+    { "bin/awk": "bootstrap-awk"
+    , "bin/cmp": "bootstrap-cmp"
+    , "bin/sed": "bootstrap-sed"
+    , "bin/diff": "bootstrap-diff"
+    , "bin/patch": "bootstrap-patch"
+    , "bin/tar": "bootstrap-tar"
+    , "bin/bzip2": "bootstrap-bzip2"
+    , "bin/grep": "bootstrap-grep"
+    , "bin/find": "bootstrap-find"
+    }
   }
 , "toolchain":
   { "type": "export"
@@ -9,38 +18,245 @@
   , "target": "busybox"
   }
 , "files": {"type": "install", "deps": [["TREE", null, "."]]}
-, "staged_bootstrap_sources":
-  { "type": "install"
-  , "dirs":
-    [["files", "src"], [["@", "scripts", "", "bootstrap-busybox"], "."]]
+, "bootstrap-awk":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "editors", "APPLET_NAME": "awk"}
+  , "target": "configured-applet"
   }
-, "bootstrap-essentials":
-  { "type": ["@", "rules", "CC/foreign/shell", "data"]
-  , "project": ["staged_bootstrap_sources"]
-  , "cmds":
-    [ "cd bootstrap-busybox"
-    , "./bootstrap.sh ../src editors awk >>build.log 2>&1 || (cat build.log && exit 1)"
-    , "./bootstrap.sh ../src editors cmp >>build.log 2>&1 || (cat build.log && exit 1)"
-    , "./bootstrap.sh ../src editors sed >>build.log 2>&1 || (cat build.log && exit 1)"
-    , "./bootstrap.sh ../src editors diff >>build.log 2>&1 || (cat build.log && exit 1)"
-    , "./bootstrap.sh ../src editors patch >>build.log 2>&1 || (cat build.log && exit 1)"
-    , "./bootstrap.sh ../src archival tar >>build.log 2>&1 || (cat build.log && exit 1)"
-    , "./bootstrap.sh ../src archival bzip2 >>build.log 2>&1 || (cat build.log && exit 1)"
-    , "./bootstrap.sh ../src findutils grep >>build.log 2>&1 || (cat build.log && exit 1)"
-    , "./bootstrap.sh ../src findutils find >>build.log 2>&1 || (cat build.log && exit 1)"
-    , "mv awk cmp sed diff patch tar bzip2 grep find ${DESTDIR}/bin/"
+, "bootstrap-cmp":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "editors", "APPLET_NAME": "cmp"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-sed":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "editors", "APPLET_NAME": "sed"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-diff":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "editors", "APPLET_NAME": "diff"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-patch":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "editors", "APPLET_NAME": "patch"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-tar":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "archival", "APPLET_NAME": "tar"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-bzip2":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "archival", "APPLET_NAME": "bzip2"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-grep":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "findutils", "APPLET_NAME": "grep"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-find":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "findutils", "APPLET_NAME": "find"}
+  , "target": "configured-applet"
+  }
+, "configured-applet":
+  { "type": "configure"
+  , "arguments_config": ["TOOLCHAIN_CONFIG"]
+  , "config":
+    { "type": "singleton_map"
+    , "key": "TOOLCHAIN_CONFIG"
+    , "value":
+      { "type": "map_union"
+      , "$1":
+        [ { "type": "var"
+          , "name": "TOOLCHAIN_CONFIG"
+          , "default": {"type": "empty_map"}
+          }
+        , {"type": "singleton_map", "key": "STATIC_RUNLIBS", "value": true}
+        ]
+      }
+    }
+  , "target": "bootstrap-applet"
+  }
+, "bootstrap-applet":
+  { "type": ["@", "rules", "CC", "binary"]
+  , "arguments_config": ["APPLET_NAME"]
+  , "name": [{"type": "var", "name": "APPLET_NAME"}]
+  , "pure C": ["yes"]
+  , "srcs": ["bootstrap-sources"]
+  , "private-hdrs": ["bootstrap-headers"]
+  , "private-defines": ["_GNU_SOURCE"]
+  }
+, "bootstrap-headers":
+  { "type": "install"
+  , "deps":
+    [ ["./", "include", "bootstrap-headers"]
+    , "libbb/xatonum_template.c"
+    , "editors/awk.c"
+    , "editors/cmp.c"
+    , "editors/sed.c"
+    , "editors/diff.c"
+    , "editors/patch.c"
+    , "archival/tar.c"
+    , "archival/bzip2.c"
+    , "archival/libarchive/bz/bzlib.h"
+    , "archival/libarchive/bz/bzlib_private.h"
+    , "archival/libarchive/bz/blocksort.c"
+    , "archival/libarchive/bz/bzlib.c"
+    , "archival/libarchive/bz/compress.c"
+    , "archival/libarchive/bz/huffman.c"
+    , "findutils/grep.c"
+    , "findutils/find.c"
     ]
-  , "outs":
-    [ "bin/awk"
-    , "bin/cmp"
-    , "bin/sed"
-    , "bin/diff"
-    , "bin/patch"
-    , "bin/tar"
-    , "bin/bzip2"
-    , "bin/grep"
-    , "bin/find"
+  }
+, "bootstrap-sources":
+  { "type": "install"
+  , "deps":
+    [ "appletlib.c"
+    , "libbb/bb_pwd.c"
+    , "libbb/bb_strtonum.c"
+    , "libbb/concat_path_file.c"
+    , "libbb/concat_subpath_file.c"
+    , "libbb/common_bufsiz.c"
+    , "libbb/compare_string_array.c"
+    , "libbb/copyfd.c"
+    , "libbb/crc32.c"
+    , "libbb/default_error_retval.c"
+    , "libbb/endofname.c"
+    , "libbb/fclose_nonstdin.c"
+    , "libbb/fflush_stdout_and_exit.c"
+    , "libbb/full_write.c"
+    , "libbb/get_last_path_component.c"
+    , "libbb/get_line_from_file.c"
+    , "libbb/getopt32.c"
+    , "libbb/isqrt.c"
+    , "libbb/last_char_is.c"
+    , "libbb/llist.c"
+    , "libbb/makedev.c"
+    , "libbb/make_directory.c"
+    , "libbb/messages.c"
+    , "libbb/mode_string.c"
+    , "libbb/perror_msg.c"
+    , "libbb/process_escape_sequence.c"
+    , "libbb/procps.c"
+    , "libbb/ptr_to_globals.c"
+    , "libbb/read.c"
+    , "libbb/read_printf.c"
+    , "libbb/recursive_action.c"
+    , "libbb/safe_poll.c"
+    , "libbb/safe_strncpy.c"
+    , "libbb/safe_write.c"
+    , "libbb/signals.c"
+    , "libbb/skip_whitespace.c"
+    , "libbb/time.c"
+    , "libbb/verror_msg.c"
+    , "libbb/wfopen.c"
+    , "libbb/wfopen_input.c"
+    , "libbb/xatonum.c"
+    , "libbb/xfunc_die.c"
+    , "libbb/xfuncs.c"
+    , "libbb/xfuncs_printf.c"
+    , "libbb/xgetcwd.c"
+    , "libbb/xreadlink.c"
+    , "libbb/xrealloc_vector.c"
+    , "libbb/xregcomp.c"
+    , "archival/bbunzip.c"
+    , "archival/chksum_and_xwrite_tar_header.c"
+    , "archival/libarchive/data_align.c"
+    , "archival/libarchive/data_extract_all.c"
+    , "archival/libarchive/data_extract_to_stdout.c"
+    , "archival/libarchive/data_skip.c"
+    , "archival/libarchive/filter_accept_all.c"
+    , "archival/libarchive/filter_accept_reject_list.c"
+    , "archival/libarchive/find_list_entry.c"
+    , "archival/libarchive/get_header_tar.c"
+    , "archival/libarchive/header_list.c"
+    , "archival/libarchive/header_skip.c"
+    , "archival/libarchive/header_verbose_list.c"
+    , "archival/libarchive/init_handle.c"
+    , "archival/libarchive/open_transformer.c"
+    , "archival/libarchive/seek_by_jump.c"
+    , "archival/libarchive/seek_by_read.c"
+    , "archival/libarchive/unsafe_prefix.c"
+    , "archival/libarchive/unsafe_symlink_target.c"
     ]
+  }
+, "appletlib.c":
+  { "type": "file_gen"
+  , "arguments_config": ["APPLET_NAME", "APPLET_GROUP"]
+  , "name": "appletlib.c"
+  , "data":
+    { "type": "join"
+    , "separator": "\n"
+    , "$1":
+      [ "/*"
+      , " * Minimalistic implementation of appletlib.c that does not require any header"
+      , " * generation."
+      , " */"
+      , ""
+      , "/* Define this accessor before we #define \"errno\" our way */"
+      , "#include <errno.h>"
+      , "static inline int *get_perrno(void) { return &errno; }"
+      , ""
+      , { "type": "join"
+        , "$1":
+          [ "#include \""
+          , {"type": "var", "name": "APPLET_GROUP"}
+          , "/"
+          , {"type": "var", "name": "APPLET_NAME"}
+          , ".c\""
+          ]
+        }
+      , ""
+      , "int main(int argc, char **argv) {"
+      , "#ifdef bb_cached_errno_ptr"
+      , "  ASSIGN_CONST_PTR(&bb_errno, get_perrno());"
+      , "#endif"
+      , { "type": "join"
+        , "$1":
+          [ "  return "
+          , {"type": "var", "name": "APPLET_NAME"}
+          , "_main(argc, argv);"
+          ]
+        }
+      , "}"
+      , ""
+      , "/* missing definitions from appletlib.c */"
+      , { "type": "join"
+        , "$1":
+          [ "const char *applet_name = \""
+          , {"type": "var", "name": "APPLET_NAME"}
+          , "\";"
+          ]
+        }
+      , "void bb_show_usage() { xfunc_die(); }"
+      , "unsigned string_array_len(char **argv) {"
+      , "  char **start = argv;"
+      , "  while (*argv)"
+      , "    argv++;"
+      , "  return argv - start;"
+      , "}"
+      , ""
+      , "/* missing definitions for tar.c (despite 'to_command' being disabled) */"
+      , "#include \"bb_archive.h\""
+      , "void FAST_FUNC data_extract_to_command(archive_handle_t *archive_handle) {"
+      , "  /* unused */"
+      , "}"
+      ]
+    }
   }
 , "staged-gcc":
   {"type": "install", "dirs": [[["@", "gcc", "", "toolchain"], "gcc"]]}

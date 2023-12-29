@@ -245,7 +245,6 @@
     , "target_file_name": "stage-0-busybox.TARGETS"
     , "bindings":
       { "rules": "rules/stage-0"
-      , "scripts": "scripts"
       , "gcc": "stage-0/gcc"
       , "make": "stage-0/make"
       }

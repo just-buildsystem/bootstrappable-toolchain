@@ -23,8 +23,8 @@ Bootstrapping a minimal set of tools that are needed for this stage includes:
 - `cmp`/`tar` (for running `gcc-4.7.4`'s install target)
 - `find`/`bzip2` (for building full `busybox`)
 
-All tools are bootstrapped via a custom shell script. Note that Busybox' `ar` is
-not included, due to its missing indexing support.
+All tools are bootstrapped by selectively compiling the required C files. Note
+that Busybox' `ar` is not included, due to its missing indexing support.
 
 ### 2. Bootstrapped GNU Make
 

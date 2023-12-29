@@ -1,5 +1,1 @@
-{ "bootstrap-busybox":
-  {"type": "install", "deps": [["TREE", null, "bootstrap-busybox"]]}
-, "bootstrap-ar": {"type": "install", "deps": ["bootstrap-ar.sh"]}
-, "bootstrap-make": {"type": "install", "deps": ["bootstrap-make.sh"]}
-}
+{"bootstrap-ar": {"type": "install", "deps": ["bootstrap-ar.sh"]}}
