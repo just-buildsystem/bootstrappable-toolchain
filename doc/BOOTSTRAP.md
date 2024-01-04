@@ -37,7 +37,7 @@ to missing `ar`, final linking is done via custom compile commands.
 Bootstrapping the archiver `ar`, requires the Busybox "essentials" and `make`
 from the previous steps. This archiver has proper indexing support and is
 compiled via its `Makefile`. However, due to missing `ar` from earlier stages,
-final linking is done via custom script.
+final linking is done via custom compile commands.
 
 ### 4. Binutils
 

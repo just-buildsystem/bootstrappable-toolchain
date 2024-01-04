@@ -1,7 +1,6 @@
 { "main": "gcc-latest-musl+tools"
 , "repositories":
   { "patches": {"repository": {"type": "file", "path": "etc/patches"}}
-  , "scripts": {"repository": {"type": "file", "path": "etc/scripts"}}
   , "imports": {"repository": {"type": "file", "path": "etc/imports"}}
   , "defaults": {"repository": {"type": "file", "path": "etc/defaults"}}
   , "bootstrap": {"repository": {"type": "file", "path": "src/bootstrap"}}
@@ -273,7 +272,6 @@
       { "rules": "rules/stage-0"
       , "busybox": "stage-0/busybox"
       , "make": "stage-0/make"
-      , "scripts": "scripts"
       }
     }
   , "stage-0/gcc":

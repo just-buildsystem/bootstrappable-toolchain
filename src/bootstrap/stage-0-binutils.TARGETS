@@ -20,13 +20,7 @@
   , "outs": ["cflags"]
   }
 , "staged_bootstrap_sources_and_flags":
-  { "type": "install"
-  , "dirs":
-    [ ["files", "src"]
-    , ["flag_files", "flags"]
-    , [["@", "scripts", "", "bootstrap-ar"], "."]
-    ]
-  }
+  {"type": "install", "dirs": [["files", "src"], ["flag_files", "flags"]]}
 , "bootstrap-ar":
   { "type": ["@", "rules", "CC/foreign/shell", "data"]
   , "project": ["staged_bootstrap_sources_and_flags"]
@@ -34,12 +28,21 @@
     [["@", "busybox", "", "bootstrap"], ["@", "make", "", "bootstrap"]]
   , "cmds":
     [ "export LD=${CC}"
+    , "export AR=true"
+    , "export RANLIB=true"
     , "export MAKE=${LOCALBASE}/bin/make"
     , "export PATH=${LOCALBASE}/bin:$PATH"
-    , "export CFLAGS=\"${CFLAGS} $(cat flags/cflags)\""
+    , "export CFLAGS=\"${CFLAGS} $(cat flags/cflags) -I${TMPDIR}\""
     , "unset LDFLAGS"
-    , "./bootstrap-ar.sh src >build.log 2>&1 || (cat build.log && exit 1)"
-    , "mv ar ${DESTDIR}/bin/"
+    , "printf '#error fail here' > ${TMPDIR}/dlfcn.h  # disable via fake header"
+    , "cd src"
+    , "./configure --prefix=/ --disable-nls --enable-gprofng=no --disable-werror --enable-deterministic-archives --without-zstd >configure.log 2>&1 || (cat configure.log && exit 1)"
+    , "${MAKE} MAKEINFO=true all-binutils >build.log 2>&1 || true"
+    , "cd binutils"
+    , "AR_SRCS='ar.c arparse.c arlex.c arsup.c not-ranlib.c rename.c binemul.c emul_vanilla.c bucomm.c version.c filemode.c'"
+    , "AR_DEPS=\"$(ls ../bfd/*.o ../libiberty/*.o ../zlib/*.o ../libsframe/*.o | LC_ALL=C sort)\""
+    , "AR_CFLAGS=\"${CFLAGS} -DDEFAULT_AR_DETERMINISTIC=1 -Dbin_dummy_emulation=bin_vanilla_emulation -I../include -I../bfd\""
+    , "${CC} ${AR_CFLAGS} -o ${DESTDIR}/bin/ar ${AR_SRCS} ${AR_DEPS} -ldl >../build.log 2>&1 || (cat ../configure.log ../build.log && exit 1)"
     ]
   , "outs": ["bin/ar"]
   }
