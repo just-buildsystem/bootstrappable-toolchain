@@ -1,19 +1,9 @@
 { "defaults":
   { "type": ["CC/foreign", "defaults"]
   , "base":
-    [ ["@", "cmake", "CC/foreign", "defaults"]
+    [ ["@", "base", "CC/foreign", "defaults"]
+    , ["@", "cmake", "CC/foreign", "defaults"]
     , ["@", "python", "CC/foreign", "defaults"]
     ]
-  , "MAKE": ["make/bin/make"]
-  , "toolchain": ["staged-make", "staged-busybox"]
-  , "PATH":
-    [ "$(TOOLCHAIN)/make/bin"
-    , "$(TOOLCHAIN)/busybox/bin"
-    , "$(TOOLCHAIN)/busybox/usr/bin"
-    ]
   }
-, "staged-make":
-  {"type": "install", "dirs": [[["@", "make", "", "toolchain"], "make"]]}
-, "staged-busybox":
-  {"type": "install", "dirs": [[["@", "busybox", "", "toolchain"], "busybox"]]}
 }

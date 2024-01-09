@@ -1,15 +1,5 @@
 { "defaults":
   { "type": ["CC/foreign", "defaults"]
-  , "MAKE": ["make/bin/make"]
-  , "toolchain": ["staged-make", "staged-busybox"]
-  , "PATH":
-    [ "$(TOOLCHAIN)/make/bin"
-    , "$(TOOLCHAIN)/busybox/bin"
-    , "$(TOOLCHAIN)/busybox/usr/bin"
-    ]
+  , "base": [["@", "base", "CC/foreign", "defaults"]]
   }
-, "staged-make":
-  {"type": "install", "dirs": [[["@", "make", "", "toolchain"], "make"]]}
-, "staged-busybox":
-  {"type": "install", "dirs": [[["@", "busybox", "", "toolchain"], "busybox"]]}
 }

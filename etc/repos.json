@@ -38,11 +38,7 @@
     , "target_root": "defaults"
     , "target_file_name": "gcc.TARGETS"
     , "rule_root": "rules"
-    , "bindings":
-      { "make": "stage-0/make"
-      , "busybox": "stage-0/busybox"
-      , "gcc": "stage-1/gcc"
-      }
+    , "bindings": {"base": "rules/stage-1", "gcc": "stage-1/gcc"}
     }
   , "rules/clang_with_gcc13":
     { "repository": "rules"
@@ -50,23 +46,19 @@
     , "target_file_name": "clang.TARGETS"
     , "rule_root": "rules"
     , "bindings":
-      { "make": "stage-0/make"
-      , "busybox": "stage-0/busybox"
+      { "base": "rules/gcc"
       , "gcc": "compilers/gcc-13.2.0-native"
       , "cmake": "cmake-3.27.1"
       , "python": "python-3.12.0"
       }
     }
-  , "rules/static-build":
+  , "rules/tools":
     { "repository": "rules"
     , "target_root": "defaults"
-    , "target_file_name": "static-build.TARGETS"
+    , "target_file_name": "tools.TARGETS"
     , "rule_root": "rules"
     , "bindings":
-      { "make": "stage-0/make"
-      , "busybox": "stage-0/busybox"
-      , "gcc-musl": "compilers/gcc-13.2.0-musl"
-      }
+      {"base": "rules/gcc", "gcc-musl": "compilers/gcc-13.2.0-musl"}
     }
   , "imports/stage-0/gmp-4.2.4":
     { "repository":
@@ -218,7 +210,7 @@
       }
     , "target_root": "imports"
     , "target_file_name": "boringssl.TARGETS"
-    , "bindings": {"rules": "rules/static-build"}
+    , "bindings": {"rules": "rules/tools"}
     }
   , "imports/zlib":
     { "repository":
@@ -230,7 +222,7 @@
       }
     , "target_root": "imports"
     , "target_file_name": "zlib.TARGETS"
-    , "bindings": {"rules": "rules/static-build"}
+    , "bindings": {"rules": "rules/tools"}
     }
   , "stage-0/busybox":
     { "repository":
@@ -243,10 +235,7 @@
     , "target_root": "bootstrap"
     , "target_file_name": "stage-0-busybox.TARGETS"
     , "bindings":
-      { "rules": "rules/stage-0"
-      , "gcc": "stage-0/gcc"
-      , "make": "stage-0/make"
-      }
+      {"rules": "rules/stage-0", "gcc": "stage-0/gcc", "make": "stage-0/make"}
     }
   , "stage-0/make":
     { "repository":
@@ -396,7 +385,7 @@
       }
     , "target_root": "tools"
     , "target_file_name": "busybox-1.36.TARGETS"
-    , "bindings": {"rules": "rules/static-build"}
+    , "bindings": {"rules": "rules/tools"}
     }
   , "tools/make-4.4.1":
     { "repository":
@@ -408,7 +397,7 @@
       }
     , "target_root": "tools"
     , "target_file_name": "make-4.4.TARGETS"
-    , "bindings": {"rules": "rules/static-build"}
+    , "bindings": {"rules": "rules/tools"}
     }
   , "tools/cmake-3.27.1":
     { "repository":
@@ -420,7 +409,7 @@
       }
     , "target_root": "tools"
     , "target_file_name": "cmake-3.27.TARGETS"
-    , "bindings": {"rules": "rules/static-build", "ssl": "imports/boringssl"}
+    , "bindings": {"rules": "rules/tools", "ssl": "imports/boringssl"}
     }
   , "tools/python-3.12.0":
     { "repository":
@@ -432,7 +421,7 @@
       }
     , "target_root": "tools"
     , "target_file_name": "python-3.12.TARGETS"
-    , "bindings": {"rules": "rules/static-build", "zlib": "imports/zlib"}
+    , "bindings": {"rules": "rules/tools", "zlib": "imports/zlib"}
     }
   , "gcc-latest-native":
     { "repository": "toolchains"
