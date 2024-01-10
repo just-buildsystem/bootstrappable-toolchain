@@ -13,7 +13,7 @@
   { "type": ["@", "rules", "CC/foreign/shell", "data"]
   , "cmds":
     [ "echo 'int main() {int i=1; return *((char*)&i) == 1;}' > endian_test.c"
-    , "${CC} -o endian_test endian_test.c"
+    , "${CC} ${CFLAGS} -o endian_test endian_test.c"
     , "CFLAGS=\"-D__$(./endian_test && echo BIG || echo LITTLE)_ENDIAN__=1\""
     , "echo \"${CFLAGS}\" > ${DESTDIR}/cflags"
     ]
@@ -36,7 +36,8 @@
     [ "export LD=${CC}"
     , "export MAKE=${LOCALBASE}/bin/make"
     , "export PATH=${LOCALBASE}/bin:$PATH"
-    , "export CFLAGS=\"$(cat flags/cflags)\""
+    , "export CFLAGS=\"${CFLAGS} $(cat flags/cflags)\""
+    , "unset LDFLAGS"
     , "./bootstrap-ar.sh src >build.log 2>&1 || (cat build.log && exit 1)"
     , "mv ar ${DESTDIR}/bin/"
     ]
@@ -56,7 +57,7 @@
     , "export AR=${LOCALBASE}/bin/ar"
     , "export MAKE=${LOCALBASE}/bin/make"
     , "export PATH=${LOCALBASE}/bin:$PATH"
-    , "export CFLAGS=\"$(cat flags/cflags)\""
+    , "export CFLAGS=\"${CFLAGS} $(cat flags/cflags)\""
     , "unset LDFLAGS"
     , "if [ -f /lib/ld-musl-$(uname -m).so.1 ]; then"
     , "  ln -s /lib/ld-musl-$(uname -m).so.1 ${TMPDIR}/ldd"

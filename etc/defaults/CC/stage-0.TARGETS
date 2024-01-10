@@ -12,6 +12,16 @@
       , "default": "cc"
       }
     ]
+  , "CFLAGS":
+    { "type": "lookup"
+    , "map":
+      { "type": "var"
+      , "name": "TOOLCHAIN_CONFIG"
+      , "default": {"type": "empty_map"}
+      }
+    , "key": "BOOTSTRAP_CFLAGS"
+    , "default": ["-w"]
+    }
   , "PATH":
     { "type": "lookup"
     , "map":

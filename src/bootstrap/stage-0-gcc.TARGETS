@@ -103,7 +103,7 @@
     , "export MAKE=${LOCALBASE}/bin/make"
     , "export PATH=$(pwd)/binutils/bin:${LOCALBASE}/bin:$PATH"
     , "export BUILD_ROOT_DIR=${ACTION_DIR}"
-    , "unset CFLAGS LDFLAGS"
+    , "unset LDFLAGS"
     , "CONF_ARGS="
     , "if [ -n \"$HOST_SYSTEM_HDR_DIR\" ]; then"
     , "  CONF_ARGS=\"$CONF_ARGS --with-sysroot=/ --with-native-system-header-dir=$HOST_SYSTEM_HDR_DIR\""

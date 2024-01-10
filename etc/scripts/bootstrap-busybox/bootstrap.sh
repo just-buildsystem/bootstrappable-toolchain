@@ -7,7 +7,7 @@ APPLET_GROUP=$2
 APPLET_NAME=$3
 
 export CC=${CC:-cc}
-export CFLAGS="-D_GNU_SOURCE -Iinclude -I${SRCDIR} -I${SRCDIR}/include"
+export CFLAGS="${CFLAGS:-} -D_GNU_SOURCE -Iinclude -I${SRCDIR} -I${SRCDIR}/include"
 
 DEP_SRCS="
   libbb/bb_pwd.c

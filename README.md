@@ -119,10 +119,10 @@ For bootstrapping the toolchains, the build host must be a Linux system with:
 3. C compiler (e.g., TinyCC, old GCC)
 
 The C compiler for bootstrapping can be specified by setting the fields
-`BOOTSTRAP_CC` and `BOOTSTRAP_PATH` in configuration variable `TOOLCHAIN_CONFIG`
-(e.g., on command line `-D'{"TOOLCHAIN_CONFIG": {"BOOTSTRAP_CC": "gcc"}}'`). If
-not set, the C compiler is assumed to be `cc` available in the search paths
-`/bin` or `/usr/bin`.
+`BOOTSTRAP_CC`, `BOOTSTRAP_CFLAGS`, and `BOOTSTRAP_PATH` in configuration
+variable `TOOLCHAIN_CONFIG` (e.g., on command line `-D'{"TOOLCHAIN_CONFIG":
+{"BOOTSTRAP_CC": "gcc"}}'`). If not set, the C compiler is assumed to be `cc`
+available in the search paths `/bin` or `/usr/bin`.
 
 *Note that currently supported build hosts are required to be an `x86_64`
 architecture and use either the GNU or musl C library.*
@@ -158,6 +158,8 @@ Fields for building the toolchains:
 
 - `BOOTSTRAP_CC`:
   The initial C compiler for bootstrapping (default: `"cc"`)
+- `BOOTSTRAP_CFLAGS`:
+  The initial C compile flags for bootstrapping (default: `["-w"]`)
 - `BOOTSTRAP_PATH`:
   Search path for the initial C compiler (default: `["/bin", "/usr/bin"]`)
 - `HOST_SYSTEM_HDR_DIR`:
