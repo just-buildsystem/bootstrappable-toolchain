@@ -116,103 +116,175 @@
     }
   }
 , "test-c_shared-gnulibs":
-  { "type": "export"
-  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
-  , "fixed_config":
-    { "STATIC_FULL": false
-    , "STATIC_RUNLIBS": false
-    , "USE_LIBCXX": false
-    , "CONFIG_TARGET": "test-c"
+  { "type": "configure"
+  , "config":
+    { "type": "let*"
+    , "bindings":
+      [ ["STATIC_FULL", false]
+      , ["STATIC_RUNLIBS", false]
+      , ["USE_LIBCXX", false]
+      , ["CONFIG_TARGET", "test-c"]
+      ]
+    , "body":
+      { "type": "env"
+      , "vars":
+        ["STATIC_FULL", "STATIC_RUNLIBS", "USE_LIBCXX", "CONFIG_TARGET"]
+      }
     }
   , "target": "config"
+  , "tainted": ["test"]
   }
 , "test-cpp_shared-gnulibs":
-  { "type": "export"
-  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
-  , "fixed_config":
-    { "STATIC_FULL": false
-    , "STATIC_RUNLIBS": false
-    , "USE_LIBCXX": false
-    , "CONFIG_TARGET": "test-cpp"
+  { "type": "configure"
+  , "config":
+    { "type": "let*"
+    , "bindings":
+      [ ["STATIC_FULL", false]
+      , ["STATIC_RUNLIBS", false]
+      , ["USE_LIBCXX", false]
+      , ["CONFIG_TARGET", "test-cpp"]
+      ]
+    , "body":
+      { "type": "env"
+      , "vars":
+        ["STATIC_FULL", "STATIC_RUNLIBS", "USE_LIBCXX", "CONFIG_TARGET"]
+      }
     }
   , "target": "config"
+  , "tainted": ["test"]
   }
 , "test-cpp_shared-llvmlibs":
-  { "type": "export"
-  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
-  , "fixed_config":
-    { "STATIC_FULL": false
-    , "STATIC_RUNLIBS": false
-    , "USE_LIBCXX": true
-    , "CONFIG_TARGET": "test-cpp"
+  { "type": "configure"
+  , "config":
+    { "type": "let*"
+    , "bindings":
+      [ ["STATIC_FULL", false]
+      , ["STATIC_RUNLIBS", false]
+      , ["USE_LIBCXX", true]
+      , ["CONFIG_TARGET", "test-cpp"]
+      ]
+    , "body":
+      { "type": "env"
+      , "vars":
+        ["STATIC_FULL", "STATIC_RUNLIBS", "USE_LIBCXX", "CONFIG_TARGET"]
+      }
     }
   , "target": "config"
+  , "tainted": ["test"]
   }
 , "test-c_mixed-gnulibs":
-  { "type": "export"
-  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
-  , "fixed_config":
-    { "STATIC_FULL": false
-    , "STATIC_RUNLIBS": true
-    , "USE_LIBCXX": false
-    , "CONFIG_TARGET": "test-c"
+  { "type": "configure"
+  , "config":
+    { "type": "let*"
+    , "bindings":
+      [ ["STATIC_FULL", false]
+      , ["STATIC_RUNLIBS", true]
+      , ["USE_LIBCXX", false]
+      , ["CONFIG_TARGET", "test-c"]
+      ]
+    , "body":
+      { "type": "env"
+      , "vars":
+        ["STATIC_FULL", "STATIC_RUNLIBS", "USE_LIBCXX", "CONFIG_TARGET"]
+      }
     }
   , "target": "config"
+  , "tainted": ["test"]
   }
 , "test-cpp_mixed-gnulibs":
-  { "type": "export"
-  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
-  , "fixed_config":
-    { "STATIC_FULL": false
-    , "STATIC_RUNLIBS": true
-    , "USE_LIBCXX": false
-    , "CONFIG_TARGET": "test-cpp"
+  { "type": "configure"
+  , "config":
+    { "type": "let*"
+    , "bindings":
+      [ ["STATIC_FULL", false]
+      , ["STATIC_RUNLIBS", true]
+      , ["USE_LIBCXX", false]
+      , ["CONFIG_TARGET", "test-cpp"]
+      ]
+    , "body":
+      { "type": "env"
+      , "vars":
+        ["STATIC_FULL", "STATIC_RUNLIBS", "USE_LIBCXX", "CONFIG_TARGET"]
+      }
     }
   , "target": "config"
+  , "tainted": ["test"]
   }
 , "test-cpp_mixed-llvmlibs":
-  { "type": "export"
-  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
-  , "fixed_config":
-    { "STATIC_FULL": false
-    , "STATIC_RUNLIBS": true
-    , "USE_LIBCXX": true
-    , "CONFIG_TARGET": "test-cpp"
+  { "type": "configure"
+  , "config":
+    { "type": "let*"
+    , "bindings":
+      [ ["STATIC_FULL", false]
+      , ["STATIC_RUNLIBS", true]
+      , ["USE_LIBCXX", true]
+      , ["CONFIG_TARGET", "test-cpp"]
+      ]
+    , "body":
+      { "type": "env"
+      , "vars":
+        ["STATIC_FULL", "STATIC_RUNLIBS", "USE_LIBCXX", "CONFIG_TARGET"]
+      }
     }
   , "target": "config"
+  , "tainted": ["test"]
   }
 , "test-c_static-gnulibs":
-  { "type": "export"
-  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
-  , "fixed_config":
-    { "STATIC_FULL": true
-    , "STATIC_RUNLIBS": true
-    , "USE_LIBCXX": false
-    , "CONFIG_TARGET": "test-c"
+  { "type": "configure"
+  , "config":
+    { "type": "let*"
+    , "bindings":
+      [ ["STATIC_FULL", true]
+      , ["STATIC_RUNLIBS", true]
+      , ["USE_LIBCXX", false]
+      , ["CONFIG_TARGET", "test-c"]
+      ]
+    , "body":
+      { "type": "env"
+      , "vars":
+        ["STATIC_FULL", "STATIC_RUNLIBS", "USE_LIBCXX", "CONFIG_TARGET"]
+      }
     }
   , "target": "config"
+  , "tainted": ["test"]
   }
 , "test-cpp_static-gnulibs":
-  { "type": "export"
-  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
-  , "fixed_config":
-    { "STATIC_FULL": true
-    , "STATIC_RUNLIBS": true
-    , "USE_LIBCXX": false
-    , "CONFIG_TARGET": "test-cpp"
+  { "type": "configure"
+  , "config":
+    { "type": "let*"
+    , "bindings":
+      [ ["STATIC_FULL", true]
+      , ["STATIC_RUNLIBS", true]
+      , ["USE_LIBCXX", false]
+      , ["CONFIG_TARGET", "test-cpp"]
+      ]
+    , "body":
+      { "type": "env"
+      , "vars":
+        ["STATIC_FULL", "STATIC_RUNLIBS", "USE_LIBCXX", "CONFIG_TARGET"]
+      }
     }
   , "target": "config"
+  , "tainted": ["test"]
   }
 , "test-cpp_static-llvmlibs":
-  { "type": "export"
-  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
-  , "fixed_config":
-    { "STATIC_FULL": true
-    , "STATIC_RUNLIBS": true
-    , "USE_LIBCXX": true
-    , "CONFIG_TARGET": "test-cpp"
+  { "type": "configure"
+  , "config":
+    { "type": "let*"
+    , "bindings":
+      [ ["STATIC_FULL", true]
+      , ["STATIC_RUNLIBS", true]
+      , ["USE_LIBCXX", true]
+      , ["CONFIG_TARGET", "test-cpp"]
+      ]
+    , "body":
+      { "type": "env"
+      , "vars":
+        ["STATIC_FULL", "STATIC_RUNLIBS", "USE_LIBCXX", "CONFIG_TARGET"]
+      }
     }
   , "target": "config"
+  , "tainted": ["test"]
   }
 , "ALL":
   { "type": "install"
