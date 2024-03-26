@@ -10,6 +10,7 @@
     , "bin/bzip2": "bootstrap-bzip2"
     , "bin/grep": "bootstrap-grep"
     , "bin/find": "bootstrap-find"
+    , "bin/sh": "bootstrap-ash"
     }
   }
 , "toolchain":
@@ -72,6 +73,12 @@
   , "fixed_config": {"APPLET_GROUP": "findutils", "APPLET_NAME": "find"}
   , "target": "configured-applet"
   }
+, "bootstrap-ash":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "shell", "APPLET_NAME": "ash"}
+  , "target": "configured-applet"
+  }
 , "configured-applet":
   { "type": "configure"
   , "arguments_config": ["TOOLCHAIN_CONFIG"]
@@ -120,16 +127,23 @@
     , "archival/libarchive/bz/huffman.c"
     , "findutils/grep.c"
     , "findutils/find.c"
+    , "shell/ash.c"
+    , "shell/shell_common.h"
+    , "shell/math.h"
+    , "shell/random.h"
     ]
   }
 , "bootstrap-sources":
   { "type": "install"
   , "deps":
     [ "appletlib.c"
+    , "libbb/auto_string.c"
+    , "libbb/bb_getgroups.c"
     , "libbb/bb_pwd.c"
     , "libbb/bb_strtonum.c"
     , "libbb/concat_path_file.c"
     , "libbb/concat_subpath_file.c"
+    , "libbb/const_hack.c"
     , "libbb/common_bufsiz.c"
     , "libbb/compare_string_array.c"
     , "libbb/copyfd.c"
@@ -138,22 +152,28 @@
     , "libbb/endofname.c"
     , "libbb/fclose_nonstdin.c"
     , "libbb/fflush_stdout_and_exit.c"
+    , "libbb/find_pid_by_name.c"
     , "libbb/full_write.c"
     , "libbb/get_last_path_component.c"
     , "libbb/get_line_from_file.c"
     , "libbb/getopt32.c"
     , "libbb/isqrt.c"
     , "libbb/last_char_is.c"
+    , "libbb/lineedit.c"
+    , "libbb/lineedit_ptr_hack.c"
     , "libbb/llist.c"
     , "libbb/makedev.c"
     , "libbb/make_directory.c"
     , "libbb/messages.c"
     , "libbb/mode_string.c"
+    , "libbb/parse_mode.c"
     , "libbb/perror_msg.c"
     , "libbb/process_escape_sequence.c"
     , "libbb/procps.c"
     , "libbb/ptr_to_globals.c"
+    , "libbb/printable_string.c"
     , "libbb/read.c"
+    , "libbb/read_key.c"
     , "libbb/read_printf.c"
     , "libbb/recursive_action.c"
     , "libbb/safe_poll.c"
@@ -161,7 +181,10 @@
     , "libbb/safe_write.c"
     , "libbb/signals.c"
     , "libbb/skip_whitespace.c"
+    , "libbb/sysconf.c"
     , "libbb/time.c"
+    , "libbb/unicode.c"
+    , "libbb/u_signal_names.c"
     , "libbb/verror_msg.c"
     , "libbb/wfopen.c"
     , "libbb/wfopen_input.c"
@@ -192,6 +215,14 @@
     , "archival/libarchive/seek_by_read.c"
     , "archival/libarchive/unsafe_prefix.c"
     , "archival/libarchive/unsafe_symlink_target.c"
+    , "coreutils/echo.c"
+    , "coreutils/test.c"
+    , "coreutils/test_ptr_hack.c"
+    , "shell/ash_ptr_hack.c"
+    , "shell/math.c"
+    , "shell/random.c"
+    , "shell/shell_common.c"
+    , "procps/kill.c"
     ]
   }
 , "appletlib.c":
