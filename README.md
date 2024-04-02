@@ -198,6 +198,14 @@ Example configuration for bootstrapping on NixOS (hashes may vary):
 }
 ~~~
 
+## Musl Performance Issues
+
+Musl has huge allocator contention issues with multithreading. For that reason,
+all our `musl` compilers are shipped with the alternative allocator
+[mimalloc](https://github.com/microsoft/mimalloc) that solves these issues. If
+you notice any performance slowdowns with your Musl-linked binaries, consider
+using the alternative allocator by appending `-l:mimalloc.o` to your `LDFLAGS`.
+
 ## License
 
 All files are copyright Huawei Cloud Computing Technology Co., Ltd., license

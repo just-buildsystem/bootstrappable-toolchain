@@ -118,6 +118,7 @@
     , [["@", "mpc", "", "files"], "mpc"]
     , [["@", "mpfr", "", "files"], "mpfr"]
     , [["@", "gcc", "", "patched_sources"], "gcc"]
+    , [["@", "mimalloc", "", "files"], "mimalloc"]
     ]
   }
 , "combined_patched_sources":
@@ -131,6 +132,7 @@
     , "mv mpc ${DESTDIR}/mpc-latest.orig"
     , "mv mpfr ${DESTDIR}/mpfr-latest.orig"
     , "mv gcc ${DESTDIR}/gcc-13.orig"
+    , "mv mimalloc ${DESTDIR}/mimalloc"
     , "chmod +w ${DESTDIR}/config.mak"
     , "printf 'GCC_VER = 13\n' >> ${DESTDIR}/config.mak"
     ]
@@ -283,8 +285,14 @@
             [ "for f in $(ls ./bin/${TARGET}-*); do"
             , "  ln -s $(basename $f) $(echo $f | sed 's|/'${TARGET}-'|/|g')"
             , "done"
+            , "# set CC for building alternative allocator"
+            , "export CC_FOR_TARGET=\"$(pwd)/bin/gcc\""
             ]
           }
+        , [ "# provide alternative allocator mimalloc"
+          , "export MI_CFLAGS=\"-DMI_MALLOC_OVERRIDE -I${WORKDIR}/mimalloc/include -O3 -DNDEBUG -fPIC -fvisibility=hidden -ftls-model=initial-exec -fno-builtin-malloc -std=gnu11\""
+          , "${CC_FOR_TARGET} ${MI_CFLAGS} -c ${WORKDIR}/mimalloc/src/static.c -o ./${TARGET}/lib/mimalloc.o"
+          ]
         ]
       }
     }

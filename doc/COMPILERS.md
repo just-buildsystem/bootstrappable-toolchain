@@ -30,6 +30,11 @@ binutils and GCC versions.
 Unfortunately, *musl-cross-make* does not call the `install-strip` target.
 Therefore, we apply manual stripping to achieve reproducibility.
 
+Additionally, the alternative allocator object
+[`mimalloc.o`](https://github.com/microsoft/mimalloc) is also built and added to
+GCC's lib folder. Linking it can solve Musl's slowdowns with allocator
+contention in multithreaded applications.
+
 ## GCC Musl Static
 
 Static building is achieved by using the GCC 13.2.0 Musl toolchain
