@@ -5,4 +5,5 @@
   {"type": "install", "deps": [["TREE", null, "musl-cross-make-fe915821"]]}
 , "clang-16": {"type": "install", "deps": [["TREE", null, "clang-16"]]}
 , "clang-17": {"type": "install", "deps": [["TREE", null, "clang-17"]]}
+, "clang-18": {"type": "install", "deps": [["TREE", null, "clang-18"]]}
 }

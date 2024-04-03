@@ -387,6 +387,23 @@
       , "patches": "patches"
       }
     }
+  , "compilers/clang-18.1.1-native":
+    { "repository":
+      { "type": "archive"
+      , "content": "7a020fab54c00befc5fa96fd8e2fddc3d98c933d"
+      , "fetch": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-18.1.1.tar.gz"
+      , "sha256": "62439f733311869dbbaf704ce2e02141d2a07092d952fc87ef52d1d636a9b1e4"
+      , "subdir": "llvm-project-llvmorg-18.1.1"
+      , "pragma": {"special": "resolve-partially"}
+      }
+    , "target_root": "compilers"
+    , "target_file_name": "clang-18-native.TARGETS"
+    , "bindings":
+      { "rules": "rules/clang_with_gcc13"
+      , "binutils": "imports/binutils-latest"
+      , "patches": "patches"
+      }
+    }
   , "tools/busybox-1.36.1":
     { "repository":
       { "type": "archive"
@@ -468,7 +485,12 @@
   , "clang-latest-native":
     { "repository": "toolchains"
     , "target_file_name": "clang.TARGETS"
-    , "bindings": {"rules": "rules", "clang": "compilers/clang-17.0.6-native"}
+    , "bindings": {"rules": "rules", "clang": "compilers/clang-18.1.1-native"}
+    }
+  , "clang-18.1.1-native":
+    { "repository": "toolchains"
+    , "target_file_name": "clang.TARGETS"
+    , "bindings": {"rules": "rules", "clang": "compilers/clang-18.1.1-native"}
     }
   , "clang-17.0.6-native":
     { "repository": "toolchains"
@@ -580,6 +602,15 @@
       { "rules": "rules"
       , "tools": "tools-all"
       , "compiler": "clang-latest-native"
+      }
+    }
+  , "clang-18.1.1-native+tools":
+    { "repository": "toolchains"
+    , "target_file_name": "compiler+tools.TARGETS"
+    , "bindings":
+      { "rules": "rules"
+      , "tools": "tools-all"
+      , "compiler": "clang-18.1.1-native"
       }
     }
   , "clang-17.0.6-native+tools":
