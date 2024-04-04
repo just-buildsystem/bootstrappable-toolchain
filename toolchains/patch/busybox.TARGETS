@@ -2,7 +2,7 @@
   { "type": ["@", "rules", "patch", "defaults"]
   , "PATCH": ["busybox/usr/bin/patch"]
   , "toolchain": ["staged-busybox"]
-  , "PATH": ["/bin"]
+  , "PATH": ["/bin", "/usr/bin"]
   }
 , "staged-busybox":
   {"type": "install", "dirs": [[["", "toolchain"], "busybox"]]}

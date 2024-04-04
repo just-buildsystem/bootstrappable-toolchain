@@ -32,7 +32,7 @@
     , "else": [["@", "gcc", "", "runlibs"]]
     }
   , "toolchain": ["staged-gcc"]
-  , "PATH": ["$(TOOLCHAIN)/gcc/bin", "/bin"]
+  , "PATH": ["$(TOOLCHAIN)/gcc/bin", "/bin", "/usr/bin"]
   }
 , "staged-gcc": {"type": "install", "dirs": [[["", "toolchain"], "gcc"]]}
 }

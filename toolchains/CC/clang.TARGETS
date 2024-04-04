@@ -83,7 +83,7 @@
       }
     }
   , "toolchain": ["staged-clang"]
-  , "PATH": ["$(TOOLCHAIN)/clang/bin", "/bin"]
+  , "PATH": ["$(TOOLCHAIN)/clang/bin", "/bin", "/usr/bin"]
   }
 , "staged-clang": {"type": "install", "dirs": [[["", "toolchain"], "clang"]]}
 }
