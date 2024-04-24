@@ -1,4 +1,10 @@
 { "defaults":
+  { "type": "export"
+  , "target": "defaults (unexported)"
+  , "flexible_config":
+    ["ARCH", "ENV", "HOST_ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG"]
+  }
+, "defaults (unexported)":
   { "type": ["@", "rules", "patch", "defaults"]
   , "base": [["@", "busybox", "patch", "defaults"]]
   }
