@@ -7,14 +7,17 @@ details about the bootstrap process, see [BOOTSTRAP.md](./doc/BOOTSTRAP.md).*
 Available compiler toolchains are:
 
 - `gcc-latest-native`
+- `gcc-14.1.0-native`
 - `gcc-13.2.0-native`
 - `clang-latest-native`
 - `clang-18.1.4-native`
 - `clang-17.0.6-native`
 - `clang-16.0.6-native`
 - `gcc-latest-musl`
+- `gcc-14.1.0-musl`
 - `gcc-13.2.0-musl`
 - `gcc-latest-musl-static`
+- `gcc-14.1.0-musl-static`
 - `gcc-13.2.0-musl-static`
 
 *For details about how these compilers are built, see

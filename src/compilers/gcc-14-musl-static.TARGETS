@@ -1,0 +1,14 @@
+{ "toolchain":
+  { "type": "export"
+  , "flexible_config":
+    ["ARCH", "TARGET_ARCH", "BUILD_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"MUSL_BUILD_STATIC": true}
+  , "target": ["@", "gcc-musl", "", "toolchain_internal"]
+  }
+, "runlibs":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"MUSL_BUILD_STATIC": true}
+  , "target": ["@", "gcc-musl", "", "runlibs_internal"]
+  }
+}

@@ -1,0 +1,26 @@
+From 324a42a4cc1b9152ee73c285725038b9a610d7f1 Mon Sep 17 00:00:00 2001
+From: Oliver Reiche <oliver.reiche@huawei.com>
+Date: Fri, 8 Sep 2023 14:59:34 +0200
+Subject: [PATCH 5/5] Do not hardcode rpath into cc1 libs
+
+... which is a temporary path anyway.
+---
+ libcc1/configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libcc1/configure b/libcc1/configure
+index ea689a353..07ff4cde4 100755
+--- a/libcc1/configure
++++ b/libcc1/configure
+@@ -17453,7 +17453,7 @@ finish_cmds=$lt_finish_cmds
+ finish_eval=$lt_finish_eval
+ 
+ # Whether we should hardcode library paths into libraries.
+-hardcode_into_libs=$hardcode_into_libs
++hardcode_into_libs=no #$hardcode_into_libs
+ 
+ # Compile-time system search path for libraries.
+ sys_lib_search_path_spec=$lt_sys_lib_search_path_spec
+-- 
+2.30.2
+

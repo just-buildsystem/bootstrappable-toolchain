@@ -1,0 +1,352 @@
+{ "toolchain":
+  { "type": "export"
+  , "flexible_config":
+    ["ARCH", "TARGET_ARCH", "BUILD_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"MUSL_BUILD_STATIC": false}
+  , "target": "toolchain_internal"
+  }
+, "runlibs":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"MUSL_BUILD_STATIC": false}
+  , "target": "runlibs_internal"
+  }
+, "toolchain_internal":
+  { "type": "configure"
+  , "arguments_config": ["ARCH", "TARGET_ARCH", "BUILD_ARCH"]
+  , "config":
+    { "type": "let*"
+    , "bindings":
+      [ [ "ARCH"
+        , { "type": "var"
+          , "name": "ARCH"
+          , "default":
+            {"type": "fail", "msg": "ARCH is required for cross-compiler."}
+          }
+        ]
+      , [ "TARGET_ARCH"
+        , { "type": "var"
+          , "name": "TARGET_ARCH"
+          , "default": {"type": "var", "name": "ARCH"}
+          }
+        ]
+      , [ "BUILD_ARCH"
+        , { "type": "var"
+          , "name": "BUILD_ARCH"
+          , "default": {"type": "var", "name": "ARCH"}
+          }
+        ]
+      , [ "MUSL_BUILD_CROSSED_NATIVE"
+        , { "type": "case*"
+          , "expr": {"type": "var", "name": "TARGET_ARCH"}
+          , "case":
+            [ [{"type": "var", "name": "ARCH"}, false]
+            , [{"type": "var", "name": "BUILD_ARCH"}, true]
+            ]
+          , "default":
+            { "type": "fail"
+            , "msg":
+              ["crossback and canadian builds are currently unsupported."]
+            }
+          }
+        ]
+      ]
+    , "body":
+      { "type": "env"
+      , "vars": ["TARGET_ARCH", "BUILD_ARCH", "MUSL_BUILD_CROSSED_NATIVE"]
+      }
+    }
+  , "target": "toolchain_cross"
+  }
+, "toolchain_non_static_for_host":
+  { "type": "configure"
+  , "arguments_config": ["ARCH"]
+  , "config":
+    { "type": "let*"
+    , "bindings":
+      [ ["BUILD_ARCH", {"type": "var", "name": "ARCH"}]
+      , ["TARGET_ARCH", {"type": "var", "name": "ARCH"}]
+      , ["MUSL_BUILD_STATIC", false]
+      ]
+    , "body":
+      { "type": "env"
+      , "vars": ["TARGET_ARCH", "BUILD_ARCH", "MUSL_BUILD_STATIC"]
+      }
+    }
+  , "target": "toolchain_internal"
+  }
+, "toolchain_for_target":
+  { "type": "configure"
+  , "arguments_config": ["ARCH", "TARGET_ARCH"]
+  , "config":
+    { "type": "let*"
+    , "bindings":
+      [ ["BUILD_ARCH", {"type": "var", "name": "TARGET_ARCH"}]
+      , ["TARGET_ARCH", {"type": "var", "name": "ARCH"}]
+      ]
+    , "body": {"type": "env", "vars": ["TARGET_ARCH", "BUILD_ARCH"]}
+    }
+  , "target": "toolchain_internal"
+  }
+, "toolchain_non_static_for_target":
+  { "type": "configure"
+  , "arguments_config": ["ARCH", "TARGET_ARCH"]
+  , "config":
+    {"type": "singleton_map", "key": "MUSL_BUILD_STATIC", "value": false}
+  , "target": "toolchain_for_target"
+  }
+, "toolchain_cross":
+  { "type": "export"
+  , "flexible_config":
+    [ "ARCH"
+    , "TARGET_ARCH"
+    , "BUILD_ARCH"
+    , "TOOLCHAIN_CONFIG"
+    , "ENV"
+    , "MUSL_BUILD_STATIC"
+    , "MUSL_BUILD_CROSSED_NATIVE"
+    ]
+  , "target": "gcc-musl"
+  }
+, "separate_patched_sources":
+  { "type": "install"
+  , "dirs":
+    [ [["@", "musl-cross-make", "", "combined_sources_and_patches"], "src"]
+    , [["@", "binutils", "", "files"], "binutils"]
+    , [["@", "musl", "", "files"], "musl"]
+    , [["@", "gmp", "", "files"], "gmp"]
+    , [["@", "mpc", "", "files"], "mpc"]
+    , [["@", "mpfr", "", "files"], "mpfr"]
+    , [["@", "gcc", "", "patched_sources"], "gcc"]
+    , [["@", "mimalloc", "", "files"], "mimalloc"]
+    ]
+  }
+, "combined_patched_sources":
+  { "type": ["@", "rules", "CC/foreign/shell", "data"]
+  , "project": ["separate_patched_sources"]
+  , "cmds":
+    [ "cp -r src/. ${DESTDIR}"
+    , "mv binutils ${DESTDIR}/binutils-latest.orig"
+    , "mv musl ${DESTDIR}/musl-latest.orig"
+    , "mv gmp ${DESTDIR}/gmp-latest.orig"
+    , "mv mpc ${DESTDIR}/mpc-latest.orig"
+    , "mv mpfr ${DESTDIR}/mpfr-latest.orig"
+    , "mv gcc ${DESTDIR}/gcc-14.orig"
+    , "mv mimalloc ${DESTDIR}/mimalloc"
+    , "chmod +w ${DESTDIR}/config.mak"
+    , "printf 'GCC_VER = 14\n' >> ${DESTDIR}/config.mak"
+    ]
+  , "out_dirs": ["."]
+  }
+, "strip_for_host":
+  { "type": "configure"
+  , "arguments_config": ["ARCH"]
+  , "config":
+    { "type": "singleton_map"
+    , "key": "TARGET_ARCH"
+    , "value": {"type": "var", "name": "ARCH"}
+    }
+  , "target": ["@", "binutils", "", "multi-target strip"]
+  }
+, "gcc-musl_localbase":
+  { "type": "install"
+  , "arguments_config": ["MUSL_BUILD_STATIC", "MUSL_BUILD_CROSSED_NATIVE"]
+  , "dirs":
+    { "type": "++"
+    , "$1":
+      [ [["strip_for_host", "binutils"]]
+      , { "type": "if"
+        , "cond": {"type": "var", "name": "MUSL_BUILD_STATIC"}
+        , "then": [["toolchain_non_static_for_host", "hostcc"]]
+        }
+      , { "type": "if"
+        , "cond": {"type": "var", "name": "MUSL_BUILD_CROSSED_NATIVE"}
+        , "then": [["toolchain_non_static_for_target", "crosscc"]]
+        }
+      ]
+    }
+  }
+, "gcc-musl":
+  { "type": ["@", "rules", "CC/foreign/shell", "data"]
+  , "project": ["combined_patched_sources"]
+  , "localbase": ["gcc-musl_localbase"]
+  , "arguments_config":
+    ["BUILD_ARCH", "MUSL_BUILD_STATIC", "MUSL_BUILD_CROSSED_NATIVE"]
+  , "cmds":
+    { "type": "let*"
+    , "bindings":
+      [ [ "MUSL_TARGET"
+        , { "type": "case"
+          , "expr":
+            { "type": "var"
+            , "name": "BUILD_ARCH"
+            , "default": {"type": "fail", "msg": "BUILD_ARCH is missing."}
+            }
+          , "case":
+            { "x86": "i686-linux-musl"
+            , "x86_64": "x86_64-linux-musl"
+            , "arm": "arm-linux-musleabi"
+            , "arm64": "aarch64-linux-musl"
+            }
+          , "default":
+            { "type": "fail"
+            , "msg":
+              ["Unsupported BUILD_ARCH", {"type": "var", "name": "BUILD_ARCH"}]
+            }
+          }
+        ]
+      ]
+    , "body":
+      { "type": "++"
+      , "$1":
+        [ [ { "type": "join"
+            , "$1": ["TARGET=", {"type": "var", "name": "MUSL_TARGET"}]
+            }
+          , "export NJOBS=$(nproc --all 2>/dev/null || echo 1)"
+          , "export MAKEINFO=missing"
+          , "export BUILD_ROOT_DIR=${ACTION_DIR}"
+          , "unset CFLAGS CXXFLAGS LDFLAGS"
+          , "GCC_CONFIG='--disable-fixincludes'"
+          ]
+        , { "type": "if"
+          , "cond": {"type": "var", "name": "MUSL_BUILD_CROSSED_NATIVE"}
+          , "then": ["CROSS_PREFIX=${LOCALBASE}/crosscc/bin/"]
+          }
+        , { "type": "if"
+          , "cond": {"type": "var", "name": "MUSL_BUILD_STATIC"}
+          , "then":
+            { "type": "++"
+            , "$1":
+              [ [ "printf '#!/bin/sh\\nexec \"%s\" -static \"$@\"' \"${LOCALBASE}/hostcc/bin/gcc\" >${TMPDIR}/host-gcc"
+                , "printf '#!/bin/sh\\nexec \"%s\" -static \"$@\"' \"${LOCALBASE}/hostcc/bin/g++\" >${TMPDIR}/host-g++"
+                , "chmod +x ${TMPDIR}/host-gcc ${TMPDIR}/host-g++"
+                , "export CC=\"${TMPDIR}/host-gcc\""
+                , "export CXX=\"${TMPDIR}/host-g++\""
+                , "export LDFLAGS='-static'"
+                , "export LDFLAGS_FOR_TARGET='-static'"
+                , "GCC_CONFIG=\"$GCC_CONFIG --disable-shared\""
+                ]
+              , { "type": "if"
+                , "cond": {"type": "var", "name": "MUSL_BUILD_CROSSED_NATIVE"}
+                , "then":
+                  [ "printf '#!/bin/sh\\nexec \"%s\" -static \"$@\"' \"${CROSS_PREFIX}gcc\" >${TMPDIR}/cross-gcc"
+                  , "printf '#!/bin/sh\\nexec \"%s\" -static \"$@\"' \"${CROSS_PREFIX}g++\" >${TMPDIR}/cross-g++"
+                  , "ln -s ${LOCALBASE}/crosscc/bin/ar ${TMPDIR}/cross-ar"
+                  , "ln -s ${LOCALBASE}/crosscc/bin/ranlib ${TMPDIR}/cross-ranlib"
+                  , "chmod +x ${TMPDIR}/cross-*"
+                  , "CROSS_PREFIX=${TMPDIR}/cross-"
+                  ]
+                }
+              ]
+            }
+          , "else": ["export LD_LIBRARY_PATH=\"$(dirname ${CC})/../lib64\""]
+          }
+        , { "type": "if"
+          , "cond": {"type": "var", "name": "MUSL_BUILD_CROSSED_NATIVE"}
+          , "then":
+            [ "# set native toolchain for build host (use ranlib from PATH)"
+            , "export CC_FOR_BUILD=$CC"
+            , "export CXX_FOR_BUILD=$CXX"
+            , "export AR_FOR_BUILD=$AR"
+            , "# set cross toolchain as default (for musl libc)"
+            , "export CC=${CROSS_PREFIX}gcc"
+            , "export CXX=${CROSS_PREFIX}g++"
+            , "export AR=${CROSS_PREFIX}ar"
+            , "export RANLIB=${CROSS_PREFIX}ranlib"
+            , "# explicitly set cross toolchain for target"
+            , "export CC_FOR_TARGET=${CROSS_PREFIX}gcc"
+            , "export CXX_FOR_TARGET=${CROSS_PREFIX}g++"
+            , "export AR_FOR_TARGET=${CROSS_PREFIX}ar"
+            , "export RANLIB_FOR_TARGET=${CROSS_PREFIX}ranlib"
+            , "# enable building a native compiler"
+            , "export NATIVE=true"
+            , "# force local prefix to sysroot (to find musl libc headers)"
+            , "GCC_CONFIG=\"$GCC_CONFIG --with-local-prefix=/\""
+            , "export gcc_cv_sys_sdt_h=no   # musl libc does not have sys/sdt.h"
+            ]
+          }
+        , [ "mv musl-latest.orig musl.readonly"
+          , "cp -r musl.readonly musl-latest.orig && chmod -R +w musl-latest.orig"
+          , "export check_msgfmt=no   # do not use system's msgfmt, if available"
+          , "${MAKE} -j${NJOBS} TARGET=${TARGET} GCC_CONFIG=\"${GCC_CONFIG}\" >build.log 2>&1 || (cat build.log && exit 1)"
+          , "${MAKE} -j${NJOBS} TARGET=${TARGET} GCC_CONFIG=\"${GCC_CONFIG}\" OUTPUT= DESTDIR=${DESTDIR} install >>build.log 2>&1 || (cat build.log && exit 1)"
+          , "cd ${DESTDIR}"
+          , "STRIP=${LOCALBASE}/binutils/bin/strip"
+          , "find ./bin/ ./${TARGET}/bin/ ./libexec/gcc/ -type f -exec sh -c \"${STRIP} {} 2>/dev/null\" \\;"
+          , "find . -type f -name '*.so*' -exec sh -c \"${STRIP} {} 2>/dev/null\" \\;"
+          , "find . -type f -name '*.a' -exec sh -c \"${STRIP} -g {} 2>/dev/null\" \\;"
+          , "find . -type f -name '*.o' -exec sh -c \"${STRIP} -g {} 2>/dev/null\" \\;"
+          , "find . -type l -exec sh -c 'expr match \"$(readlink {})\" \"/\" >/dev/null' \\; -delete"
+          ]
+        , { "type": "if"
+          , "cond": {"type": "var", "name": "MUSL_BUILD_CROSSED_NATIVE"}
+          , "then": []
+          , "else":
+            [ "for f in $(ls ./bin/${TARGET}-*); do"
+            , "  ln -s $(basename $f) $(echo $f | sed 's|/'${TARGET}-'|/|g')"
+            , "done"
+            , "# set CC for building alternative allocator"
+            , "export CC_FOR_TARGET=\"$(pwd)/bin/gcc\""
+            ]
+          }
+        , [ "# provide alternative allocator mimalloc"
+          , "export MI_CFLAGS=\"-DMI_MALLOC_OVERRIDE -I${WORKDIR}/mimalloc/include -O3 -DNDEBUG -fPIC -fvisibility=hidden -ftls-model=initial-exec -fno-builtin-malloc -std=gnu11\""
+          , "${CC_FOR_TARGET} ${MI_CFLAGS} -c ${WORKDIR}/mimalloc/src/static.c -o ./${TARGET}/lib/mimalloc.o"
+          ]
+        ]
+      }
+    }
+  , "out_dirs": ["."]
+  }
+, "runlibs_internal":
+  { "type": "configure"
+  , "arguments_config": ["MUSL_BUILD_STATIC"]
+  , "target":
+    { "type": "if"
+    , "cond": {"type": "var", "name": "MUSL_BUILD_STATIC"}
+    , "then": "libc"
+    , "else": "libstdc++"
+    }
+  }
+, "libstdc++":
+  { "type": ["@", "rules", "CC/prebuilt", "library"]
+  , "name": ["libstdc++"]
+  , "lib": ["libstdc++_files"]
+  , "deps": ["libc", "libgcc_s"]
+  }
+, "libgcc_s":
+  { "type": ["@", "rules", "CC/prebuilt", "library"]
+  , "name": ["libgcc_s"]
+  , "lib": ["libgcc_s_files"]
+  , "deps": ["libc"]
+  }
+, "libc":
+  { "type": ["@", "rules", "CC/prebuilt", "library"]
+  , "name": ["libc"]
+  , "lib": ["libc_files"]
+  }
+, "libstdc++_files":
+  { "type": "generic"
+  , "arguments_config": ["ENV"]
+  , "deps": ["toolchain_for_target"]
+  , "cmds": ["cp -L $(./bin/gcc -dumpmachine)/lib/libstdc++.so.6 ."]
+  , "outs": ["libstdc++.so.6"]
+  , "env": {"type": "var", "name": "ENV", "default": {"type": "empty_map"}}
+  }
+, "libgcc_s_files":
+  { "type": "generic"
+  , "arguments_config": ["ENV"]
+  , "deps": ["toolchain_for_target"]
+  , "cmds": ["cp -L $(./bin/gcc -dumpmachine)/lib/libgcc_s.so.1 ."]
+  , "outs": ["libgcc_s.so.1"]
+  , "env": {"type": "var", "name": "ENV", "default": {"type": "empty_map"}}
+  }
+, "libc_files":
+  { "type": "generic"
+  , "arguments_config": ["ENV"]
+  , "deps": ["toolchain_for_target"]
+  , "cmds": ["cp -L $(./bin/gcc -dumpmachine)/lib/libc.so ."]
+  , "outs": ["libc.so"]
+  , "env": {"type": "var", "name": "ENV", "default": {"type": "empty_map"}}
+  }
+}
