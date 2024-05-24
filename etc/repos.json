@@ -21,6 +21,7 @@
     , "target_root": "defaults"
     , "target_file_name": "stage-0.TARGETS"
     , "rule_root": "rules"
+    , "bindings": {"busybox": "stage-0/busybox"}
     }
   , "rules/stage-1":
     { "repository": "rules"

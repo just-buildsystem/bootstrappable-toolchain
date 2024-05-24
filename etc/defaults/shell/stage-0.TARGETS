@@ -1,0 +1,7 @@
+{ "defaults":
+  { "type": "defaults"
+  , "sh": ["bin/sh"]
+  , "toolchain": [["@", "busybox", "", "bootstrap"]]
+  , "bin dirs": ["bin"]
+  }
+}
