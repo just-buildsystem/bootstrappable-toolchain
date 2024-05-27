@@ -1,16 +1,48 @@
 { "bootstrap":
   { "type": "install"
   , "files":
-    { "bin/awk": "bootstrap-awk"
-    , "bin/cmp": "bootstrap-cmp"
-    , "bin/sed": "bootstrap-sed"
-    , "bin/diff": "bootstrap-diff"
-    , "bin/patch": "bootstrap-patch"
-    , "bin/tar": "bootstrap-tar"
+    { "bin/[": "bootstrap-test"
+    , "bin/awk": "bootstrap-awk"
+    , "bin/basename": "bootstrap-basename"
     , "bin/bzip2": "bootstrap-bzip2"
-    , "bin/grep": "bootstrap-grep"
+    , "bin/cat": "bootstrap-cat"
+    , "bin/chmod": "bootstrap-chmod"
+    , "bin/cmp": "bootstrap-cmp"
+    , "bin/cp": "bootstrap-cp"
+    , "bin/date": "bootstrap-date"
+    , "bin/diff": "bootstrap-diff"
+    , "bin/dirname": "bootstrap-dirname"
+    , "bin/echo": "bootstrap-echo"
+    , "bin/env": "bootstrap-env"
+    , "bin/expr": "bootstrap-expr"
+    , "bin/false": "bootstrap-false"
     , "bin/find": "bootstrap-find"
+    , "bin/grep": "bootstrap-grep"
+    , "bin/install": "bootstrap-install"
+    , "bin/ln": "bootstrap-ln"
+    , "bin/ls": "bootstrap-ls"
+    , "bin/mkdir": "bootstrap-mkdir"
+    , "bin/mktemp": "bootstrap-mktemp"
+    , "bin/mv": "bootstrap-mv"
+    , "bin/patch": "bootstrap-patch"
+    , "bin/printf": "bootstrap-printf"
+    , "bin/pwd": "bootstrap-pwd"
+    , "bin/rm": "bootstrap-rm"
+    , "bin/rmdir": "bootstrap-rmdir"
+    , "bin/sed": "bootstrap-sed"
     , "bin/sh": "bootstrap-ash"
+    , "bin/sleep": "bootstrap-sleep"
+    , "bin/sort": "bootstrap-sort"
+    , "bin/tail": "bootstrap-tail"
+    , "bin/tar": "bootstrap-tar"
+    , "bin/test": "bootstrap-test"
+    , "bin/touch": "bootstrap-touch"
+    , "bin/tr": "bootstrap-tr"
+    , "bin/true": "bootstrap-true"
+    , "bin/od": "bootstrap-od"
+    , "bin/uname": "bootstrap-uname"
+    , "bin/uniq": "bootstrap-uniq"
+    , "bin/wc": "bootstrap-wc"
     }
   }
 , "toolchain":
@@ -19,40 +51,22 @@
   , "target": "busybox"
   }
 , "files": {"type": "install", "deps": [["TREE", null, "."]]}
+, "bootstrap-ash":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "shell", "APPLET_NAME": "ash"}
+  , "target": "configured-applet"
+  }
 , "bootstrap-awk":
   { "type": "export"
   , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
   , "fixed_config": {"APPLET_GROUP": "editors", "APPLET_NAME": "awk"}
   , "target": "configured-applet"
   }
-, "bootstrap-cmp":
+, "bootstrap-basename":
   { "type": "export"
   , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
-  , "fixed_config": {"APPLET_GROUP": "editors", "APPLET_NAME": "cmp"}
-  , "target": "configured-applet"
-  }
-, "bootstrap-sed":
-  { "type": "export"
-  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
-  , "fixed_config": {"APPLET_GROUP": "editors", "APPLET_NAME": "sed"}
-  , "target": "configured-applet"
-  }
-, "bootstrap-diff":
-  { "type": "export"
-  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
-  , "fixed_config": {"APPLET_GROUP": "editors", "APPLET_NAME": "diff"}
-  , "target": "configured-applet"
-  }
-, "bootstrap-patch":
-  { "type": "export"
-  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
-  , "fixed_config": {"APPLET_GROUP": "editors", "APPLET_NAME": "patch"}
-  , "target": "configured-applet"
-  }
-, "bootstrap-tar":
-  { "type": "export"
-  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
-  , "fixed_config": {"APPLET_GROUP": "archival", "APPLET_NAME": "tar"}
+  , "fixed_config": {"APPLET_GROUP": "coreutils", "APPLET_NAME": "basename"}
   , "target": "configured-applet"
   }
 , "bootstrap-bzip2":
@@ -61,10 +75,70 @@
   , "fixed_config": {"APPLET_GROUP": "archival", "APPLET_NAME": "bzip2"}
   , "target": "configured-applet"
   }
-, "bootstrap-grep":
+, "bootstrap-cat":
   { "type": "export"
   , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
-  , "fixed_config": {"APPLET_GROUP": "findutils", "APPLET_NAME": "grep"}
+  , "fixed_config": {"APPLET_GROUP": "coreutils", "APPLET_NAME": "cat"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-chmod":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "coreutils", "APPLET_NAME": "chmod"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-cmp":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "editors", "APPLET_NAME": "cmp"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-cp":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "coreutils", "APPLET_NAME": "cp"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-date":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "coreutils", "APPLET_NAME": "date"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-diff":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "editors", "APPLET_NAME": "diff"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-dirname":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "coreutils", "APPLET_NAME": "dirname"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-echo":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "coreutils", "APPLET_NAME": "echo"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-env":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "coreutils", "APPLET_NAME": "env"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-expr":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "coreutils", "APPLET_NAME": "expr"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-false":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "coreutils", "APPLET_NAME": "false"}
   , "target": "configured-applet"
   }
 , "bootstrap-find":
@@ -73,10 +147,154 @@
   , "fixed_config": {"APPLET_GROUP": "findutils", "APPLET_NAME": "find"}
   , "target": "configured-applet"
   }
-, "bootstrap-ash":
+, "bootstrap-grep":
   { "type": "export"
   , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
-  , "fixed_config": {"APPLET_GROUP": "shell", "APPLET_NAME": "ash"}
+  , "fixed_config": {"APPLET_GROUP": "findutils", "APPLET_NAME": "grep"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-ls":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "coreutils", "APPLET_NAME": "ls"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-install":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "coreutils", "APPLET_NAME": "install"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-ln":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "coreutils", "APPLET_NAME": "ln"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-mkdir":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "coreutils", "APPLET_NAME": "mkdir"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-mktemp":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "coreutils", "APPLET_NAME": "mktemp"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-mv":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "coreutils", "APPLET_NAME": "mv"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-patch":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "editors", "APPLET_NAME": "patch"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-printf":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "coreutils", "APPLET_NAME": "printf"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-pwd":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "coreutils", "APPLET_NAME": "pwd"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-rm":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "coreutils", "APPLET_NAME": "rm"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-rmdir":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "coreutils", "APPLET_NAME": "rmdir"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-sed":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "editors", "APPLET_NAME": "sed"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-sleep":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "coreutils", "APPLET_NAME": "sleep"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-sort":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "coreutils", "APPLET_NAME": "sort"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-tail":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "coreutils", "APPLET_NAME": "tail"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-tar":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "archival", "APPLET_NAME": "tar"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-test":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "coreutils", "APPLET_NAME": "test"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-true":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "coreutils", "APPLET_NAME": "true"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-tr":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "coreutils", "APPLET_NAME": "tr"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-od":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "coreutils", "APPLET_NAME": "od"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-touch":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "coreutils", "APPLET_NAME": "touch"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-uname":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "coreutils", "APPLET_NAME": "uname"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-uniq":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "coreutils", "APPLET_NAME": "uniq"}
+  , "target": "configured-applet"
+  }
+, "bootstrap-wc":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "fixed_config": {"APPLET_GROUP": "coreutils", "APPLET_NAME": "wc"}
   , "target": "configured-applet"
   }
 , "configured-applet":
@@ -111,119 +329,188 @@
   { "type": "install"
   , "deps":
     [ ["./", "include", "bootstrap-headers"]
-    , "libbb/xatonum_template.c"
-    , "editors/awk.c"
-    , "editors/cmp.c"
-    , "editors/sed.c"
-    , "editors/diff.c"
-    , "editors/patch.c"
-    , "archival/tar.c"
     , "archival/bzip2.c"
-    , "archival/libarchive/bz/bzlib.h"
-    , "archival/libarchive/bz/bzlib_private.h"
     , "archival/libarchive/bz/blocksort.c"
     , "archival/libarchive/bz/bzlib.c"
+    , "archival/libarchive/bz/bzlib.h"
+    , "archival/libarchive/bz/bzlib_private.h"
     , "archival/libarchive/bz/compress.c"
     , "archival/libarchive/bz/huffman.c"
-    , "findutils/grep.c"
+    , "archival/tar.c"
+    , "coreutils/basename.c"
+    , "coreutils/cat.c"
+    , "coreutils/chmod.c"
+    , "coreutils/cp.c"
+    , "coreutils/date.c"
+    , "coreutils/dirname.c"
+    , "coreutils/echo.c"
+    , "coreutils/env.c"
+    , "coreutils/expr.c"
+    , "coreutils/false.c"
+    , "coreutils/install.c"
+    , "coreutils/libcoreutils/coreutils.h"
+    , "coreutils/ln.c"
+    , "coreutils/ls.c"
+    , "coreutils/mkdir.c"
+    , "coreutils/mktemp.c"
+    , "coreutils/mv.c"
+    , "coreutils/printf.c"
+    , "coreutils/pwd.c"
+    , "coreutils/rm.c"
+    , "coreutils/rmdir.c"
+    , "coreutils/sleep.c"
+    , "coreutils/sort.c"
+    , "coreutils/tail.c"
+    , "coreutils/test.c"
+    , "coreutils/touch.c"
+    , "coreutils/tail.c"
+    , "coreutils/tr.c"
+    , "coreutils/true.c"
+    , "coreutils/od.c"
+    , "coreutils/od_bloaty.c"
+    , "coreutils/uname.c"
+    , "coreutils/uniq.c"
+    , "coreutils/wc.c"
+    , "editors/awk.c"
+    , "editors/cmp.c"
+    , "editors/diff.c"
+    , "editors/patch.c"
+    , "editors/sed.c"
     , "findutils/find.c"
+    , "findutils/grep.c"
+    , "libbb/xatonum_template.c"
     , "shell/ash.c"
-    , "shell/shell_common.h"
     , "shell/math.h"
     , "shell/random.h"
+    , "shell/shell_common.h"
     ]
   }
 , "bootstrap-sources":
   { "type": "install"
+  , "arguments_config": ["APPLET_NAME"]
   , "deps":
-    [ "appletlib.c"
-    , "libbb/auto_string.c"
-    , "libbb/bb_getgroups.c"
-    , "libbb/bb_pwd.c"
-    , "libbb/bb_strtonum.c"
-    , "libbb/concat_path_file.c"
-    , "libbb/concat_subpath_file.c"
-    , "libbb/const_hack.c"
-    , "libbb/common_bufsiz.c"
-    , "libbb/compare_string_array.c"
-    , "libbb/copyfd.c"
-    , "libbb/crc32.c"
-    , "libbb/default_error_retval.c"
-    , "libbb/endofname.c"
-    , "libbb/fclose_nonstdin.c"
-    , "libbb/fflush_stdout_and_exit.c"
-    , "libbb/find_pid_by_name.c"
-    , "libbb/full_write.c"
-    , "libbb/get_last_path_component.c"
-    , "libbb/get_line_from_file.c"
-    , "libbb/getopt32.c"
-    , "libbb/isqrt.c"
-    , "libbb/last_char_is.c"
-    , "libbb/lineedit.c"
-    , "libbb/lineedit_ptr_hack.c"
-    , "libbb/llist.c"
-    , "libbb/makedev.c"
-    , "libbb/make_directory.c"
-    , "libbb/messages.c"
-    , "libbb/mode_string.c"
-    , "libbb/parse_mode.c"
-    , "libbb/perror_msg.c"
-    , "libbb/process_escape_sequence.c"
-    , "libbb/procps.c"
-    , "libbb/ptr_to_globals.c"
-    , "libbb/printable_string.c"
-    , "libbb/read.c"
-    , "libbb/read_key.c"
-    , "libbb/read_printf.c"
-    , "libbb/recursive_action.c"
-    , "libbb/safe_poll.c"
-    , "libbb/safe_strncpy.c"
-    , "libbb/safe_write.c"
-    , "libbb/signals.c"
-    , "libbb/skip_whitespace.c"
-    , "libbb/sysconf.c"
-    , "libbb/time.c"
-    , "libbb/unicode.c"
-    , "libbb/u_signal_names.c"
-    , "libbb/verror_msg.c"
-    , "libbb/wfopen.c"
-    , "libbb/wfopen_input.c"
-    , "libbb/xatonum.c"
-    , "libbb/xfunc_die.c"
-    , "libbb/xfuncs.c"
-    , "libbb/xfuncs_printf.c"
-    , "libbb/xgetcwd.c"
-    , "libbb/xreadlink.c"
-    , "libbb/xrealloc_vector.c"
-    , "libbb/xregcomp.c"
-    , "archival/bbunzip.c"
-    , "archival/chksum_and_xwrite_tar_header.c"
-    , "archival/libarchive/data_align.c"
-    , "archival/libarchive/data_extract_all.c"
-    , "archival/libarchive/data_extract_to_stdout.c"
-    , "archival/libarchive/data_skip.c"
-    , "archival/libarchive/filter_accept_all.c"
-    , "archival/libarchive/filter_accept_reject_list.c"
-    , "archival/libarchive/find_list_entry.c"
-    , "archival/libarchive/get_header_tar.c"
-    , "archival/libarchive/header_list.c"
-    , "archival/libarchive/header_skip.c"
-    , "archival/libarchive/header_verbose_list.c"
-    , "archival/libarchive/init_handle.c"
-    , "archival/libarchive/open_transformer.c"
-    , "archival/libarchive/seek_by_jump.c"
-    , "archival/libarchive/seek_by_read.c"
-    , "archival/libarchive/unsafe_prefix.c"
-    , "archival/libarchive/unsafe_symlink_target.c"
-    , "coreutils/echo.c"
-    , "coreutils/test.c"
-    , "coreutils/test_ptr_hack.c"
-    , "shell/ash_ptr_hack.c"
-    , "shell/math.c"
-    , "shell/random.c"
-    , "shell/shell_common.c"
-    , "procps/kill.c"
-    ]
+    { "type": "++"
+    , "$1":
+      [ [ "appletlib.c"
+        , "archival/bbunzip.c"
+        , "archival/chksum_and_xwrite_tar_header.c"
+        , "archival/libarchive/data_align.c"
+        , "archival/libarchive/data_extract_all.c"
+        , "archival/libarchive/data_extract_to_stdout.c"
+        , "archival/libarchive/data_skip.c"
+        , "archival/libarchive/filter_accept_all.c"
+        , "archival/libarchive/filter_accept_reject_list.c"
+        , "archival/libarchive/find_list_entry.c"
+        , "archival/libarchive/get_header_tar.c"
+        , "archival/libarchive/header_list.c"
+        , "archival/libarchive/header_skip.c"
+        , "archival/libarchive/header_verbose_list.c"
+        , "archival/libarchive/init_handle.c"
+        , "archival/libarchive/open_transformer.c"
+        , "archival/libarchive/seek_by_jump.c"
+        , "archival/libarchive/seek_by_read.c"
+        , "archival/libarchive/unsafe_prefix.c"
+        , "archival/libarchive/unsafe_symlink_target.c"
+        , "coreutils/libcoreutils/cp_mv_stat.c"
+        , "coreutils/test_ptr_hack.c"
+        , "libbb/ask_confirmation.c"
+        , "libbb/auto_string.c"
+        , "libbb/bb_cat.c"
+        , "libbb/bb_getgroups.c"
+        , "libbb/bb_pwd.c"
+        , "libbb/bb_strtonum.c"
+        , "libbb/common_bufsiz.c"
+        , "libbb/compare_string_array.c"
+        , "libbb/concat_path_file.c"
+        , "libbb/concat_subpath_file.c"
+        , "libbb/const_hack.c"
+        , "libbb/copyfd.c"
+        , "libbb/copy_file.c"
+        , "libbb/crc32.c"
+        , "libbb/default_error_retval.c"
+        , "libbb/dump.c"
+        , "libbb/endofname.c"
+        , "libbb/executable.c"
+        , "libbb/fclose_nonstdin.c"
+        , "libbb/fflush_stdout_and_exit.c"
+        , "libbb/find_pid_by_name.c"
+        , "libbb/full_write.c"
+        , "libbb/get_last_path_component.c"
+        , "libbb/get_line_from_file.c"
+        , "libbb/human_readable.c"
+        , "libbb/getopt32.c"
+        , "libbb/inode_hash.c"
+        , "libbb/isdirectory.c"
+        , "libbb/isqrt.c"
+        , "libbb/last_char_is.c"
+        , "libbb/lineedit.c"
+        , "libbb/lineedit_ptr_hack.c"
+        , "libbb/llist.c"
+        , "libbb/makedev.c"
+        , "libbb/make_directory.c"
+        , "libbb/messages.c"
+        , "libbb/mode_string.c"
+        , "libbb/parse_mode.c"
+        , "libbb/perror_msg.c"
+        , "libbb/perror_nomsg_and_die.c"
+        , "libbb/printable_string.c"
+        , "libbb/process_escape_sequence.c"
+        , "libbb/procps.c"
+        , "libbb/ptr_to_globals.c"
+        , "libbb/read.c"
+        , "libbb/read_key.c"
+        , "libbb/read_printf.c"
+        , "libbb/recursive_action.c"
+        , "libbb/remove_file.c"
+        , "libbb/replace.c"
+        , "libbb/safe_poll.c"
+        , "libbb/safe_strncpy.c"
+        , "libbb/safe_write.c"
+        , "libbb/signals.c"
+        , "libbb/single_argv.c"
+        , "libbb/skip_whitespace.c"
+        , "libbb/sysconf.c"
+        , "libbb/time.c"
+        , "libbb/unicode.c"
+        , "libbb/u_signal_names.c"
+        , "libbb/verror_msg.c"
+        , "libbb/vfork_daemon_rexec.c"
+        , "libbb/wfopen.c"
+        , "libbb/wfopen_input.c"
+        , "libbb/xatonum.c"
+        , "libbb/xfunc_die.c"
+        , "libbb/xfuncs.c"
+        , "libbb/xfuncs_printf.c"
+        , "libbb/xgetcwd.c"
+        , "libbb/xreadlink.c"
+        , "libbb/xrealloc_vector.c"
+        , "libbb/xregcomp.c"
+        , "procps/kill.c"
+        , "shell/ash_ptr_hack.c"
+        , "shell/math.c"
+        , "shell/random.c"
+        , "shell/shell_common.c"
+        ]
+      , { "type": "if"
+        , "cond":
+          { "type": "=="
+          , "$1": {"type": "var", "name": "APPLET_NAME"}
+          , "$2": "echo"
+          }
+        , "then": []
+        , "else": ["coreutils/echo.c"]
+        }
+      , { "type": "if"
+        , "cond":
+          { "type": "=="
+          , "$1": {"type": "var", "name": "APPLET_NAME"}
+          , "$2": "test"
+          }
+        , "then": []
+        , "else": ["coreutils/test.c"]
+        }
+      ]
+    }
   }
 , "appletlib.c":
   { "type": "file_gen"
