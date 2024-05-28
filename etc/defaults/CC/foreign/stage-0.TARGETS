@@ -1,1 +1,20 @@
-{"defaults": {"type": ["CC/foreign", "defaults"]}}
+{ "defaults": {"type": ["CC/foreign", "defaults"]}
+, "expand_exec":
+  { "type": "export"
+  , "target": "expand_exec (binary)"
+  , "flexible_config":
+    [ "TOOLCHAIN_CONFIG"
+    , "ARCH"
+    , "BUILD_ARCH"
+    , "HOST_ARCH"
+    , "TARGET_ARCH"
+    , "ENV"
+    ]
+  }
+, "expand_exec (binary)":
+  { "type": ["CC", "binary"]
+  , "srcs": ["expand_exec.c"]
+  , "name": ["expand_exec"]
+  , "pure C": [""]
+  }
+}
