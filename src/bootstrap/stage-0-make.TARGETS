@@ -18,10 +18,12 @@
     , "export LD=${CC}"
     , "export AR=true"
     , "export RANLIB=true"
+    , "export SHELL=${LOCALBASE}/bin/sh"
+    , "export CONFIG_SHELL=${LOCALBASE}/bin/sh"
     , "unset LDFLAGS"
     , "cd ${TMPDIR}"
-    , "${WORKDIR}/configure --prefix=/ --disable-nls --disable-rpath --disable-load --disable-dependency-tracking >configure.log 2>&1 || (cat configure.log && exit 1)"
-    , "./build.sh >build.log 2>&1 || true"
+    , "(sh ${WORKDIR}/configure --prefix=/ --disable-nls --disable-rpath --disable-load --disable-dependency-tracking >configure.log 2>&1) || (cat configure.log && exit 1)"
+    , "(sh ./build.sh >build.log 2>&1) || true"
     , "${CC} -o make $(ls src/*.o lib/*.o | LC_ALL=C sort) >build.log 2>&1 || (cat configure.log build.log && exit 1)"
     , "mv make ${DESTDIR}/bin/"
     ]
@@ -46,7 +48,7 @@
     , "export MAKE=${LOCALBASE}/make/bin/make"
     , "export CC=${LOCALBASE}/gcc/bin/gcc"
     , "export CXX=unused"
-    , "./configure --prefix=/ --disable-rpath --disable-load >configure.log 2>&1 || (cat configure.log && exit 1)"
+    , "sh ./configure --prefix=/ --disable-rpath --disable-load >configure.log 2>&1 || (cat configure.log && exit 1)"
     , "${MAKE} -j${NJOBS} MAKEINFO=missing >build.log 2>&1 || (cat configure.log build.log && exit 1)"
     , "${MAKE} -j${NJOBS} MAKEINFO=missing DESTDIR=${DESTDIR} install-strip >>build.log 2>&1 || (cat configure.log build.log && exit 1)"
     ]
