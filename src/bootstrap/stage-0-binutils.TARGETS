@@ -62,6 +62,7 @@
     , "  ln -s /lib/ld-musl-$(uname -m).so.1 ${TMPDIR}/ldd"
     , "  export PATH=$PATH:${TMPDIR}"
     , "fi"
+    , "export CXX=no"
     , "mkdir build"
     , "cd build"
     , "sh ../configure --prefix=/ --disable-nls --enable-gprofng=no --disable-werror --enable-deterministic-archives >configure.log 2>&1 || (cat configure.log && exit 1)"
