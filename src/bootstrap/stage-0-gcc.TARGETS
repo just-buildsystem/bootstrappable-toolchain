@@ -46,7 +46,7 @@
     , [["@", "binutils", "", "toolchain"], "binutils"]
     ]
   }
-, "gcc-4.7.4":
+, "gcc-4.7.4 (real)":
   { "type": ["@", "rules", "CC/foreign/shell", "data"]
   , "arguments_config": ["TOOLCHAIN_CONFIG"]
   , "project": ["staged_sources_and_binutils"]
@@ -162,9 +162,124 @@
     , "cd ${DESTDIR}/bin"
     , "mv gcc gcc.real"
     , "mv g++ g++.real"
-    , "printf '#!/bin/sh\\nexport PATH=\"$(dirname $0):$PATH\"\\nexec gcc.real %s \"$@\"' \"${LINK_ARGS}\" >gcc"
-    , "printf '#!/bin/sh\\nexport PATH=\"$(dirname $0):$PATH\"\\nexec g++.real %s \"$@\"' \"${LINK_ARGS}\" >g++"
-    , "chmod +x gcc g++"
+    ]
+  , "out_dirs": ["."]
+  }
+, "link_args.h":
+  { "type": "file_gen"
+  , "arguments_config": ["TOOLCHAIN_CONFIG"]
+  , "name": "link_args.h"
+  , "data":
+    { "type": "let*"
+    , "bindings":
+      [ [ "system_lib_dir"
+        , { "type": "lookup"
+          , "key": "HOST_SYSTEM_LIB_DIR"
+          , "map":
+            { "type": "var"
+            , "name": "TOOLCHAIN_CONFIG"
+            , "default": {"type": "empty_map"}
+            }
+          }
+        ]
+      , [ "link_args"
+        , { "type": "if"
+          , "cond": {"type": "var", "name": "system_lib_dir"}
+          , "then":
+            [ { "type": "join"
+              , "$1": ["-B", {"type": "var", "name": "system_lib_dir"}]
+              }
+            , { "type": "join"
+              , "$1": ["-L", {"type": "var", "name": "system_lib_dir"}]
+              }
+            , "-Xlinker"
+            , "-rpath"
+            , "-Xlinker"
+            , {"type": "var", "name": "system_lib_dir"}
+            ]
+          }
+        ]
+      , [ "link_args_c"
+        , { "type": "json_encode"
+          , "$1":
+            {"type": "length", "$1": {"type": "var", "name": "link_args"}}
+          }
+        ]
+      , [ "args_array"
+        , { "type": "join"
+          , "separator": ", "
+          , "$1":
+            { "type": "++"
+            , "$1":
+              [ { "type": "foreach"
+                , "range": {"type": "var", "name": "link_args"}
+                , "body":
+                  {"type": "json_encode", "$1": {"type": "var", "name": "_"}}
+                }
+              , ["NULL"]
+              ]
+            }
+          }
+        ]
+      ]
+    , "body":
+      { "type": "join"
+      , "$1":
+        [ "char* link_args[]"
+        , " = {"
+        , {"type": "var", "name": "args_array"}
+        , "};\n"
+        , "size_t link_args_c = (size_t) "
+        , {"type": "var", "name": "link_args_c"}
+        , ";\n"
+        ]
+      }
+    }
+  }
+, "toolname.h":
+  { "type": "file_gen"
+  , "arguments_config": ["TOOL"]
+  , "name": "toolname.h"
+  , "data":
+    { "type": "join"
+    , "$1":
+      [ "char *toolname = "
+      , { "type": "json_encode"
+        , "$1":
+          {"type": "join", "$1": [{"type": "var", "name": "TOOL"}, ".real"]}
+        }
+      , ";\n"
+      ]
+    }
+  }
+, "wrapper":
+  { "type": ["@", "rules", "CC", "binary"]
+  , "arguments_config": ["TOOL"]
+  , "pure C": [""]
+  , "name": [{"type": "var", "name": "TOOL"}]
+  , "private-hdrs": ["toolname.h", "link_args.h"]
+  , "srcs": [["@", "patches", "", "wrapper.c"]]
+  }
+, "gcc":
+  { "type": "configure"
+  , "target": "wrapper"
+  , "config": {"type": "singleton_map", "key": "TOOL", "value": "gcc"}
+  }
+, "g++":
+  { "type": "configure"
+  , "target": "wrapper"
+  , "config": {"type": "singleton_map", "key": "TOOL", "value": "g++"}
+  }
+, "wrappers":
+  {"type": "install", "files": {"wrapper/gcc": "gcc", "wrapper/g++": "g++"}}
+, "gcc-4.7.4":
+  { "type": ["@", "rules", "CC/foreign/shell", "data"]
+  , "project": ["gcc-4.7.4 (real)"]
+  , "localbase": [["@", "busybox", "", "bootstrap"], "wrappers"]
+  , "cmds":
+    [ "export PATH=$(pwd)/binutils/bin:${LOCALBASE}/bin:$PATH"
+    , "cp -r . ${DESTDIR}"
+    , "cp ${LOCALBASE}/wrapper/gcc ${LOCALBASE}/wrapper/g++ ${DESTDIR}/bin"
     ]
   , "out_dirs": ["."]
   }
