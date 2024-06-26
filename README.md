@@ -118,9 +118,8 @@ $ just-mr --main gcc-latest-musl install toolchain \
 
 For bootstrapping the toolchains, the build host must be a Linux system with:
 
-1. Coreutils
-2. POSIX-compliant shell (`/bin/sh`)
-3. C compiler (e.g., TinyCC, old GCC)
+1. C compiler (e.g., TinyCC, old GCC)
+2. POSIX-compliant shell located at `/bin/sh`
 
 The C compiler for bootstrapping can be specified by setting the fields
 `BOOTSTRAP_CC`, `BOOTSTRAP_CFLAGS`, and `BOOTSTRAP_PATH` in configuration

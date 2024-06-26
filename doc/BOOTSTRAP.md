@@ -3,10 +3,9 @@
 The bootstrap process cannot rely on anything existing on the build systems,
 except:
 
-1. Coreutils
-2. POSIX-compliant shell located at `/bin/sh`
-3. C89 compiler (e.g., TinyCC, old GCC) with a working C library (*glibc* /
+1. C89 compiler (e.g., TinyCC, old GCC) with a working C library (*glibc* /
    *musl libc*)
+2. POSIX-compliant shell located at `/bin/sh`
 
 Consequently, the process is designed to bootstrap a "minimal distribution" that
 contains everything required for building modern toolchains. The process is
@@ -18,13 +17,19 @@ currently separated into two stages.
 
 Bootstrapping a minimal set of tools that are needed for this stage includes:
 
+- The majority of the coreutils, as they are used in configure scripts
 - `sed`/`awk`/`diff` (for building `make`/`binutils`/`gcc-4.7.4`/`busybox`)
 - `patch` (for patching `gcc-4.7.4`)
 - `cmp`/`tar` (for running `gcc-4.7.4`'s install target)
 - `find`/`bzip2` (for building full `busybox`)
+- `sh`
 
 All tools are bootstrapped by selectively compiling the required C files. Note
-that Busybox' `ar` is not included, due to its missing indexing support.
+that Busybox' `ar` is not included, due to its missing indexing support. While
+we cannot avoid dependency on the hard-coded path `/bin/sh` entirely due to
+the usage of `popen`(3) in `awk`, in (currently only) stage 0, we try do reduce
+the usage of that shell to the absolute minimum to a bootstrap process as
+self-contained as possible.
 
 ### 2. Bootstrapped GNU Make
 
