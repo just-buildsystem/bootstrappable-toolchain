@@ -1,0 +1,16 @@
+{ "defaults":
+  { "type": "defaults"
+  , "sh": ["shell-busybox/bin/sh"]
+  , "toolchain": ["shell-busybox"]
+  , "bin dirs":
+    [ "shell-busybox/bin"
+    , "shell-busybox/sbin"
+    , "shell-busybox/usr/bin"
+    , "shell-busybox/usr/sbin"
+    ]
+  }
+, "shell-busybox":
+  { "type": "install"
+  , "dirs": [[["@", "busybox", "", "busybox"], "shell-busybox"]]
+  }
+}
