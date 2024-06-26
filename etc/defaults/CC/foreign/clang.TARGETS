@@ -6,4 +6,8 @@
     , ["@", "python", "CC/foreign", "defaults"]
     ]
   }
+, "expand_exec":
+  { "type": "configure"
+  , "target": ["@", "stage-0", "CC/foreign", "expand_exec"]
+  }
 }

@@ -32,6 +32,7 @@
       { "make": "stage-0/make"
       , "busybox": "stage-0/busybox"
       , "gcc": "stage-0/gcc"
+      , "stage-0": "rules/stage-0"
       }
     }
   , "rules/gcc":
@@ -39,7 +40,11 @@
     , "target_root": "defaults"
     , "target_file_name": "gcc.TARGETS"
     , "rule_root": "rules"
-    , "bindings": {"base": "rules/stage-1", "gcc": "stage-1/gcc"}
+    , "bindings":
+      { "base": "rules/stage-1"
+      , "gcc": "stage-1/gcc"
+      , "stage-0": "rules/stage-0"
+      }
     }
   , "rules/clang_with_gcc13":
     { "repository": "rules"
@@ -51,6 +56,7 @@
       , "gcc": "compilers/gcc-13.2.0-native"
       , "cmake": "cmake-3.27.1"
       , "python": "python-3.12.0"
+      , "stage-0": "rules/stage-0"
       }
     }
   , "rules/tools":
@@ -59,7 +65,10 @@
     , "target_file_name": "tools.TARGETS"
     , "rule_root": "rules"
     , "bindings":
-      {"base": "rules/gcc", "gcc-musl": "compilers/gcc-14.1.0-musl"}
+      { "base": "rules/gcc"
+      , "gcc-musl": "compilers/gcc-14.1.0-musl"
+      , "stage-0": "rules/stage-0"
+      }
     }
   , "imports/stage-0/gmp-4.2.4":
     { "repository":
@@ -726,14 +735,22 @@
     , "target_root": "defaults"
     , "target_file_name": "test.TARGETS"
     , "rule_root": "rules"
-    , "bindings": {"rules": "rules", "toolchain": "gcc-latest-musl-static"}
+    , "bindings":
+      { "rules": "rules"
+      , "toolchain": "gcc-latest-musl-static"
+      , "stage-0": "rules/stage-0"
+      }
     }
   , "test/rules-clang-native":
     { "repository": "rules"
     , "target_root": "defaults"
     , "target_file_name": "test.TARGETS"
     , "rule_root": "rules"
-    , "bindings": {"rules": "rules", "toolchain": "clang-latest-native"}
+    , "bindings":
+      { "rules": "rules"
+      , "toolchain": "clang-latest-native"
+      , "stage-0": "rules/stage-0"
+      }
     }
   , "test/gcc-native":
     { "repository": {"type": "file", "path": "test"}
