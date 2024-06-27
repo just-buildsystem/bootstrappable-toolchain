@@ -186,43 +186,33 @@
   , "lib": ["libatomic_files"]
   }
 , "libstdc++_files":
-  { "type": "generic"
-  , "arguments_config": ["ENV"]
+  { "type": ["@", "rules", "shell", "cmds"]
   , "deps": ["toolchain"]
   , "cmds": ["cp -L lib64/libstdc++.so.6 ."]
   , "outs": ["libstdc++.so.6"]
-  , "env": {"type": "var", "name": "ENV", "default": {"type": "empty_map"}}
   }
 , "libc++_files":
-  { "type": "generic"
-  , "arguments_config": ["ENV"]
+  { "type": ["@", "rules", "shell", "cmds"]
   , "deps": ["toolchain"]
   , "cmds": ["cp -L lib/$(./bin/clang -dumpmachine)/libc++.so.1 ."]
   , "outs": ["libc++.so.1"]
-  , "env": {"type": "var", "name": "ENV", "default": {"type": "empty_map"}}
   }
 , "libc++abi_files":
-  { "type": "generic"
-  , "arguments_config": ["ENV"]
+  { "type": ["@", "rules", "shell", "cmds"]
   , "deps": ["toolchain"]
   , "cmds": ["cp -L lib/$(./bin/clang -dumpmachine)/libc++abi.so.1 ."]
   , "outs": ["libc++abi.so.1"]
-  , "env": {"type": "var", "name": "ENV", "default": {"type": "empty_map"}}
   }
 , "libgcc_s_files":
-  { "type": "generic"
-  , "arguments_config": ["ENV"]
+  { "type": ["@", "rules", "shell", "cmds"]
   , "deps": ["toolchain"]
   , "cmds": ["cp -L lib64/libgcc_s.so.1 ."]
   , "outs": ["libgcc_s.so.1"]
-  , "env": {"type": "var", "name": "ENV", "default": {"type": "empty_map"}}
   }
 , "libatomic_files":
-  { "type": "generic"
-  , "arguments_config": ["ENV"]
+  { "type": ["@", "rules", "shell", "cmds"]
   , "deps": ["toolchain"]
   , "cmds": ["cp -L lib64/libatomic.so.1 ."]
   , "outs": ["libatomic.so.1"]
-  , "env": {"type": "var", "name": "ENV", "default": {"type": "empty_map"}}
   }
 }

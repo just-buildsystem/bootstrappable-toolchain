@@ -178,19 +178,15 @@
   , "lib": ["libgcc_s_files"]
   }
 , "libstdc++_files":
-  { "type": "generic"
-  , "arguments_config": ["ENV"]
+  { "type": ["@", "rules", "shell", "cmds"]
   , "deps": ["toolchain"]
   , "cmds": ["cp -L lib64/libstdc++.so.6 ."]
   , "outs": ["libstdc++.so.6"]
-  , "env": {"type": "var", "name": "ENV", "default": {"type": "empty_map"}}
   }
 , "libgcc_s_files":
-  { "type": "generic"
-  , "arguments_config": ["ENV"]
+  { "type": ["@", "rules", "shell", "cmds"]
   , "deps": ["toolchain"]
   , "cmds": ["cp -L lib64/libgcc_s.so.1 ."]
   , "outs": ["libgcc_s.so.1"]
-  , "env": {"type": "var", "name": "ENV", "default": {"type": "empty_map"}}
   }
 }
