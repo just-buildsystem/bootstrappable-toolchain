@@ -585,8 +585,8 @@
   , "cmds":
     [ "export NJOBS=$(nproc --all 2>/dev/null || echo 1)"
     , "export PATH=${LOCALBASE}/bin:${LOCALBASE}/gcc/bin:$PATH"
-    , "export CC_REAL_DIRECTORY=${LOCALBASE}/gcc/bin"
     , "export MAKE=${LOCALBASE}/bin/make"
+    , "export CC_DIR=${LOCALBASE}/gcc/bin/"
     , "export CC=${LOCALBASE}/gcc/bin/gcc"
     , "export CXX=${LOCALBASE}/gcc/bin/g++"
     , "unset CFLAGS LDFLAGS"

@@ -160,14 +160,12 @@
     , "mv ${GCC_LIBDIR}/include-fixed ${TMPDIR}/"
     , "cp -rL ${TMPDIR}/include-fixed ${GCC_LIBDIR}/.   # resolve symlinks"
     , "cd ${DESTDIR}/bin"
-    , "mv gcc gcc.real"
-    , "mv g++ g++.real"
     ]
   , "out_dirs": ["."]
   }
 , "link_args.h":
   { "type": "file_gen"
-  , "arguments_config": ["TOOLCHAIN_CONFIG"]
+  , "arguments_config": ["TOOLCHAIN_CONFIG", "USE_LINK_ARGS"]
   , "name": "link_args.h"
   , "data":
     { "type": "let*"
@@ -184,7 +182,13 @@
         ]
       , [ "link_args"
         , { "type": "if"
-          , "cond": {"type": "var", "name": "system_lib_dir"}
+          , "cond":
+            { "type": "and"
+            , "$1":
+              [ {"type": "var", "name": "system_lib_dir"}
+              , {"type": "var", "name": "USE_LINK_ARGS"}
+              ]
+            }
           , "then":
             [ { "type": "join"
               , "$1": ["-B", {"type": "var", "name": "system_lib_dir"}]
@@ -244,15 +248,13 @@
     { "type": "join"
     , "$1":
       [ "char *toolname = "
-      , { "type": "json_encode"
-        , "$1":
-          {"type": "join", "$1": [{"type": "var", "name": "TOOL"}, ".real"]}
-        }
+      , {"type": "json_encode", "$1": {"type": "var", "name": "TOOL"}}
       , ";\n"
+      , "char *dir_offset =  \"../__real/bin\";\n"
       ]
     }
   }
-, "wrapper":
+, "wrapper (real)":
   { "type": ["@", "rules", "CC", "binary"]
   , "arguments_config": ["TOOL"]
   , "pure C": [""]
@@ -262,25 +264,64 @@
   }
 , "gcc":
   { "type": "configure"
-  , "target": "wrapper"
-  , "config": {"type": "singleton_map", "key": "TOOL", "value": "gcc"}
+  , "target": "wrapper (real)"
+  , "config":
+    { "type": "let*"
+    , "bindings": [["TOOL", "gcc"], ["USE_LINK_ARGS", true]]
+    , "body": {"type": "env", "vars": ["TOOL", "USE_LINK_ARGS"]}
+    }
   }
 , "g++":
   { "type": "configure"
-  , "target": "wrapper"
-  , "config": {"type": "singleton_map", "key": "TOOL", "value": "g++"}
+  , "target": "wrapper (real)"
+  , "config":
+    { "type": "let*"
+    , "bindings": [["TOOL", "g++"], ["USE_LINK_ARGS", true]]
+    , "body": {"type": "env", "vars": ["TOOL", "USE_LINK_ARGS"]}
+    }
+  }
+, "ar":
+  { "type": "configure"
+  , "target": "wrapper (real)"
+  , "config":
+    { "type": "let*"
+    , "bindings": [["TOOL", "ar"], ["USE_LINK_ARGS", false]]
+    , "body": {"type": "env", "vars": ["TOOL", "USE_LINK_ARGS"]}
+    }
+  }
+, "ranlib":
+  { "type": "configure"
+  , "target": "wrapper (real)"
+  , "config":
+    { "type": "let*"
+    , "bindings": [["TOOL", "ranlib"], ["USE_LINK_ARGS", false]]
+    , "body": {"type": "env", "vars": ["TOOL", "USE_LINK_ARGS"]}
+    }
+  }
+, "ld":
+  { "type": "configure"
+  , "target": "wrapper (real)"
+  , "config":
+    { "type": "let*"
+    , "bindings": [["TOOL", "ld"], ["USE_LINK_ARGS", false]]
+    , "body": {"type": "env", "vars": ["TOOL", "USE_LINK_ARGS"]}
+    }
+  }
+, "strip":
+  { "type": "configure"
+  , "target": "wrapper (real)"
+  , "config":
+    { "type": "let*"
+    , "bindings": [["TOOL", "strip"], ["USE_LINK_ARGS", false]]
+    , "body": {"type": "env", "vars": ["TOOL", "USE_LINK_ARGS"]}
+    }
   }
 , "wrappers":
-  {"type": "install", "files": {"wrapper/gcc": "gcc", "wrapper/g++": "g++"}}
+  { "type": ["@", "rules", "CC", "install-with-deps"]
+  , "targets": ["gcc", "g++", "ar", "ranlib", "ld", "strip"]
+  }
 , "gcc-4.7.4":
-  { "type": ["@", "rules", "CC/foreign/shell", "data"]
-  , "project": ["gcc-4.7.4 (real)"]
-  , "localbase": [["@", "busybox", "", "bootstrap"], "wrappers"]
-  , "cmds":
-    [ "export PATH=$(pwd)/binutils/bin:${LOCALBASE}/bin:$PATH"
-    , "cp -r . ${DESTDIR}"
-    , "cp ${LOCALBASE}/wrapper/gcc ${LOCALBASE}/wrapper/g++ ${DESTDIR}/bin"
-    ]
-  , "out_dirs": ["."]
+  { "type": "install"
+  , "dirs": [["wrappers", "."], ["gcc-4.7.4 (real)", "__real"]]
   }
 }
