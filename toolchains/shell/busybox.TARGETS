@@ -1,3 +1,21 @@
-{ "defaults": {"type": "export", "target": "defaults (unexported)"}
-, "defaults (unexported)": {"type": ["@", "rules", "shell", "defaults"]}
+{ "defaults":
+  { "type": "export"
+  , "target": "defaults (unexported)"
+  , "flexible_config":
+    ["ARCH", "ENV", "HOST_ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG"]
+  }
+, "defaults (unexported)":
+  { "type": ["@", "rules", "shell", "defaults"]
+  , "toolchain": ["shell-busybox"]
+  , "bin dirs":
+    [ "shell-busybox/bin"
+    , "shell-busybox/sbin"
+    , "shell-busybox/usr/bin"
+    , "shell-busybox/usr/sbin"
+    ]
+  }
+, "shell-busybox":
+  { "type": "install"
+  , "dirs": [[["@", "busybox", "", "busybox"], "shell-busybox"]]
+  }
 }
