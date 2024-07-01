@@ -6,6 +6,6 @@
   }
 , "defaults (unexported)":
   { "type": ["@", "rules", "shell", "defaults"]
-  , "base": [["@", "busybox", "shell", "defaults"]]
+  , "base": [["@", "tools", "shell", "defaults"]]
   }
 }
