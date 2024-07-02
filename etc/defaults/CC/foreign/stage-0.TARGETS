@@ -1,7 +1,7 @@
 { "defaults": {"type": ["CC/foreign", "defaults"]}
 , "expand_exec":
   { "type": "export"
-  , "target": "expand_exec (binary)"
+  , "target": "expand_exec (with deps)"
   , "flexible_config":
     [ "TOOLCHAIN_CONFIG"
     , "ARCH"
@@ -11,6 +11,8 @@
     , "ENV"
     ]
   }
+, "expand_exec (with deps)":
+  {"type": ["CC", "install-with-deps"], "targets": ["expand_exec (binary)"]}
 , "expand_exec (binary)":
   { "type": ["CC", "binary"]
   , "srcs": ["expand_exec.c"]
