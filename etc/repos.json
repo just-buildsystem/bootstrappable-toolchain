@@ -721,14 +721,22 @@
     , "target_root": "defaults"
     , "target_file_name": "test.TARGETS"
     , "rule_root": "rules"
-    , "bindings": {"rules": "rules", "toolchain": "gcc-latest-native"}
+    , "bindings":
+      { "rules": "rules"
+      , "toolchain": "gcc-latest-native"
+      , "stage-0": "rules/stage-0"
+      }
     }
   , "test/rules-gcc-musl":
     { "repository": "rules"
     , "target_root": "defaults"
     , "target_file_name": "test.TARGETS"
     , "rule_root": "rules"
-    , "bindings": {"rules": "rules", "toolchain": "gcc-latest-musl"}
+    , "bindings":
+      { "rules": "rules"
+      , "toolchain": "gcc-latest-musl"
+      , "stage-0": "rules/stage-0"
+      }
     }
   , "test/rules-gcc-musl-static":
     { "repository": "rules"

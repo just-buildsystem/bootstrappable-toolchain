@@ -1,4 +1,7 @@
-{ "defaults": {"type": ["CC/foreign", "defaults"]}
+{ "defaults":
+  { "type": "defaults"
+  , "base": [["@", "stage-0", "CC/foreign", "defaults"]]
+  }
 , "expand_exec":
   { "type": "configure"
   , "target": ["@", "stage-0", "CC/foreign", "expand_exec"]

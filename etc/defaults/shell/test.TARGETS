@@ -1,1 +1,5 @@
-{"defaults": {"type": "defaults"}}
+{ "defaults":
+  { "type": "defaults"
+  , "base": [["@", "stage-0", "shell", "defaults"]]
+  }
+}
