@@ -436,13 +436,13 @@
       , "patches": "patches"
       }
     }
-  , "compilers/clang-18.1.4-native":
+  , "compilers/clang-18.1.8-native":
     { "repository":
       { "type": "archive"
-      , "content": "5c9a67ff302cf323942dc7b39b5cb63b1f796e1d"
-      , "fetch": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-18.1.4.tar.gz"
-      , "sha256": "deca5a29e8b1d103ecc4badb3c304aca50d5cac6453364d88ee415dc55699dfb"
-      , "subdir": "llvm-project-llvmorg-18.1.4"
+      , "content": "3d2972e91936ce5d4176802eb8b5ef3e0a727914"
+      , "fetch": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-18.1.8.tar.gz"
+      , "sha256": "09c08693a9afd6236f27a2ebae62cda656eba19021ef3f94d59e931d662d4856"
+      , "subdir": "llvm-project-llvmorg-18.1.8"
       , "pragma": {"special": "resolve-partially"}
       }
     , "target_root": "compilers"
@@ -549,12 +549,12 @@
   , "clang-latest-native":
     { "repository": "toolchains"
     , "target_file_name": "clang.TARGETS"
-    , "bindings": {"rules": "rules", "clang": "compilers/clang-18.1.4-native"}
+    , "bindings": {"rules": "rules", "clang": "compilers/clang-18.1.8-native"}
     }
-  , "clang-18.1.4-native":
+  , "clang-18.1.8-native":
     { "repository": "toolchains"
     , "target_file_name": "clang.TARGETS"
-    , "bindings": {"rules": "rules", "clang": "compilers/clang-18.1.4-native"}
+    , "bindings": {"rules": "rules", "clang": "compilers/clang-18.1.8-native"}
     }
   , "clang-17.0.6-native":
     { "repository": "toolchains"
@@ -689,13 +689,13 @@
       , "compiler": "clang-latest-native"
       }
     }
-  , "clang-18.1.4-native+tools":
+  , "clang-18.1.8-native+tools":
     { "repository": "toolchains"
     , "target_file_name": "compiler+tools.TARGETS"
     , "bindings":
       { "rules": "rules"
       , "tools": "tools-all"
-      , "compiler": "clang-18.1.4-native"
+      , "compiler": "clang-18.1.8-native"
       }
     }
   , "clang-17.0.6-native+tools":
