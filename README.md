@@ -8,17 +8,17 @@ Available compiler toolchains are:
 
 - `gcc-latest-native`
 - `gcc-14.1.0-native`
-- `gcc-13.2.0-native`
+- `gcc-13.3.0-native`
 - `clang-latest-native`
 - `clang-18.1.4-native`
 - `clang-17.0.6-native`
 - `clang-16.0.6-native`
 - `gcc-latest-musl`
 - `gcc-14.1.0-musl`
-- `gcc-13.2.0-musl`
+- `gcc-13.3.0-musl`
 - `gcc-latest-musl-static`
 - `gcc-14.1.0-musl-static`
-- `gcc-13.2.0-musl-static`
+- `gcc-13.3.0-musl-static`
 
 *For details about how these compilers are built, see
 [COMPILERS.md](./doc/COMPILERS.md).*
@@ -58,7 +58,7 @@ Details about toolchain variants:
       the target system*)
     - **supports fully static linking (unlike *glibc* toolchains)**
     - **supports cross-compilation for project's `TARGET_ARCH`**
-- `<toolchain>+tools` (e.g., `gcc-13.2.0-native+tools`)  
+- `<toolchain>+tools` (e.g., `gcc-latest-native+tools`)  
     - `<toolchain>` bundled with all latest tools (see `tools-all` above)
 
 All `musl` variants support cross-compilation. In your project, make sure
