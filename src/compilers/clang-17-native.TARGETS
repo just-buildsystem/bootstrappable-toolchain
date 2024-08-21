@@ -133,7 +133,61 @@
     , "cp -r ${LOCALBASE}/. ${DESTDIR}/."
     , "chmod -R +w ${DESTDIR}/*"
     , "mkdir build"
-    , "cmake -B build -S llvm ${CONF_ARGS} -DLLVM_USE_FOLDERS=OFF -DLLVM_INCLUDE_DOCS=OFF -DLLVM_INCLUDE_TESTS=OFF -DLLVM_INSTALL_TOOLCHAIN_ONLY=ON -DLLVM_ENABLE_PROJECTS=clang -DLLVM_ENABLE_RUNTIMES='libcxx;libcxxabi;libunwind' -DLLVM_TARGETS_TO_BUILD=X86 -DLLVM_PARALLEL_LINK_JOBS=1 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX= -DLLVM_HOST_TRIPLE=${HOST_TRIPLE} -DLLVM_NATIVE_TARGET=ON -DLIBCXXABI_ENABLE_ASSERTIONS=OFF -DLIBUNWIND_ENABLE_ASSERTIONS=OFF >configure.log 2>&1 || (cat configure.log && exit 1)"
+    , { "type": "join"
+      , "separator": " "
+      , "$1":
+        [ "cmake"
+        , "-B"
+        , "build"
+        , "-S"
+        , "llvm"
+        , "${CONF_ARGS}"
+        , "-DLLVM_USE_FOLDERS=OFF"
+        , "-DLLVM_INCLUDE_DOCS=OFF"
+        , "-DLLVM_INCLUDE_TESTS=OFF"
+        , "-DLLVM_INSTALL_TOOLCHAIN_ONLY=ON"
+        , { "type": "join"
+          , "$1":
+            [ "-DLLVM_ENABLE_PROJECTS="
+            , { "type": "join_cmd"
+              , "$1":
+                [ { "type": "join"
+                  , "separator": ";"
+                  , "$1":
+                    { "type": "++"
+                    , "$1":
+                      [ ["clang"]
+                      , { "type": "if"
+                        , "cond":
+                          { "type": "lookup"
+                          , "key": "INCLUDE_LINTER"
+                          , "map":
+                            { "type": "var"
+                            , "name": "TOOLCHAIN_CONFIG"
+                            , "default": {"type": "empty_map"}
+                            }
+                          }
+                        , "then": ["clang-tools-extra"]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        , "-DLLVM_ENABLE_RUNTIMES='libcxx;libcxxabi;libunwind'"
+        , "-DLLVM_TARGETS_TO_BUILD=X86"
+        , "-DLLVM_PARALLEL_LINK_JOBS=1"
+        , "-DCMAKE_BUILD_TYPE=Release"
+        , "-DCMAKE_INSTALL_PREFIX="
+        , "-DLLVM_HOST_TRIPLE=${HOST_TRIPLE}"
+        , "-DLLVM_NATIVE_TARGET=ON"
+        , "-DLIBCXXABI_ENABLE_ASSERTIONS=OFF"
+        , "-DLIBUNWIND_ENABLE_ASSERTIONS=OFF"
+        , ">configure.log 2>&1 || (cat configure.log && exit 1)"
+        ]
+      }
     , "cmake --build build --target clang -j${NJOBS} >build.log 2>&1 || (cat configure.log build.log && exit 1)"
     , "export LDFLAGS=\"--gcc-toolchain=${GCC_TOOLCHAIN} ${LINK_ARGS}\""
     , "cmake --build build --target all -j${NJOBS} >>build.log 2>&1 || (cat configure.log build.log && exit 1)"

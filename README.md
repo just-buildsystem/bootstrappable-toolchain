@@ -171,6 +171,8 @@ Fields for building the toolchains:
   Library directory of the C library on the build host (default: not set)
 - `HOST_DYNAMIC_LINKER`:
   Absolute path to the dynamic linker on the build host (default: not set)
+- `INCLUDE_LINTER`:
+  Add linter to toolchain if supported, e.g., `clang-tidy` (default: `false`)
 
 Fields for using the toolchains
 (within [Justbuild](https://github.com/just-buildsystem/justbuild) projects):
