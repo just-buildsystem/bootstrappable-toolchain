@@ -35,7 +35,7 @@
     , "export LDFLAGS='-static'"
     , "export CFLAGS='-D__FILE__=__FILE_NAME__ -Wno-builtin-macro-redefined'"
     , "export CXXFLAGS='-D__FILE__=__FILE_NAME__ -Wno-builtin-macro-redefined'"
-    , "${WORKDIR}/bootstrap --parallel=${NJOBS} -- -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=${LOCALBASE} -DCMAKE_INSTALL_PREFIX=/ >bootstrap.log 2>&1 || (cat bootstrap.log && exit 1)"
+    , "${WORKDIR}/bootstrap --parallel=${NJOBS} -- -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=${LOCALBASE} -DCMAKE_INSTALL_PREFIX=/ -DCMAKE_MAKE_PROGRAM=${MAKE} >bootstrap.log 2>&1 || (cat bootstrap.log && exit 1)"
     , "${MAKE} -j${NJOBS} install >build.log 2>&1 || (cat bootstrap.log && cat build.log && exit 1)"
     ]
   , "out_dirs": ["."]
