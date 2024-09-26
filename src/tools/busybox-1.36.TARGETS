@@ -9,6 +9,7 @@
   , "cmds":
     [ "NJOBS=$(nproc --all 2>/dev/null || echo 1)"
     , "GCC_TOOLCHAIN=$(dirname ${CC})/.."
+    , "export PATH=$(dirname ${CC}):${PATH}"
     , "unset CFLAGS CXXFLAGS"
     , "export LDFLAGS=\"-static\""
     , "export SOURCE_DATE_EPOCH=0"
