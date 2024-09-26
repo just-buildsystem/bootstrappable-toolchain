@@ -5,7 +5,7 @@
   , "AR": ["gcc/bin/ar"]
   , "LDFLAGS": ["-static", "-l:mimalloc.o"]
   , "toolchain": ["staged-gcc"]
-  , "PATH": ["$(TOOLCHAIN)/gcc/bin", "/bin", "/usr/bin"]
+  , "PATH": ["/bin", "/usr/bin"]
   }
 , "staged-gcc":
   {"type": "install", "dirs": [[["@", "gcc-musl", "", "toolchain"], "gcc"]]}

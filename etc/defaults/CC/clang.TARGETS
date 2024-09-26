@@ -4,7 +4,7 @@
   , "CXX": ["gcc/bin/g++"]
   , "AR": ["gcc/bin/ar"]
   , "toolchain": ["staged-gcc"]
-  , "PATH": ["$(TOOLCHAIN)/gcc/bin", "/bin", "/usr/bin"]
+  , "PATH": ["/bin", "/usr/bin"]
   }
 , "staged-gcc":
   {"type": "install", "dirs": [[["@", "gcc", "", "toolchain"], "gcc"]]}
