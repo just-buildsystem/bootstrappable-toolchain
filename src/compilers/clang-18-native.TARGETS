@@ -136,7 +136,7 @@
     , { "type": "join"
       , "separator": " "
       , "$1":
-        [ "cmake"
+        [ "${CMAKE}"
         , "-B"
         , "build"
         , "-S"
@@ -189,10 +189,10 @@
         , ">configure.log 2>&1 || (cat configure.log && exit 1)"
         ]
       }
-    , "cmake --build build --target clang -j${NJOBS} >build.log 2>&1 || (cat configure.log build.log && exit 1)"
+    , "${CMAKE} --build build --target clang -j${NJOBS} >build.log 2>&1 || (cat configure.log build.log && exit 1)"
     , "export LDFLAGS=\"--gcc-toolchain=${GCC_TOOLCHAIN} ${LINK_ARGS}\""
-    , "cmake --build build --target all -j${NJOBS} >>build.log 2>&1 || (cat configure.log build.log && exit 1)"
-    , "cmake --build build --target install -j${NJOBS} >>build.log 2>&1 || (cat configure.log build.log && exit 1)"
+    , "${CMAKE} --build build --target all -j${NJOBS} >>build.log 2>&1 || (cat configure.log build.log && exit 1)"
+    , "${CMAKE} --build build --target install -j${NJOBS} >>build.log 2>&1 || (cat configure.log build.log && exit 1)"
     , "cd ${DESTDIR}"
     , "strip ./bin/* 2>/dev/null || true"
     , "find . -type f -name '*.so*' -exec sh -c \"strip {} 2>/dev/null\" \\;"
