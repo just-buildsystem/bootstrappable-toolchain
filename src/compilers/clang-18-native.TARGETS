@@ -141,6 +141,7 @@
         , "build"
         , "-S"
         , "llvm"
+        , "-DCMAKE_MAKE_PROGRAM=${MAKE}"
         , "${CONF_ARGS}"
         , "-DLLVM_USE_FOLDERS=OFF"
         , "-DLLVM_INCLUDE_DOCS=OFF"
