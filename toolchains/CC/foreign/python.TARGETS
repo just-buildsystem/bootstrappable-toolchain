@@ -4,10 +4,5 @@
   , "flexible_config":
     ["ARCH", "ENV", "HOST_ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG"]
   }
-, "defaults (unexported)":
-  { "type": ["@", "rules", "CC/foreign", "defaults"]
-  , "toolchain": ["staged-python"]
-  , "PATH": ["$(TOOLCHAIN)/python/usr/bin"]
-  }
-, "staged-python": {"type": "install", "dirs": [[["", "toolchain"], "python"]]}
+, "defaults (unexported)": {"type": ["@", "rules", "CC/foreign", "defaults"]}
 }

@@ -7,13 +7,5 @@
 , "defaults (unexported)":
   { "type": ["@", "rules", "CC/foreign", "defaults"]
   , "toolchain": ["staged-busybox"]
-  , "PATH":
-    [ "$(TOOLCHAIN)/busybox/bin"
-    , "$(TOOLCHAIN)/busybox/sbin"
-    , "$(TOOLCHAIN)/busybox/usr/bin"
-    , "$(TOOLCHAIN)/busybox/usr/sbin"
-    ]
   }
-, "staged-busybox":
-  {"type": "install", "dirs": [[["", "toolchain"], "busybox"]]}
 }

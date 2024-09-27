@@ -1,5 +1,6 @@
 { "defaults":
   { "type": "defaults"
-  , "base": [["@", "base", "shell", "defaults"]]
+  , "base":
+    [["@", "base", "shell", "defaults"], ["@", "python", "shell", "defaults"]]
   }
 }
