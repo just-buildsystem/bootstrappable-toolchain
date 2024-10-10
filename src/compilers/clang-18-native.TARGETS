@@ -65,7 +65,10 @@
   { "type": ["@", "rules", "CC/foreign/shell", "data"]
   , "arguments_config": ["TOOLCHAIN_CONFIG"]
   , "project": ["patched_sources"]
-  , "localbase": ["binutils_dir"]
+  , "localbase":
+    [ "binutils_dir"
+    , ["@", "iwyu", "", "sources"]
+    ]
   , "cmds":
     [ { "type": "join"
       , "$1":
@@ -161,7 +164,15 @@
               , "default": {"type": "empty_map"}
               }
             }
-          , "then": "-DLLVM_ENABLE_PROJECTS='clang;clang-tools-extra'"
+          , "then":
+            { "type": "join"
+            , "separator": " "
+            , "$1":
+              [ "-DLLVM_ENABLE_PROJECTS='clang;clang-tools-extra'"
+              , "-DLLVM_EXTERNAL_PROJECTS=iwyu"
+              , "-DLLVM_EXTERNAL_IWYU_SOURCE_DIR=${LOCALBASE}/iwyu"
+              ]
+            }
           , "else": "-DLLVM_ENABLE_PROJECTS=clang"
           }
         , "-DLLVM_ENABLE_RUNTIMES='libcxx;libcxxabi;libunwind'"

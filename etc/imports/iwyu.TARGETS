@@ -1,0 +1,6 @@
+{ "sources": {"type": "export", "target": "files"}
+, "files":
+  { "type": "install"
+  , "dirs": [[["TREE", null, "."], "iwyu"]]
+  }
+}

@@ -472,6 +472,7 @@
       { "rules": "rules/clang_with_gcc13"
       , "binutils": "imports/binutils-latest"
       , "patches": "patches"
+      , "iwyu": "iwyu-18"
       }
     }
   , "tools/busybox-1.36.1":
@@ -800,6 +801,17 @@
   , "test/clang-native":
     { "repository": {"type": "file", "path": "test"}
     , "bindings": {"rules": "test/rules-clang-native"}
+    }
+  , "iwyu-18":
+    { "repository":
+      { "type": "archive"
+      , "content": "04ffb3d3e78e6d20fd0ea2fe627f83de4418528d"
+      , "fetch": "https://github.com/include-what-you-use/include-what-you-use/archive/refs/tags/0.22.tar.gz"
+      , "sha256": "34c7636da2abe7b86580b53b762f5269e71efff460f24f17d5913c56eb99cb7c"
+      , "subdir": "include-what-you-use-0.22"
+      }
+    , "target_file_name": "iwyu.TARGETS"
+    , "target_root": "imports"
     }
   }
 }
