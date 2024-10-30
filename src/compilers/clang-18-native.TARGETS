@@ -57,11 +57,15 @@
     ]
   , "out_dirs": ["."]
   }
+, "binutils_dir":
+  { "type": "install"
+  , "dirs": [[["@", "binutils", "", "binutils"], "binutils"]]
+  }
 , "clang-native":
   { "type": ["@", "rules", "CC/foreign/shell", "data"]
   , "arguments_config": ["TOOLCHAIN_CONFIG"]
   , "project": ["patched_sources"]
-  , "localbase": [["@", "binutils", "", "binutils"]]
+  , "localbase": ["binutils_dir"]
   , "cmds":
     [ { "type": "join"
       , "$1":
@@ -111,7 +115,7 @@
     , "NJOBS=$(nproc --all 2>/dev/null || echo 1)"
     , "HOST_TRIPLE=$(${CC} -dumpmachine)"
     , "GCC_TOOLCHAIN=$(dirname ${CC})/.."
-    , "export PATH=${LOCALBASE}/bin:$PATH"
+    , "export PATH=${LOCALBASE}/binutils/bin:$PATH"
     , "export PKG_CONFIG=false"
     , "export LD_LIBRARY_PATH=\"${GCC_TOOLCHAIN}/lib64\""
     , "unset LDFLAGS"
@@ -130,7 +134,7 @@
     , "if [ -n \"$HOST_DYNAMIC_LINKER\" ]; then"
     , "  LINK_ARGS=\"$LINK_ARGS -Xlinker --dynamic-linker -Xlinker $HOST_DYNAMIC_LINKER\""
     , "fi"
-    , "cp -r ${LOCALBASE}/. ${DESTDIR}/."
+    , "cp -r ${LOCALBASE}/binutils/. ${DESTDIR}/."
     , "chmod -R +w ${DESTDIR}/*"
     , "mkdir build"
     , { "type": "join"
