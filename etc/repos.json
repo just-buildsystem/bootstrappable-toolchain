@@ -31,10 +31,10 @@
   , "rules":
     { "repository":
       { "type": "zip"
-      , "content": "06d6ec710091846f6daaac758018b5901440884a"
-      , "fetch": "https://github.com/just-buildsystem/rules-cc/archive/b8ae7e38c0c51467ead55361362a0fd0da3666d5.zip"
-      , "sha256": "a84d6d977eb7a3a57aa0a206d6144c286d832cf96956ebfcfab5e889a3c32c5a"
-      , "subdir": "rules-cc-b8ae7e38c0c51467ead55361362a0fd0da3666d5/rules"
+      , "content": "b70b93929aee3fff6593d0f160c93b06c17d0a3b"
+      , "fetch": "https://github.com/just-buildsystem/rules-cc/archive/refs/tags/v1.4.0.zip"
+      , "sha256": "7bff0abd544d90cab092e183952c64afb866dd583d6fb62ac01b194f21ef5fc2"
+      , "subdir": "rules-cc-1.4.0/rules"
       }
     }
   , "rules/stage-0":
