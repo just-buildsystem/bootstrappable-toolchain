@@ -118,17 +118,12 @@
 , "test-c_shared-gnulibs":
   { "type": "configure"
   , "config":
-    { "type": "let*"
-    , "bindings":
-      [ ["STATIC_FULL", false]
-      , ["STATIC_RUNLIBS", false]
-      , ["USE_LIBCXX", false]
-      , ["CONFIG_TARGET", "test-c"]
-      ]
-    , "body":
-      { "type": "env"
-      , "vars":
-        ["STATIC_FULL", "STATIC_RUNLIBS", "USE_LIBCXX", "CONFIG_TARGET"]
+    { "type": "'"
+    , "$1":
+      { "STATIC_FULL": false
+      , "STATIC_RUNLIBS": false
+      , "USE_LIBCXX": false
+      , "CONFIG_TARGET": "test-c"
       }
     }
   , "target": "config"
@@ -137,17 +132,12 @@
 , "test-cpp_shared-gnulibs":
   { "type": "configure"
   , "config":
-    { "type": "let*"
-    , "bindings":
-      [ ["STATIC_FULL", false]
-      , ["STATIC_RUNLIBS", false]
-      , ["USE_LIBCXX", false]
-      , ["CONFIG_TARGET", "test-cpp"]
-      ]
-    , "body":
-      { "type": "env"
-      , "vars":
-        ["STATIC_FULL", "STATIC_RUNLIBS", "USE_LIBCXX", "CONFIG_TARGET"]
+    { "type": "'"
+    , "$1":
+      { "STATIC_FULL": false
+      , "STATIC_RUNLIBS": false
+      , "USE_LIBCXX": false
+      , "CONFIG_TARGET": "test-cpp"
       }
     }
   , "target": "config"
@@ -156,17 +146,12 @@
 , "test-cpp_shared-llvmlibs":
   { "type": "configure"
   , "config":
-    { "type": "let*"
-    , "bindings":
-      [ ["STATIC_FULL", false]
-      , ["STATIC_RUNLIBS", false]
-      , ["USE_LIBCXX", true]
-      , ["CONFIG_TARGET", "test-cpp"]
-      ]
-    , "body":
-      { "type": "env"
-      , "vars":
-        ["STATIC_FULL", "STATIC_RUNLIBS", "USE_LIBCXX", "CONFIG_TARGET"]
+    { "type": "'"
+    , "$1":
+      { "STATIC_FULL": false
+      , "STATIC_RUNLIBS": false
+      , "USE_LIBCXX": true
+      , "CONFIG_TARGET": "test-cpp"
       }
     }
   , "target": "config"
@@ -175,17 +160,12 @@
 , "test-c_mixed-gnulibs":
   { "type": "configure"
   , "config":
-    { "type": "let*"
-    , "bindings":
-      [ ["STATIC_FULL", false]
-      , ["STATIC_RUNLIBS", true]
-      , ["USE_LIBCXX", false]
-      , ["CONFIG_TARGET", "test-c"]
-      ]
-    , "body":
-      { "type": "env"
-      , "vars":
-        ["STATIC_FULL", "STATIC_RUNLIBS", "USE_LIBCXX", "CONFIG_TARGET"]
+    { "type": "'"
+    , "$1":
+      { "STATIC_FULL": false
+      , "STATIC_RUNLIBS": true
+      , "USE_LIBCXX": false
+      , "CONFIG_TARGET": "test-c"
       }
     }
   , "target": "config"
@@ -213,17 +193,12 @@
 , "test-cpp_mixed-llvmlibs":
   { "type": "configure"
   , "config":
-    { "type": "let*"
-    , "bindings":
-      [ ["STATIC_FULL", false]
-      , ["STATIC_RUNLIBS", true]
-      , ["USE_LIBCXX", true]
-      , ["CONFIG_TARGET", "test-cpp"]
-      ]
-    , "body":
-      { "type": "env"
-      , "vars":
-        ["STATIC_FULL", "STATIC_RUNLIBS", "USE_LIBCXX", "CONFIG_TARGET"]
+    { "type": "'"
+    , "$1":
+      { "STATIC_FULL": false
+      , "STATIC_RUNLIBS": true
+      , "USE_LIBCXX": true
+      , "CONFIG_TARGET": "test-cpp"
       }
     }
   , "target": "config"
@@ -232,17 +207,12 @@
 , "test-c_static-gnulibs":
   { "type": "configure"
   , "config":
-    { "type": "let*"
-    , "bindings":
-      [ ["STATIC_FULL", true]
-      , ["STATIC_RUNLIBS", true]
-      , ["USE_LIBCXX", false]
-      , ["CONFIG_TARGET", "test-c"]
-      ]
-    , "body":
-      { "type": "env"
-      , "vars":
-        ["STATIC_FULL", "STATIC_RUNLIBS", "USE_LIBCXX", "CONFIG_TARGET"]
+    { "type": "'"
+    , "$1":
+      { "STATIC_FULL": true
+      , "STATIC_RUNLIBS": true
+      , "USE_LIBCXX": false
+      , "CONFIG_TARGET": "test-c"
       }
     }
   , "target": "config"
@@ -251,17 +221,12 @@
 , "test-cpp_static-gnulibs":
   { "type": "configure"
   , "config":
-    { "type": "let*"
-    , "bindings":
-      [ ["STATIC_FULL", true]
-      , ["STATIC_RUNLIBS", true]
-      , ["USE_LIBCXX", false]
-      , ["CONFIG_TARGET", "test-cpp"]
-      ]
-    , "body":
-      { "type": "env"
-      , "vars":
-        ["STATIC_FULL", "STATIC_RUNLIBS", "USE_LIBCXX", "CONFIG_TARGET"]
+    { "type": "'"
+    , "$1":
+      { "STATIC_FULL": true
+      , "STATIC_RUNLIBS": true
+      , "USE_LIBCXX": false
+      , "CONFIG_TARGET": "test-cpp"
       }
     }
   , "target": "config"
@@ -270,17 +235,12 @@
 , "test-cpp_static-llvmlibs":
   { "type": "configure"
   , "config":
-    { "type": "let*"
-    , "bindings":
-      [ ["STATIC_FULL", true]
-      , ["STATIC_RUNLIBS", true]
-      , ["USE_LIBCXX", true]
-      , ["CONFIG_TARGET", "test-cpp"]
-      ]
-    , "body":
-      { "type": "env"
-      , "vars":
-        ["STATIC_FULL", "STATIC_RUNLIBS", "USE_LIBCXX", "CONFIG_TARGET"]
+    { "type": "'"
+    , "$1":
+      { "STATIC_FULL": true
+      , "STATIC_RUNLIBS": true
+      , "USE_LIBCXX": true
+      , "CONFIG_TARGET": "test-cpp"
       }
     }
   , "target": "config"
