@@ -277,7 +277,11 @@
     , "target_root": "bootstrap"
     , "target_file_name": "stage-0-busybox.TARGETS"
     , "bindings":
-      {"rules": "rules/stage-0", "gcc": "stage-0/gcc", "make": "stage-0/make"}
+      { "rules": "rules/stage-0"
+      , "gcc": "stage-0/gcc"
+      , "make": "stage-0/make"
+      , "patch-cbq": "patches/busybox-1593"
+      }
     }
   , "stage-0/make":
     { "repository":
@@ -485,7 +489,7 @@
       }
     , "target_root": "tools"
     , "target_file_name": "busybox-1.36.TARGETS"
-    , "bindings": {"rules": "rules/tools"}
+    , "bindings": {"rules": "rules/tools", "patch-cbq": "patches/busybox-1593"}
     }
   , "tools/make-4.4.1":
     { "repository":
@@ -812,6 +816,17 @@
       }
     , "target_file_name": "iwyu.TARGETS"
     , "target_root": "imports"
+    }
+  , "patches/busybox-1593":
+    { "repository":
+      { "type": "foreign file"
+      , "content": "5c8fd3526a514ff64fd3d31b9a849d0649e0d197"
+      , "fetch": "https://bugs.busybox.net/attachment.cgi?id=9751"
+      , "sha256": "6671a12c48dbcefb653fc8403d1f103a1e2eba4a49b1ee9a9c27da8aa2db80d4"
+      , "name": "remove-cbq.patch"
+      }
+    , "target_root": "imports"
+    , "target_file_name": "empty.TARGETS"
     }
   }
 }

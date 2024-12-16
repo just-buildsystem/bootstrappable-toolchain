@@ -54,7 +54,8 @@
   , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
   , "target": "busybox"
   }
-, "files": {"type": "install", "deps": [["TREE", null, "."]]}
+, "original sources":
+  {"type": "install", "dirs": [[["TREE", null, "."], "src"]]}
 , "bootstrap-ash":
   { "type": "export"
   , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
@@ -582,9 +583,21 @@
   }
 , "staged-gcc":
   {"type": "install", "dirs": [[["@", "gcc", "", "toolchain"], "gcc"]]}
+, "sources":
+  { "type": ["@", "rules", "CC/foreign/shell", "data"]
+  , "project": ["original sources"]
+  , "localbase": ["bootstrap", ["@", "patch-cbq", "", "remove-cbq.patch"]]
+  , "cmds":
+    [ "export PATH=${LOCALBASE}/bin"
+    , "cp -r src/. ${DESTDIR}"
+    , "chmod 644 ${DESTDIR}/networking/tc.c"
+    , "(cd ${DESTDIR} && patch -p1 < ${LOCALBASE}/remove-cbq.patch)"
+    ]
+  , "out_dirs": ["."]
+  }
 , "busybox":
   { "type": ["@", "rules", "CC/foreign/shell", "data"]
-  , "project": ["files"]
+  , "project": ["sources"]
   , "localbase": ["bootstrap", ["@", "make", "", "bootstrap"], "staged-gcc"]
   , "cmds":
     [ "export NJOBS=$(nproc --all 2>/dev/null || echo 1)"

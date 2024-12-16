@@ -3,9 +3,22 @@
   , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
   , "target": "busybox"
   }
+, "original sources":
+  {"type": "install", "dirs": [[["TREE", null, "."], "src"]]}
+, "sources":
+  { "type": ["@", "rules", "CC/foreign/shell", "data"]
+  , "project": ["original sources"]
+  , "localbase": [["@", "patch-cbq", "", "remove-cbq.patch"]]
+  , "cmds":
+    [ "cp -r src/. ${DESTDIR}"
+    , "chmod 644 ${DESTDIR}/networking/tc.c"
+    , "(cd ${DESTDIR} && patch -p1 < ${LOCALBASE}/remove-cbq.patch)"
+    ]
+  , "out_dirs": ["."]
+  }
 , "busybox":
   { "type": ["@", "rules", "CC/foreign/shell", "data"]
-  , "project": [["TREE", null, "."]]
+  , "project": ["sources"]
   , "cmds":
     [ "NJOBS=$(nproc --all 2>/dev/null || echo 1)"
     , "GCC_TOOLCHAIN=$(dirname ${CC})/.."
