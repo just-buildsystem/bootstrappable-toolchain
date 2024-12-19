@@ -171,6 +171,11 @@ Fields for building the toolchains:
   Library directory of the C library on the build host (default: not set)
 - `HOST_DYNAMIC_LINKER`:
   Absolute path to the dynamic linker on the build host (default: not set)
+- `BOOTSTRAP_WRAP_CC`:
+  If true, when using the bootstrap C compiler with autotools, use a wrapper
+  script calling the compiler with the `BOOTSTRAP_CFLAGS` instead. In this way,
+  it can be avoided that the autotools draw wrong conclusions from calling the
+  compiler without the specified flags (as some tests do).
 - `INCLUDE_LINTER`:
   Add linter to toolchain if supported, e.g., `clang-tidy` (default: `false`)
 
