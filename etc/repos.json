@@ -87,7 +87,7 @@
     , "rule_root": "rules"
     , "bindings":
       { "base": "rules/gcc"
-      , "gcc-musl": "compilers/gcc-14.1.0-musl"
+      , "gcc-musl": "compilers/gcc-14.2.0-musl"
       , "stage-0": "rules/stage-0"
       }
     }
@@ -368,13 +368,13 @@
       , "patches": "patches"
       }
     }
-  , "compilers/gcc-14.1.0-native":
+  , "compilers/gcc-14.2.0-native":
     { "repository":
       { "type": "archive"
-      , "content": "5ee9523adf9ef022a1e64c3b97f617c6e7192532"
-      , "fetch": "https://ftp.gnu.org/gnu/gcc/gcc-14.1.0/gcc-14.1.0.tar.gz"
-      , "sha256": "a0be066c02775002a0fa65ad3c65fb56a8bfd923d072a26ed148c0439ecdb68f"
-      , "subdir": "gcc-14.1.0"
+      , "content": "97ed2ad91801278cb7d89c720ee1dce6fa3e2a5d"
+      , "fetch": "https://ftp.gnu.org/gnu/gcc/gcc-14.2.0/gcc-14.2.0.tar.xz"
+      , "sha256": "a7b39bc69cbf9e25826c5a60ab26477001f7c08d85cec04bc0e29cabed6f3cc9"
+      , "subdir": "gcc-14.2.0"
       }
     , "target_root": "compilers"
     , "target_file_name": "gcc-14-native.TARGETS"
@@ -402,7 +402,7 @@
       , "mimalloc": "imports/mimalloc-2.1.2"
       }
     }
-  , "compilers/gcc-14.1.0-musl":
+  , "compilers/gcc-14.2.0-musl":
     { "repository": "compilers"
     , "target_file_name": "gcc-14-musl.TARGETS"
     , "bindings":
@@ -413,7 +413,7 @@
       , "gmp": "imports/gmp-6.3.0"
       , "mpc": "imports/mpc-1.3.1"
       , "mpfr": "imports/mpfr-4.2.1"
-      , "gcc": "compilers/gcc-14.1.0-native"
+      , "gcc": "compilers/gcc-14.2.0-native"
       , "mimalloc": "imports/mimalloc-2.1.2"
       }
     }
@@ -422,10 +422,10 @@
     , "target_file_name": "gcc-13-musl-static.TARGETS"
     , "bindings": {"gcc-musl": "compilers/gcc-13.3.0-musl"}
     }
-  , "compilers/gcc-14.1.0-musl-static":
+  , "compilers/gcc-14.2.0-musl-static":
     { "repository": "compilers"
     , "target_file_name": "gcc-14-musl-static.TARGETS"
-    , "bindings": {"gcc-musl": "compilers/gcc-14.1.0-musl"}
+    , "bindings": {"gcc-musl": "compilers/gcc-14.2.0-musl"}
     }
   , "compilers/clang-16.0.6-native":
     { "repository":
@@ -530,47 +530,47 @@
   , "gcc-latest-native":
     { "repository": "toolchains"
     , "target_file_name": "gcc.TARGETS"
-    , "bindings": {"rules": "rules", "gcc": "compilers/gcc-14.1.0-native"}
+    , "bindings": {"rules": "rules", "gcc": "compilers/gcc-14.2.0-native"}
     }
   , "gcc-13.3.0-native":
     { "repository": "toolchains"
     , "target_file_name": "gcc.TARGETS"
     , "bindings": {"rules": "rules", "gcc": "compilers/gcc-13.3.0-native"}
     }
-  , "gcc-14.1.0-native":
+  , "gcc-14.2.0-native":
     { "repository": "toolchains"
     , "target_file_name": "gcc.TARGETS"
-    , "bindings": {"rules": "rules", "gcc": "compilers/gcc-14.1.0-native"}
+    , "bindings": {"rules": "rules", "gcc": "compilers/gcc-14.2.0-native"}
     }
   , "gcc-latest-musl":
     { "repository": "toolchains"
     , "target_file_name": "gcc.TARGETS"
-    , "bindings": {"rules": "rules", "gcc": "compilers/gcc-14.1.0-musl"}
+    , "bindings": {"rules": "rules", "gcc": "compilers/gcc-14.2.0-musl"}
     }
   , "gcc-13.3.0-musl":
     { "repository": "toolchains"
     , "target_file_name": "gcc.TARGETS"
     , "bindings": {"rules": "rules", "gcc": "compilers/gcc-13.3.0-musl"}
     }
-  , "gcc-14.1.0-musl":
+  , "gcc-14.2.0-musl":
     { "repository": "toolchains"
     , "target_file_name": "gcc.TARGETS"
-    , "bindings": {"rules": "rules", "gcc": "compilers/gcc-14.1.0-musl"}
+    , "bindings": {"rules": "rules", "gcc": "compilers/gcc-14.2.0-musl"}
     }
   , "gcc-latest-musl-static":
     { "repository": "toolchains"
     , "target_file_name": "gcc.TARGETS"
-    , "bindings": {"rules": "rules", "gcc": "compilers/gcc-14.1.0-musl-static"}
+    , "bindings": {"rules": "rules", "gcc": "compilers/gcc-14.2.0-musl-static"}
     }
   , "gcc-13.3.0-musl-static":
     { "repository": "toolchains"
     , "target_file_name": "gcc.TARGETS"
     , "bindings": {"rules": "rules", "gcc": "compilers/gcc-13.3.0-musl-static"}
     }
-  , "gcc-14.1.0-musl-static":
+  , "gcc-14.2.0-musl-static":
     { "repository": "toolchains"
     , "target_file_name": "gcc.TARGETS"
-    , "bindings": {"rules": "rules", "gcc": "compilers/gcc-14.1.0-musl-static"}
+    , "bindings": {"rules": "rules", "gcc": "compilers/gcc-14.2.0-musl-static"}
     }
   , "clang-latest-native":
     { "repository": "toolchains"
@@ -655,11 +655,11 @@
     , "bindings":
       {"rules": "rules", "tools": "tools-all", "compiler": "gcc-13.3.0-native"}
     }
-  , "gcc-14.1.0-native+tools":
+  , "gcc-14.2.0-native+tools":
     { "repository": "toolchains"
     , "target_file_name": "compiler+tools.TARGETS"
     , "bindings":
-      {"rules": "rules", "tools": "tools-all", "compiler": "gcc-14.1.0-native"}
+      {"rules": "rules", "tools": "tools-all", "compiler": "gcc-14.2.0-native"}
     }
   , "gcc-latest-musl+tools":
     { "repository": "toolchains"
@@ -673,11 +673,11 @@
     , "bindings":
       {"rules": "rules", "tools": "tools-all", "compiler": "gcc-13.3.0-musl"}
     }
-  , "gcc-14.1.0-musl+tools":
+  , "gcc-14.2.0-musl+tools":
     { "repository": "toolchains"
     , "target_file_name": "compiler+tools.TARGETS"
     , "bindings":
-      {"rules": "rules", "tools": "tools-all", "compiler": "gcc-14.1.0-musl"}
+      {"rules": "rules", "tools": "tools-all", "compiler": "gcc-14.2.0-musl"}
     }
   , "gcc-latest-musl-static+tools":
     { "repository": "toolchains"
@@ -697,13 +697,13 @@
       , "compiler": "gcc-13.3.0-musl-static"
       }
     }
-  , "gcc-14.1.0-musl-static+tools":
+  , "gcc-14.2.0-musl-static+tools":
     { "repository": "toolchains"
     , "target_file_name": "compiler+tools.TARGETS"
     , "bindings":
       { "rules": "rules"
       , "tools": "tools-all"
-      , "compiler": "gcc-14.1.0-musl-static"
+      , "compiler": "gcc-14.2.0-musl-static"
       }
     }
   , "clang-latest-native+tools":
