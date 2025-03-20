@@ -10,6 +10,7 @@ Available compiler toolchains are:
 - `gcc-14.2.0-native`
 - `gcc-13.3.0-native`
 - `clang-latest-native`
+- `clang-19.1.1-native`
 - `clang-18.1.8-native`
 - `clang-17.0.6-native`
 - `clang-16.0.6-native`
@@ -177,7 +178,11 @@ Fields for building the toolchains:
   it can be avoided that the autotools draw wrong conclusions from calling the
   compiler without the specified flags (as some tests do).
 - `INCLUDE_LINTER`:
-  Add linter to toolchain if supported, e.g., `clang-tidy` (default: `false`)
+  Add linter to toolchain if supported. (default: `false`)  
+  Currently this option is only supported by `clang` toolchains, adding
+  `clang-tidy`. Additionally, Clang versions `18` and `19` will also include
+  the *external project*
+  [Include What You Use](https://github.com/include-what-you-use/include-what-you-use).
 
 Fields for using the toolchains
 (within [Justbuild](https://github.com/just-buildsystem/justbuild) projects):

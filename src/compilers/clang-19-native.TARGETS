@@ -1,0 +1,282 @@
+{ "toolchain":
+  { "type": "configure"
+  , "arguments_config": ["ARCH", "TARGET_ARCH", "BUILD_ARCH"]
+  , "config":
+    { "type": "if"
+    , "cond":
+      { "type": "=="
+      , "$1":
+        { "type": "var"
+        , "name": "TARGET_ARCH"
+        , "default": {"type": "var", "name": "ARCH"}
+        }
+      , "$2":
+        { "type": "var"
+        , "name": "BUILD_ARCH"
+        , "default": {"type": "var", "name": "ARCH"}
+        }
+      }
+    , "then": {"type": "empty_map"}
+    , "else":
+      { "type": "fail"
+      , "msg": "clang-native does not support cross-compilation."
+      }
+    }
+  , "target": "toolchain_native"
+  }
+, "toolchain_native":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "target": "clang-native"
+  }
+, "runlibs":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "target": "libstdc++"
+  }
+, "runlibs_libcxx":
+  { "type": "export"
+  , "flexible_config": ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV"]
+  , "target": "libc++"
+  }
+, "original_sources_and_patches":
+  { "type": "install"
+  , "dirs":
+    [ [["TREE", null, "."], "src"]
+    , [["@", "patches", "", "clang-19"], "patches"]
+    ]
+  }
+, "patched_sources":
+  { "type": ["@", "rules", "CC/foreign/shell", "data"]
+  , "project": ["original_sources_and_patches"]
+  , "cmds":
+    [ "cp -r src/. ${DESTDIR}/."
+    , "cd ${DESTDIR}"
+    , "chmod -R +w *"
+    , "patch -p1 < ${WORKDIR}/patches/clang-19/libcxx-musl-support.patch >/dev/null"
+    ]
+  , "out_dirs": ["."]
+  }
+, "binutils_dir":
+  { "type": "install"
+  , "dirs": [[["@", "binutils", "", "binutils"], "binutils"]]
+  }
+, "clang-native":
+  { "type": ["@", "rules", "CC/foreign/shell", "data"]
+  , "arguments_config": ["TOOLCHAIN_CONFIG"]
+  , "project": ["patched_sources"]
+  , "localbase":
+    [ "binutils_dir"
+    , ["@", "iwyu", "", "sources"]
+    ]
+  , "cmds":
+    [ { "type": "join"
+      , "$1":
+        [ "HOST_SYSTEM_HDR_DIR='"
+        , { "type": "lookup"
+          , "key": "HOST_SYSTEM_HDR_DIR"
+          , "map":
+            { "type": "var"
+            , "name": "TOOLCHAIN_CONFIG"
+            , "default": {"type": "empty_map"}
+            }
+          , "default": ""
+          }
+        , "'"
+        ]
+      }
+    , { "type": "join"
+      , "$1":
+        [ "HOST_SYSTEM_LIB_DIR='"
+        , { "type": "lookup"
+          , "key": "HOST_SYSTEM_LIB_DIR"
+          , "map":
+            { "type": "var"
+            , "name": "TOOLCHAIN_CONFIG"
+            , "default": {"type": "empty_map"}
+            }
+          , "default": ""
+          }
+        , "'"
+        ]
+      }
+    , { "type": "join"
+      , "$1":
+        [ "HOST_DYNAMIC_LINKER='"
+        , { "type": "lookup"
+          , "key": "HOST_DYNAMIC_LINKER"
+          , "map":
+            { "type": "var"
+            , "name": "TOOLCHAIN_CONFIG"
+            , "default": {"type": "empty_map"}
+            }
+          , "default": ""
+          }
+        , "'"
+        ]
+      }
+    , "NJOBS=$(nproc --all 2>/dev/null || echo 1)"
+    , "HOST_TRIPLE=$(${CC} -dumpmachine)"
+    , "GCC_TOOLCHAIN=$(dirname ${CC})/.."
+    , "export PATH=${LOCALBASE}/binutils/bin:$PATH"
+    , "export PKG_CONFIG=false"
+    , "export LD_LIBRARY_PATH=\"${GCC_TOOLCHAIN}/lib64\""
+    , "unset LDFLAGS"
+    , "CONF_ARGS="
+    , "INCL_ARGS="
+    , "if [ -n \"$HOST_SYSTEM_HDR_DIR\" ]; then"
+    , "  CONF_ARGS=\"-DC_INCLUDE_DIRS=$HOST_SYSTEM_HDR_DIR\""
+    , "  INCL_ARGS=\"-I$HOST_SYSTEM_HDR_DIR\""
+    , "fi"
+    , "LINK_ARGS="
+    , "if [ -n \"$HOST_SYSTEM_LIB_DIR\" ]; then"
+    , "  export LIBRARY_PATH=\"$HOST_SYSTEM_LIB_DIR\""
+    , "  LINK_ARGS=\"$LINK_ARGS -B$HOST_SYSTEM_LIB_DIR -L$HOST_SYSTEM_LIB_DIR\""
+    , "  LINK_ARGS=\"$LINK_ARGS -Xlinker -rpath -Xlinker $HOST_SYSTEM_LIB_DIR\""
+    , "fi"
+    , "if [ -n \"$HOST_DYNAMIC_LINKER\" ]; then"
+    , "  LINK_ARGS=\"$LINK_ARGS -Xlinker --dynamic-linker -Xlinker $HOST_DYNAMIC_LINKER\""
+    , "fi"
+    , "cp -r ${LOCALBASE}/binutils/. ${DESTDIR}/."
+    , "chmod -R +w ${DESTDIR}/*"
+    , "mkdir build"
+    , { "type": "join"
+      , "separator": " "
+      , "$1":
+        [ "${CMAKE}"
+        , "-B"
+        , "build"
+        , "-S"
+        , "llvm"
+        , "-DCMAKE_MAKE_PROGRAM=${MAKE}"
+        , "${CONF_ARGS}"
+        , "-DLLVM_USE_FOLDERS=OFF"
+        , "-DLLVM_INCLUDE_DOCS=OFF"
+        , "-DLLVM_INCLUDE_TESTS=OFF"
+        , "-DLLVM_INSTALL_TOOLCHAIN_ONLY=ON"
+        , { "type": "if"
+          , "cond":
+            { "type": "lookup"
+            , "key": "INCLUDE_LINTER"
+            , "map":
+              { "type": "var"
+              , "name": "TOOLCHAIN_CONFIG"
+              , "default": {"type": "empty_map"}
+              }
+            }
+          , "then":
+            { "type": "join"
+            , "separator": " "
+            , "$1":
+              [ "-DLLVM_ENABLE_PROJECTS='clang;clang-tools-extra'"
+              , "-DLLVM_EXTERNAL_PROJECTS=iwyu"
+              , "-DLLVM_EXTERNAL_IWYU_SOURCE_DIR=${LOCALBASE}/iwyu"
+              ]
+            }
+          , "else": "-DLLVM_ENABLE_PROJECTS=clang"
+          }
+        , "-DLLVM_ENABLE_RUNTIMES='libcxx;libcxxabi;libunwind'"
+        , "-DLLVM_TARGETS_TO_BUILD=X86"
+        , "-DLLVM_PARALLEL_LINK_JOBS=1"
+        , "-DCMAKE_BUILD_TYPE=Release"
+        , "-DCMAKE_INSTALL_PREFIX="
+        , "-DLLVM_HOST_TRIPLE=${HOST_TRIPLE}"
+        , "-DLLVM_NATIVE_TARGET=ON"
+        , "-DLIBCXXABI_ENABLE_ASSERTIONS=OFF"
+        , "-DLIBUNWIND_ENABLE_ASSERTIONS=OFF"
+        , ">configure.log 2>&1 || (cat configure.log && exit 1)"
+        ]
+      }
+    , "${CMAKE} --build build --target clang -j${NJOBS} >build.log 2>&1 || (cat configure.log build.log && exit 1)"
+    , "export LDFLAGS=\"--gcc-toolchain=${GCC_TOOLCHAIN} ${LINK_ARGS}\""
+    , "${CMAKE} --build build --target all -j${NJOBS} >>build.log 2>&1 || (cat configure.log build.log && exit 1)"
+    , "${CMAKE} --build build --target install -j${NJOBS} >>build.log 2>&1 || (cat configure.log build.log && exit 1)"
+    , "cd ${DESTDIR}"
+    , "strip ./bin/* 2>/dev/null || true"
+    , "find . -type f -name '*.so*' -exec sh -c \"strip {} 2>/dev/null\" \\;"
+    , "find . -type f -name '*.a' -exec sh -c \"strip -g {}\" \\;"
+    , "find . -type f -name '*.o' -exec sh -c \"strip -g {}\" \\;"
+    , "cp -r ${GCC_TOOLCHAIN}/include/c++ ${DESTDIR}/include/."
+    , "cp -r ${GCC_TOOLCHAIN}/lib/gcc ${DESTDIR}/lib/."
+    , "cp -r ${GCC_TOOLCHAIN}/lib64/. ${DESTDIR}/lib/."
+    , "ln -s lib ${DESTDIR}/lib64"
+    , "if [ -n \"${INCL_ARGS}${LINK_ARGS}\" ]; then"
+    , "  cd ${DESTDIR}/bin"
+    , "  mv clang clang.real"
+    , "  mv clang++ clang++.real"
+    , "  printf '#!/bin/sh\\nexec $(dirname $0)/clang.real %s \"$@\"' \"${INCL_ARGS} ${LINK_ARGS}\" >clang"
+    , "  printf '#!/bin/sh\\nexec $(dirname $0)/clang++.real %s \"$@\"' \"${INCL_ARGS} ${LINK_ARGS}\" >clang++"
+    , "  chmod +x clang clang++"
+    , "fi"
+    ]
+  , "out_dirs": ["."]
+  }
+, "libstdc++":
+  { "type": ["@", "rules", "CC/prebuilt", "library"]
+  , "name": ["libstdc++"]
+  , "lib": ["libstdc++_files"]
+  , "deps": ["libgcc_s"]
+  }
+, "libc++":
+  { "type": ["@", "rules", "CC/prebuilt", "library"]
+  , "name": ["libc++"]
+  , "lib": ["libc++_files"]
+  , "deps": ["libgcc_s", "libatomic", "libc++abi", "libunwind"]
+  }
+, "libc++abi":
+  { "type": ["@", "rules", "CC/prebuilt", "library"]
+  , "name": ["libc++abi"]
+  , "lib": ["libc++abi_files"]
+  }
+, "libunwind":
+  { "type": ["@", "rules", "CC/prebuilt", "library"]
+  , "name": ["libunwind"]
+  , "lib": ["libunwind_files"]
+  }
+, "libgcc_s":
+  { "type": ["@", "rules", "CC/prebuilt", "library"]
+  , "name": ["libgcc_s"]
+  , "lib": ["libgcc_s_files"]
+  }
+, "libatomic":
+  { "type": ["@", "rules", "CC/prebuilt", "library"]
+  , "name": ["libatomic"]
+  , "lib": ["libatomic_files"]
+  }
+, "libstdc++_files":
+  { "type": ["@", "rules", "shell", "cmds"]
+  , "deps": ["toolchain"]
+  , "cmds": ["cp -L lib64/libstdc++.so.6 ."]
+  , "outs": ["libstdc++.so.6"]
+  }
+, "libc++_files":
+  { "type": ["@", "rules", "shell", "cmds"]
+  , "deps": ["toolchain"]
+  , "cmds": ["cp -L lib/$(./bin/clang -dumpmachine)/libc++.so.1 ."]
+  , "outs": ["libc++.so.1"]
+  }
+, "libc++abi_files":
+  { "type": ["@", "rules", "shell", "cmds"]
+  , "deps": ["toolchain"]
+  , "cmds": ["cp -L lib/$(./bin/clang -dumpmachine)/libc++abi.so.1 ."]
+  , "outs": ["libc++abi.so.1"]
+  }
+, "libunwind_files":
+  { "type": ["@", "rules", "shell", "cmds"]
+  , "deps": ["toolchain"]
+  , "cmds": ["cp -L lib/$(./bin/clang -dumpmachine)/libunwind.so.1 ."]
+  , "outs": ["libunwind.so.1"]
+  }
+, "libgcc_s_files":
+  { "type": ["@", "rules", "shell", "cmds"]
+  , "deps": ["toolchain"]
+  , "cmds": ["cp -L lib64/libgcc_s.so.1 ."]
+  , "outs": ["libgcc_s.so.1"]
+  }
+, "libatomic_files":
+  { "type": ["@", "rules", "shell", "cmds"]
+  , "deps": ["toolchain"]
+  , "cmds": ["cp -L lib64/libatomic.so.1 ."]
+  , "outs": ["libatomic.so.1"]
+  }
+}

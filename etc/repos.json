@@ -80,6 +80,19 @@
       , "stage-0": "rules/stage-0"
       }
     }
+  , "rules/clang_with_gcc14":
+    { "repository": "rules"
+    , "target_root": "defaults"
+    , "target_file_name": "clang.TARGETS"
+    , "rule_root": "rules"
+    , "bindings":
+      { "base": "rules/gcc"
+      , "gcc": "compilers/gcc-14.2.0-native"
+      , "cmake": "cmake-3.27.1"
+      , "python": "python-3.12.0"
+      , "stage-0": "rules/stage-0"
+      }
+    }
   , "rules/tools":
     { "repository": "rules"
     , "target_root": "defaults"
@@ -479,6 +492,24 @@
       , "iwyu": "iwyu-18"
       }
     }
+  , "compilers/clang-19.1.1-native":
+    { "repository":
+      { "type": "archive"
+      , "content": "6fbd4ba1578adadde3ab0d215c93bbda30be61c5"
+      , "fetch": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-19.1.1.tar.gz"
+      , "sha256": "115dfd98a353d05bffdab3f80db22f159da48aca0124e8c416f437adcd54b77f"
+      , "subdir": "llvm-project-llvmorg-19.1.1"
+      , "pragma": {"special": "resolve-partially"}
+      }
+    , "target_root": "compilers"
+    , "target_file_name": "clang-19-native.TARGETS"
+    , "bindings":
+      { "rules": "rules/clang_with_gcc14"
+      , "binutils": "imports/binutils-latest"
+      , "patches": "patches"
+      , "iwyu": "iwyu-19"
+      }
+    }
   , "tools/busybox-1.36.1":
     { "repository":
       { "type": "archive"
@@ -575,7 +606,12 @@
   , "clang-latest-native":
     { "repository": "toolchains"
     , "target_file_name": "clang.TARGETS"
-    , "bindings": {"rules": "rules", "clang": "compilers/clang-18.1.8-native"}
+    , "bindings": {"rules": "rules", "clang": "compilers/clang-19.1.1-native"}
+    }
+  , "clang-19.1.1-native":
+    { "repository": "toolchains"
+    , "target_file_name": "clang.TARGETS"
+    , "bindings": {"rules": "rules", "clang": "compilers/clang-19.1.1-native"}
     }
   , "clang-18.1.8-native":
     { "repository": "toolchains"
@@ -715,6 +751,15 @@
       , "compiler": "clang-latest-native"
       }
     }
+  , "clang-19.1.1-native+tools":
+    { "repository": "toolchains"
+    , "target_file_name": "compiler+tools.TARGETS"
+    , "bindings":
+      { "rules": "rules"
+      , "tools": "tools-all"
+      , "compiler": "clang-19.1.1-native"
+      }
+    }
   , "clang-18.1.8-native+tools":
     { "repository": "toolchains"
     , "target_file_name": "compiler+tools.TARGETS"
@@ -813,6 +858,17 @@
       , "fetch": "https://github.com/include-what-you-use/include-what-you-use/archive/refs/tags/0.22.tar.gz"
       , "sha256": "34c7636da2abe7b86580b53b762f5269e71efff460f24f17d5913c56eb99cb7c"
       , "subdir": "include-what-you-use-0.22"
+      }
+    , "target_file_name": "iwyu.TARGETS"
+    , "target_root": "imports"
+    }
+  , "iwyu-19":
+    { "repository":
+      { "type": "archive"
+      , "content": "66888a7220ad0939788b49e12fe1909b68483ee7"
+      , "fetch": "https://github.com/include-what-you-use/include-what-you-use/archive/refs/tags/0.23.tar.gz"
+      , "sha256": "16672743fdf781d7db313f48c7f4b34bc6517eddfd92d7db793790fe793a306c"
+      , "subdir": "include-what-you-use-0.23"
       }
     , "target_file_name": "iwyu.TARGETS"
     , "target_root": "imports"

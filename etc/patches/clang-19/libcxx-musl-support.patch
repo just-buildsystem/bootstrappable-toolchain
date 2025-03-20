@@ -1,0 +1,57 @@
+From cfceef12ffa2963ffc32a0e2797dfc7e5ff7a2ac Mon Sep 17 00:00:00 2001
+From: Oliver Reiche <oliver.reiche@huawei.com>
+Date: Thu, 20 Mar 2025 12:05:42 +0200
+Subject: [PATCH] libcxx: Add musl support for __locale
+
+... which does not provide a known rune table and uses
+missing locale-based string to integer conversion functions.
+---
+ libcxx/include/__locale | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
+
+diff --git a/libcxx/include/__locale b/libcxx/include/__locale
+index 3ba7ac1..98563b6 100644
+--- a/libcxx/include/__locale
++++ b/libcxx/include/__locale
+@@ -27,6 +27,38 @@
+ #include <cstddef>
+ #include <cstring>
+ 
++// Detect musl libc (inspired by musl detection from gcc's config.guess)
++#include <features.h>
++#if !(defined(__UCLIBC__) || defined(__dietlibc__) || defined(__GLIBC__))
++# include <stdarg.h>
++# ifdef __DEFINED_va_list
++#  ifndef __MUSL_LIBC__
++#   define __MUSL_LIBC__
++#  endif
++# endif
++#endif
++
++#ifdef __MUSL_LIBC__
++// Fall back to default rune table for musl libc
++# ifndef _LIBCPP_PROVIDES_DEFAULT_RUNE_TABLE
++#  define _LIBCPP_PROVIDES_DEFAULT_RUNE_TABLE
++# endif
++// Implement missing strto*_l functions for musl libc
++# define __MUSL_LIBC_CREATE_STRTOX_L(X) \
++  static inline auto \
++  strto ## X ## _l(const char* str, char** end, int base, locale_t l) { \
++    locale_t old = uselocale(l); \
++    auto result = strto ## X(str, end, base); \
++    uselocale(old); \
++    return result; \
++  }
++__MUSL_LIBC_CREATE_STRTOX_L(l)
++__MUSL_LIBC_CREATE_STRTOX_L(ll)
++__MUSL_LIBC_CREATE_STRTOX_L(ul)
++__MUSL_LIBC_CREATE_STRTOX_L(ull)
++# undef __MUSL_LIBC_CREATE_STRTOX_L
++#endif
++
+ #ifndef _LIBCPP_HAS_NO_WIDE_CHARACTERS
+ #  include <cwchar>
+ #else
+-- 
+2.30.2
+
