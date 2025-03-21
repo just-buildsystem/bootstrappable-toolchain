@@ -8,4 +8,5 @@
 , "clang-17": {"type": "install", "deps": [["TREE", null, "clang-17"]]}
 , "clang-18": {"type": "install", "deps": [["TREE", null, "clang-18"]]}
 , "clang-19": {"type": "install", "deps": [["TREE", null, "clang-19"]]}
+, "clang-20": {"type": "install", "deps": [["TREE", null, "clang-20"]]}
 }
