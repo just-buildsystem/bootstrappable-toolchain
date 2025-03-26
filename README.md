@@ -77,20 +77,31 @@ All provided toolchains can be
 ### 1. Importing toolchains to Justbuild projects
 
 If your project includes its toolchain via an open name (usually a repository
-named `toolchain`), you can create that repository by importing any of the
-provided toolchains (e.g., `gcc-latest-musl+tools`) with the tool
-`just-import-git`:
+named `toolchain`), you can create that repository by adding the following code
+to the *imports section* of your `repos.in.json`:
 
-~~~ sh
-$ just-import-git -C repos.template.json --as toolchain -b master \
-    https://github.com/just-buildsystem/bootstrappable-toolchain gcc-latest-musl+tools \
-    > repos.json
+~~~ jsonc
+"imports": [
+  {
+    "source": "git",
+    "branch": "master",
+    "url": "https://github.com/just-buildsystem/bootstrappable-toolchain",
+    "repos": [{"repo": "gcc-latest-musl+tools", "alias": "toolchain"}]
+  },
+  // ...
+],
 ~~~
+
+Afterwards, run `just-lock` to generate the updated `repos.json` repository
+lock-file.
 
 ### 2. Obtaining a portable toolchain
 
-You can install a portable version of any provided toolchain (e.g.,
-`gcc-latest-musl`) to your local disk with:
+You can obtain a portable installation of any of the provided toolchains to your
+local disk.
+
+To do so, first clone this repository and run `just-mr` to build and install
+the requested toolchain (e.g., `gcc-latest-musl`):
 
 ~~~ sh
 $ just-mr --main gcc-latest-musl install toolchain -D'{"ARCH":"x86_64"}' -o /opt/gcc
