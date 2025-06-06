@@ -10,6 +10,7 @@
   , "CC": ["clang/bin/clang"]
   , "CXX": ["clang/bin/clang++"]
   , "AR": ["clang/bin/ar"]
+  , "DWP": ["clang/bin/dwp"]
   , "CXXFLAGS":
     { "type": "if"
     , "cond":

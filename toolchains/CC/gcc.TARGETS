@@ -10,6 +10,7 @@
   , "CC": ["gcc/bin/gcc"]
   , "CXX": ["gcc/bin/g++"]
   , "AR": ["gcc/bin/ar"]
+  , "DWP": ["gcc/bin/dwp"]
   , "LDFLAGS":
     { "type": "if"
     , "cond":

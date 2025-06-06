@@ -47,8 +47,8 @@ final linking is done via custom compile commands.
 ### 4. Binutils
 
 Building binutils requires the Busybox "essentials", `make`, and `ar` from the
-previous steps. This *full collection* of binutils includes `ar`, `as`, `ld`,
-`ranlib`, `strip`, and more.
+previous steps. This *full collection* of binutils includes `ar`, `as`, `dwp`,
+`ld`, `ranlib`, `strip`, and more.
 
 ### 5. GCC 4.7.4
 
