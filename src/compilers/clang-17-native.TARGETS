@@ -170,6 +170,18 @@
                           }
                         , "then": ["clang-tools-extra"]
                         }
+                      , { "type": "if"
+                        , "cond":
+                          { "type": "lookup"
+                          , "key": "INCLUDE_LLD"
+                          , "map":
+                            { "type": "var"
+                            , "name": "TOOLCHAIN_CONFIG"
+                            , "default": {"type": "empty_map"}
+                            }
+                          }
+                        , "then": ["lld"]
+                        }
                       ]
                     }
                   }

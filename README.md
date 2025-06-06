@@ -195,6 +195,8 @@ Fields for building the toolchains:
   `clang-tidy`. Additionally, Clang versions `18` and newer will also include
   the *external project*
   [Include What You Use](https://github.com/include-what-you-use/include-what-you-use).
+- `INCLUDE_LLD`:
+  For `clang` toolchains, add the LLD linker to toolchain. (default: `false`)
 
 Fields for using the toolchains
 (within [Justbuild](https://github.com/just-buildsystem/justbuild) projects):
