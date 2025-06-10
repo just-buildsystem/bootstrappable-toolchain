@@ -192,7 +192,7 @@ Fields for building the toolchains:
 - `INCLUDE_LINTER`:
   Add linter to toolchain if supported. (default: `false`)  
   Currently this option is only supported by `clang` toolchains, adding
-  `clang-tidy`. Additionally, Clang versions `18` and `19` will also include
+  `clang-tidy`. Additionally, Clang versions `18` and newer will also include
   the *external project*
   [Include What You Use](https://github.com/include-what-you-use/include-what-you-use).
 

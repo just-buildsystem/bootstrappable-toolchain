@@ -525,6 +525,7 @@
       { "rules": "rules/clang_with_gcc14"
       , "binutils": "imports/binutils-latest"
       , "patches": "patches"
+      , "iwyu": "iwyu-20"
       }
     }
   , "tools/busybox-1.36.1":
@@ -900,6 +901,17 @@
       , "fetch": "https://github.com/include-what-you-use/include-what-you-use/archive/refs/tags/0.23.tar.gz"
       , "sha256": "16672743fdf781d7db313f48c7f4b34bc6517eddfd92d7db793790fe793a306c"
       , "subdir": "include-what-you-use-0.23"
+      }
+    , "target_file_name": "iwyu.TARGETS"
+    , "target_root": "imports"
+    }
+  , "iwyu-20":
+    { "repository":
+      { "type": "archive"
+      , "content": "7fc1e96d2aaab23daa3783c82a9214db4dbb3c52"
+      , "fetch": "https://github.com/include-what-you-use/include-what-you-use/archive/refs/tags/0.24.tar.gz"
+      , "sha256": "897b4c864a983f493c8efef4a1a9a2d429fd7ead1011f7a41743ed7b6dbe8c2e"
+      , "subdir": "include-what-you-use-0.24"
       }
     , "target_file_name": "iwyu.TARGETS"
     , "target_root": "imports"
