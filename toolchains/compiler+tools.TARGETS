@@ -1,4 +1,10 @@
 { "toolchain":
+  { "type": "export"
+  , "target": "toolchain (unexported)"
+  , "flexible_config":
+    ["ARCH", "TARGET_ARCH", "TOOLCHAIN_CONFIG", "ENV", "BUILD_ARCH"]
+  }
+, "toolchain (unexported)":
   { "type": "install"
   , "dirs":
     [ [["@", "tools", "", "toolchain"], "."]
