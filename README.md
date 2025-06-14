@@ -227,6 +227,9 @@ Example configuration for bootstrapping on NixOS (hashes may vary):
 }
 ~~~
 
+On NixOS, the host configuration is most easily obtained using a custom derivation
+obtained from a simple [host-configuration package](doc/host-config.nix).
+
 ## Musl Performance Issues
 
 Musl has huge allocator contention issues with multithreading. For that reason,
