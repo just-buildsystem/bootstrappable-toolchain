@@ -186,7 +186,7 @@
     { "repository":
       { "type": "archive"
       , "content": "62fb991131420c31d94e7e992c9ba798e8de866f"
-      , "fetch": "https://www.mpfr.org/mpfr-current/mpfr-4.2.1.tar.xz"
+      , "fetch": "https://www.mpfr.org/mpfr-4.2.1/mpfr-4.2.1.tar.xz"
       , "sha256": "277807353a6726978996945af13e52829e3abd7a9a5b7fb2793894e18f1fcbb2"
       , "subdir": "mpfr-4.2.1"
       }
